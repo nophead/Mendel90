@@ -49,7 +49,7 @@ def sheets(machine):
                         # Run openscad on the created file
                         #
                         dxf_name = target_dir + "/" + module[:-4] + ".dxf"
-                        subprocess.call(["openscad_cl", "-o", dxf_name, dxf_maker_name])
+                        subprocess.call(["openscad", "-o", dxf_name, dxf_maker_name])
                         dxf_to_svg(dxf_name)
 
 if __name__ == '__main__':

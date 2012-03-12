@@ -95,8 +95,10 @@ def boms(machine):
     f. write("include <%s_config.scad>\n" % machine);
     f.close()
 
-    subprocess.call(["openscad_cl", "-o", "dummy.stl", "scad/bom.scad"])
+    log = open("openscad.log", "w")
+    subprocess.call(["openscad", "-o", "dummy.csg", "scad/bom.scad"], stdout = log, stderr = log)
     print "Generating bom ...",
+    log.close()
 
     main = BOM()
     stack = []
