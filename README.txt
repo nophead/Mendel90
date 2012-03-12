@@ -1,8 +1,6 @@
 Limitations
 -----------
 Currently only supports mendel and sturdy machine varients, the huxley version needs more work.
-Only builds on Windows, using the version of openscad.exe included and the openscad_cl.exe wrapper.
-
 
 Use
 ---
