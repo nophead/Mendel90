@@ -1,5 +1,5 @@
 import os
-import subprocess
+import openscad
 import shutil
 import sys
 
@@ -58,7 +58,7 @@ def stls(machine):
                         # Run openscad on the created file
                         #
                         stl_name = target_dir + "/" + module[:-4] + ".stl"
-                        subprocess.call(["openscad", "-o", stl_name, stl_maker_name])
+                        openscad.run("-o", stl_name, stl_maker_name)
                         targets.remove(module)
 
     #

@@ -1,7 +1,7 @@
 import os
-import subprocess
 import sys
 import shutil
+import openscad
 
 class BOM():
     def __init__(self):
@@ -95,10 +95,8 @@ def boms(machine):
     f. write("include <%s_config.scad>\n" % machine);
     f.close()
 
-    log = open("openscad.log", "w")
-    subprocess.call(["openscad", "-o", "dummy.csg", "scad/bom.scad"], stdout = log, stderr = log)
+    openscad.run("-o", "dummy.csg", "scad/bom.scad")
     print "Generating bom ...",
-    log.close()
 
     main = BOM()
     stack = []
