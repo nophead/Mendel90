@@ -181,12 +181,12 @@ function extruder_connector_height() = motor_y - d_motor_bracket_offset(NEMA17);
 
 module wades_big_gear_stl() {
     stl("wades_big_gear");
-    color([0,1,0]) import("../imported_stls/39t17p.stl");
+    color(wades_big_gear_color) import("../imported_stls/39t17p.stl");
 }
 
 module wades_small_gear_stl() {
     stl("wades_small_gear");
-    color([1,0,0])
+    color(wades_small_gear_color)
         translate([-10, -10, 0])
             import("../imported_stls/wades_gear.stl");
 }
@@ -238,7 +238,7 @@ module wades_idler_block_stl() {
 
 module wade_idler_assembly() {
 
-    color([0,1,0]) render() wades_idler_block_stl();
+    color(wades_idler_block_color) render() wades_idler_block_stl();
 
     translate([0, 0, idler_height - 2])
         rotate([90, 0, 0]) {
@@ -307,7 +307,7 @@ module wades_assembly() {
             ball_bearing(BB608);
 
         rotate([180, 0, 0])
-            color([1,0,0]) render() wades_gear_spacer_stl();
+            color(wades_gear_spacer_color) render() wades_gear_spacer_stl();
 
         translate([0, 0, -7.5])
             rotate([180, 0, 0])
@@ -330,9 +330,9 @@ module wades_assembly() {
 
     translate([75, 5 - nozzle_length / 4, 15])
         rotate([-90, 0, 0]) {
-            color([0.6, 0.5, 0.2]) cylinder(h = nozzle_length / 2 + 10, r = insulator_diameter(hot_end) / 2, center = true);
+            color(filament_viz_color) cylinder(h = nozzle_length / 2 + 10, r = insulator_diameter(hot_end) / 2, center = true);
             translate([0, 0, -nozzle_length /2 - 5])
-                color([1, 1, 0]) cylinder(h = nozzle_length / 2, r = 3, center = true);
+                color(extruder_nozzle_color) cylinder(h = nozzle_length / 2, r = 3, center = true);
         }
 
     for(side = [-1, 1])

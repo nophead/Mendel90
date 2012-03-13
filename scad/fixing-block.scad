@@ -86,7 +86,7 @@ module fixing_block_stl() {
 }
 
 module fixing_block_assembly(front = false) {
-    color([0,1,0]) render() fixing_block_stl();
+    color(fixing_block_color) render() fixing_block_stl();
     fixing_block_v_hole(height - counter_bore_depth)
         if(front)
             frame_screw(thickness);

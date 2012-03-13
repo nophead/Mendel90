@@ -16,12 +16,12 @@ module pillar(type) {
     height = pillar_height(type);
 
     vitamin(str("pillar M", type[0], "x", height));
-    color([0.9,0.9,0.9]) render() difference() {
+    color(pillar_color) render() difference() {
         cylinder(h = height, r = type[2] / 2);
         translate([0,0, height])
             cylinder(h = type[3] * 2, r = type[0] / 2, center = true);
     }
-    color([1,1,0]) render() cylinder(h = type[3] * 2, r = type[0] / 2, center = true);
+    color(pillar_liner_color) render() cylinder(h = type[3] * 2, r = type[0] / 2, center = true);
 
 }
 
@@ -29,7 +29,7 @@ module hex_pillar(type) {
     height = pillar_height(type);
 
     vitamin(str("HP0", type[0], height, " : Hex pillar M", type[0], " x ", height));
-    color([0.9,0.9,0.9]) render() difference() {
+    color(pillar_color) render() difference() {
         union() {
             cylinder(h = height, r = type[2] / 2, $fn = 6);
             cylinder(h = type[3] * 2, r = type[0] / 2, center = true);

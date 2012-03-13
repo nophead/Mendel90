@@ -267,7 +267,7 @@ module y_axis_assembly(show_bed) {
 
             translate([0, cable_clamp_y, carriage_top])
                 rotate([180, 0, 0])
-                    color([1,0,0]) render() ribbon_clamp(bed_ways, cap_screw);
+                    color(ribbon_clamp_color) render() ribbon_clamp(bed_ways, cap_screw);
 
             translate([0, cable_clamp_y, carriage_bottom])
                 rotate([180, 0, 0])
@@ -608,7 +608,7 @@ module bed_fan_assembly() {
                 fan_assembly(case_fan, sheet_thickness(frame) + fan_guard_thickness());
 
             translate([0, 0, sheet_thickness(frame) / 2])
-                color([0,1,0]) render() fan_guard(case_fan);
+                color(fan_guard_color) render() fan_guard(case_fan);
         }
     end("bed_fan_assembly");
 }

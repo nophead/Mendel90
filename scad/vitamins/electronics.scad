@@ -13,6 +13,8 @@ function sanguinololu_length() = 4 * 25.4;
 
 module sanguinololu() {
     vitamin("SANGUINOL: Electronics e.g. Sanguinolou");
+	
+    color(sanguinololu_color)
     import("../imported_stls/sanguinololu.stl");
 }
 
@@ -38,7 +40,7 @@ function psu_hole_list(type) = type[4];
 
 module psu(type) {
     vitamin(str(psu_name(type),": PSU e.g. ", psu_name(type)));
-    color([0.8, 0.8, 0.8])
+    color(psu_color)
         translate([0,0, psu_height(type) / 2])
             cube([psu_length(type), psu_width(type), psu_height(type)], center = true);
 

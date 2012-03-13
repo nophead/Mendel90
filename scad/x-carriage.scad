@@ -376,7 +376,7 @@ module x_carriage_stl(){
 module x_carriage_assembly(show_extruder = false) {
     assembly("x_carriage_assembly");
 
-    color([1,0,0]) render() x_carriage_stl();
+    color(x_carriage_color) render() x_carriage_stl();
 
     if(show_extruder)
         translate([75, 15, eta])
@@ -404,7 +404,7 @@ module x_carriage_assembly(show_extruder = false) {
     //
     translate([length / 2 + base_offset, -width / 2, x_carriage_offset() - ball_bearing_diameter(X_idler_bearing) / 2]) {
         mirror([1,0,0])
-            color([0,1,0]) render() x_belt_clamp_stl();
+            color(x_belt_clamp_color) render() x_belt_clamp_stl();
         translate([-lug_width / 2, lug_screw, clamp_thickness])
             nut(M3_nut, true);
     }
@@ -420,7 +420,7 @@ module x_carriage_assembly(show_extruder = false) {
             nut(M3_nut, true);
 
     translate([-length / 2 + base_offset, -width / 2, -(clamp_thickness + belt_thickness(X_belt))]) {
-        color([0,1,0]) render() x_belt_grip_stl();
+        color(x_belt_clamp_color) render() x_belt_grip_stl();
         translate([lug_width / 2, lug_screw, 0])
             rotate([180, 0, 0])
                 screw_and_washer(M3_cap_screw, 25);
@@ -432,7 +432,7 @@ module x_carriage_assembly(show_extruder = false) {
 
         translate([25 + wall, belt_tensioner_height / 2, 0])
             rotate([90, 180, 0])
-                color([0,1,0]) render() x_belt_tensioner_stl();
+                color(x_belt_clamp_color) render() x_belt_tensioner_stl();
 
         translate([25 + wall, 0, 0])
             rotate([90, 180, 0])

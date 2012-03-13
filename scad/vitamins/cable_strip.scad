@@ -23,7 +23,7 @@ module cable_strip(width, depth, travel, x, extra = 15) {
 
     vitamin(str("PP", thickness * 10, w, total,": Polypropylene strip ", total, "mm x ", w, "mm x ", thickness, "mm"));
 
-    color([1,0,1]) render() linear_extrude(height = w, center = true, convexity = 4)
+    color(cable_strip_color) render() linear_extrude(height = w, center = true, convexity = 4)
         difference() {
             union() {
                 translate([-bottom, radius])
@@ -79,7 +79,7 @@ module elliptical_cable_strip(width, p1, p2, pmax, extra = 15) {
                          [delta[2] / delta[0], 0, 1, delta[2] / 2],
                          [0, 0, 0, 1] ])
 
-        color([1,0,1]) render() linear_extrude(height = w, center = true, convexity = 4)
+        color(cable_strip_color) render() linear_extrude(height = w, center = true, convexity = 4)
             difference() {
                 union()  {
                     square([(a + thickness) * 2, extra * 2], center = true);

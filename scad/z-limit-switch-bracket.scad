@@ -129,7 +129,7 @@ module z_limit_switch_assembly() {
 
     translate([0, 0, pos]) {
         rotate([90, 0, 0])
-            color([0, 1, 0]) render()
+            color(z_limit_switch_bracket_color) render()
                 z_limit_switch_bracket_stl();
 
         translate([screw_x - screw_head_height(M3_hex_screw), -screw_y, screw_z])

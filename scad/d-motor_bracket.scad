@@ -251,12 +251,12 @@ module d_shell_assembly(motor) {
                d_width / 2 + d_motor_bracket_offset(motor),
                 -NEMA_length(NEMA17) - length - shell_length  - d_mate_distance(connector) + overlap])
         rotate([0, -90, 180])  {
-            color([0,1,0]) render() d_shell_stl();
+            color(d_shell_color) render() d_shell_stl();
             translate([0, d_width / 2, height + lid_thickness])
                 translate([length, 0, 0])
                     explode([0, 0, 40])
                         translate([-length, 0, 0])
-                            color([1,0,0]) render() rotate([180, 0, 0]) d_shell_lid_stl(motor);
+                            color(d_shell_lid_color) render() rotate([180, 0, 0]) d_shell_lid_stl(motor);
 
             for(side = [-1, 1]) {
                 translate([shell_length - shell_front, d_width / 2 - side * pitch / 2, thickness + slot_height / 2]) //connector screws
@@ -277,12 +277,12 @@ module d_shell_assembly(motor) {
 module d_motor_bracket_assembly(motor) {
     rotate([0, 90, 0])
         translate([NEMA_length(NEMA17) - overlap, -NEMA_width(NEMA17) / 2 - thickness, -NEMA_width(NEMA17) / 2 - thickness]) {
-            color([0,1,0]) render() d_motor_bracket_stl(NEMA17);
+            color(d_motor_bracket_color) render() d_motor_bracket_stl(NEMA17);
             translate([0, NEMA_width(NEMA17) / 2 + d_motor_bracket_offset(NEMA17) + thickness, height + lid_thickness])
                 translate([length, 0, 0])
                     explode([0, 0, 40])
                         translate([-length, 0, 0])
-                            color([1,0,0]) render() rotate([180, 0, 0]) d_motor_bracket_lid_stl(motor);
+                            color(d_motor_bracket_lid_color) render() rotate([180, 0, 0]) d_motor_bracket_lid_stl(motor);
         }
 
     translate([-NEMA_width(motor) / 2 + slot_height / 2,  d_motor_bracket_offset(motor), -NEMA_length(motor) + overlap]) {

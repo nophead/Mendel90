@@ -31,13 +31,13 @@ module NEMA(motor) {
     cap = 8;
     vitamin(str("NEMA", round(motor[0] / 2.54), length * 10, ": NEMA", round(motor[0] / 2.54), " x ", length, " stepper motor"));
     union() {
-        color([0,0,0]) render()                                                     // black laminations
+        color(stepper_body_color) render()                                                     // black laminations
             translate([0,0, -length / 2])
                 intersection() {
                     cube([side, side, length - cap * 2],center = true);
                     cylinder(r = body_rad, h = 2 * length, center = true);
                 }
-        color([0.5,0.5,0.5]) render() {                                     // aluminium end caps
+        color(stepper_cap_color) render() {                                     // aluminium end caps
             difference() {
                 union() {
                     intersection() {

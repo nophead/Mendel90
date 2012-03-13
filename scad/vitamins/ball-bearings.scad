@@ -17,7 +17,7 @@ module ball_bearing(type) {
     vitamin(str("BB",type[3],": Ball bearing ",type[3]," ",type[0], " x ", type[1], " x ", type[2]));
     rim = type[1] / 10;
 
-    color([0.7,0.7,0.7]) render() difference() {
+    color(bearing_color) render() difference() {
         cylinder(r = type[1] / 2, h = type[2], center = true);
         cylinder(r = type[0] / 2, h = type[2] + 1, center = true);
         for(z = [-type[2] / 2, type[2] / 2])

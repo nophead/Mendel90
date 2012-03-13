@@ -40,7 +40,7 @@ module y_belt_anchor(height, toothed) {
     recess = length - depth;
 
     stl(str("y_belt_anchor", toothed ? "_toothed" : ""));
-    color([0,1,0])  union() {
+    color(y_belt_anchor_color)  union() {
         difference() {
             union() {
                 translate([0, depth / 2, h / 2])                                                        // tall bit
@@ -86,7 +86,7 @@ module y_belt_anchor(height, toothed) {
 module y_belt_clip(toothed) {
     stl(str("y_belt_clip",  toothed ? "_toothed" : ""));
 
-    color([1, 0, 0]) union() {
+    color(y_belt_clip_color) union() {
         translate([0, 0, clamp_thickness / 2]) difference() {
             rounded_rectangle([width, depth, clamp_thickness], r = rad);
 
@@ -104,11 +104,11 @@ module y_belt_clip(toothed) {
 module y_belt_anchor_assembly(height, toothed) {
     //assembly("y_belt_anchor_assembly");
 
-    color([0, 1, 0]) render() y_belt_anchor(height, toothed);
+    color(y_belt_anchor_color) render() y_belt_anchor(height, toothed);
 
     translate([0, depth / 2, height + belt_thickness(Y_belt) + clamp_thickness]) {
         rotate([180, 0, 0])
-            color([1, 0, 0]) render() y_belt_clip(!toothed);
+            color(y_belt_clip_color) render() y_belt_clip(!toothed);
         //
         // Clamp screws
         //

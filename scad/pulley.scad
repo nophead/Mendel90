@@ -9,13 +9,13 @@ include <conf/config.scad>
 
 module pulley_stl() {
     stl("pulley");
-    color([1,0,0])
+    color(pulley_color)
         translate([-10, -10, 0])
             import("../imported_stls/pulley.stl");
 }
 
 module pulley_assembly() {
-    color([1,0,0]) render() pulley_stl();
+    color(pulley_color) render() pulley_stl();
     rotate([90, 0, 0]) {
         translate([0, 4, -5/2 - 6])
             screw(M3_grub_screw, 6);
