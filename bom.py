@@ -3,7 +3,7 @@ import sys
 import shutil
 import openscad
 
-class BOM():
+class BOM:
     def __init__(self):
         self.count = 1
         self.vitamins = {}
