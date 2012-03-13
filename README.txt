@@ -9,7 +9,7 @@ To make all the files for a machine run
 
 To make just the bom, sheets or stls run bom.py, sheets.py or stls.py
 
-machine_name can be mendel or sturdy. To make your own variant copy scad\conf\mendel.scad or scad\conf\sturdy to yourname_config.scad.
+machine_name can be mendel or sturdy. To make your own variant copy scad\conf\mendel_config.scad or scad\conf\sturdy_config to yourname_config.scad.
 
 To view the whole machine model open scad\main.scad. It will take about 8 miniutes to render but after that you can pan and zoom it
 at reasonable speed and changes takes less time to render.
