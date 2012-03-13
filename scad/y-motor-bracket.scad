@@ -27,7 +27,7 @@ module y_motor_bracket() {
     width = y_motor_bracket_width();
 
     stl("y_motor_bracket");
-        color([0,1,0]) {
+        color(y_motor_bracket_color) {
             difference() {
                 translate([0, 0, thickness - depth / 2])                    // main body
                     cube([width, height, depth], center = true);
@@ -75,7 +75,7 @@ module y_motor_bracket_holes()
 module y_motor_assembly() {
     assembly("y_motor_assembly");
 
-    color([0,1,0]) render() y_motor_bracket();
+    color(y_motor_bracket_color) render() y_motor_bracket();
     //
     // Mounting screws and washers
     //

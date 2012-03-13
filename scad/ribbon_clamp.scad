@@ -51,7 +51,7 @@ module ribbon_clamp(ways, screw_type) {
 }
 
 module ribbon_clamp_assembly(ways, screw_type, screw_length, panel_thickness = 0, vertical = false, washer = false) {
-    color([1,0,0])
+    color(ribbon_clamp_color)
         render() rotate([180, 0, 0])
             ribbon_clamp(ways, screw_type);
 

@@ -25,7 +25,7 @@ module pcb_spacer_stl(screw = M3_cap_screw, h = pcb_spacer_height()) {
 }
 
 module pcb_spacer_assembly() {
-    color([0,1,0]) render() pcb_spacer_stl();
+    color(pcb_spacer_color) render() pcb_spacer_stl();
     translate([0,0, pcb_spacer_height() + pcb_thickness])
         screw_and_washer(M3_cap_screw, pcb_screw_length, !frame_nuts);
 

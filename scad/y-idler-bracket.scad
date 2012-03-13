@@ -31,7 +31,7 @@ height = axel_height + dia / 2;
 module y_idler_bracket_stl() {
     stl("y_idler_bracket");
 
-    color([0,1,0]) intersection() {
+    color(y_idler_bracket_color) intersection() {
         difference() {
             rotate([90, 0, 90])
                 linear_extrude(height = width, center = true)                                               //side profile
@@ -79,7 +79,7 @@ module y_idler_screw_hole()
 module y_idler_assembly() {
     assembly("y_idler_assembly");
 
-    color([0,1,0]) render() y_idler_bracket_stl();
+    color(y_idler_bracket_color) render() y_idler_bracket_stl();
 
     translate([0, 0, axel_height]) rotate([0, -90, 0]) {
 

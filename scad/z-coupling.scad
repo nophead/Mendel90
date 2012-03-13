@@ -35,7 +35,7 @@ rad = M3_nut_radius + wall;
 module z_coupling_stl(){
     stl("z_coupling");
 
-    color([1,0,0]) translate([0, 0, depth / 2]) union() {
+    color(z_coupling_color) translate([0, 0, depth / 2]) union() {
         difference(){
             linear_extrude(height = depth, center = true)
                 hull() {
@@ -89,7 +89,7 @@ module z_coupler_assembly() {
         explode([10 * side, 0, 0])
             translate([centre_line * side, 0, 0])
                 rotate([0, 90, 90 * side + 90]) {
-                    color([1,0,0]) render() translate([0, 0, -depth/2]) z_coupling_stl();
+                    color(z_coupling_color) render() translate([0, 0, -depth/2]) z_coupling_stl();
                     for(pos = [[holeX, -holeY1], [-holeX, -holeY2]])
                         translate([pos[0], pos[1], -depth/2])
                             rotate([180, 0, 0])

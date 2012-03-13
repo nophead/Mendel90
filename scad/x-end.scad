@@ -460,7 +460,7 @@ module x_end_assembly(motor_end) {
     //
     // RP bit
     //
-    color([0,1,0]) render() x_end_bracket(motor_end, true);
+    color(x_end_bracket_color) render() x_end_bracket(motor_end, true);
     //
     // bearings
     //

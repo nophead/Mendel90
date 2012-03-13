@@ -28,20 +28,20 @@ include <../vitamins/electronics.scad>
 
 module rod(d , l) {
     vitamin(str("RD", d, round(l), ": Smooth rod ", d, " x ", round(l)));
-    color([0.8,0.8,0.8])
+    color(rod_color)
         cylinder(r = d / 2, h = l, center = true);
 }
 
 module studding(d , l) {
     vitamin(str("ST", d, round(l),": Threaded rod ", d, " x ", round(l)));
-    color([0.5,0.5,0.5])
+    color(studding_color)
         cylinder(r = d / 2, h = l, center = true);
 }
 
 
 module tubing(od, id, length) {
     vitamin(str("TB", od, id, length,": Tubing OD ",od, " ID ", id," x ",length));
-    color([0.8, 0.8, 0.8, 0.75]) render() difference() {
+    color(tubing_color) render() difference() {
         cylinder(r = od / 2, h = length,    center = true);
         cylinder(r = id / 2, h = length + 1, center = true);
     }

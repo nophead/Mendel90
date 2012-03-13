@@ -103,7 +103,7 @@ module z_motor_bracket_stl() {
 module z_motor_assembly() {
     assembly("z-motor-assembly");
 
-    color([0,1,0]) render() z_motor_bracket_stl();
+    color(z_motor_bracket_color) render() z_motor_bracket_stl();
     //
     // Clamp screw and washer
     //

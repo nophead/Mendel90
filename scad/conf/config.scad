@@ -7,11 +7,17 @@
 //
 // Configuration file
 //
+
+include <colors.scad>
+
 bom = 2;                        // 0 no bom, 1 assemblies and stls, 2 vitamins as well
 exploded = false;               // true for exploded view
 eta = 0.01;                     // small fudge factor to stop CSG barfing on coincident faces.
 $fa = 5;
 $fs = 0.5;
+
+glass_thickness = 2;
+
 //
 // Hole sizes
 //
