@@ -5,7 +5,7 @@ import sys
 
 source_dir = "scad"
 
-def stls(machine):
+def stls(machine, parts = None):
     #
     # Make the target directory
     #
@@ -30,7 +30,8 @@ def stls(machine):
         if words:
             last_word = words[-1]
             if len(last_word) > 4 and last_word[-4:] == ".stl":
-                targets.append(last_word.replace(".stl", "_stl"))
+                if not parts or (last_word in parts):
+                    targets.append(last_word.replace(".stl", "_stl"))
 
 
     #
@@ -69,7 +70,7 @@ def stls(machine):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        stls(sys.argv[1])
+        stls(sys.argv[1], sys.argv[2:])
     else:
-        print "usage: stls [mendel|sturdy|your_machine]"
+        print "usage: stls [mendel|sturdy|your_machine] [part.stl ...]"
     sys.exit(1)
