@@ -39,7 +39,7 @@ module microswitch_contact_space() {
 module microswitch() {
     vitamin("SMMICRO: Microswitch");
     translate([-(5.1 + 9.5 - 7.5), -(8.4 + 2.5), -3.2 + (exploded ? 5 : 0)]) {   // put operating point of button at the origin
-        color([0,0,0]) render() difference() {              // main body
+        color(microswitch_color) render() difference() {              // main body
             cube([19.8, 10.2, 6.4]);
             translate([10, 9.5, -1])
                 cube([19.8, 10.2, 8]);                      // lower half of top
@@ -48,7 +48,7 @@ module microswitch() {
             translate([5.1 + 9.5, 2.5, -1])
                 cylinder(r = 2.35 / 2, h = 8);
         }
-        color([1,0.7,0]) render()                           // orange button
+        color(microswitch_button_color) render()                           // orange button
             translate([5.1 + 9.5 - 7.5,8.4 + 2.5 - 0.5,1.6])
                 linear_extrude(height = 3.2)
                     hull() {
@@ -56,7 +56,7 @@ module microswitch() {
                         translate([0,-4])
                             circle(r = 1);
                     }
-        color([1,1,0])  render()                            // yellow contacts
+        color(microswitch_contact_color)  render()                            // yellow contacts
             for(x = [1.6, 1.6 + 8.8, 1.6 + 8.8 + 7.3])
                 translate([x, 2.5 - 6.4, 1.6])
                     difference() {

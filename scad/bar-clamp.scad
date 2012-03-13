@@ -51,7 +51,7 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
     sbracket_thickness = 7;
     sbracket_height = microswitch_length();
 
-    color([0,1,0]) {
+    color(clamp_color) {
         translate([0, rail_offset, 0]) {
             union() {
                 difference() {
@@ -141,7 +141,7 @@ module bar_clamp_assembly(d, h, w, name, switch = false, yaxis = true) {
 
     //assembly(name);
     stl(str(name, switch ? "_switch" : ""));
-    color([0,1,0]) render() bar_clamp(d, h, w, switch, yaxis);
+    color(clamp_color) render() bar_clamp(d, h, w, switch, yaxis);
     //
     // screw and washer for clamp
     //

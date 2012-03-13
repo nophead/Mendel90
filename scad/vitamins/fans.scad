@@ -78,7 +78,7 @@ module fan_holes(type, poly = false) {
 }
 
 module fan_assembly(type, thickness) {
-    color([0.2, 0.2, 0.2])
+    color(fan_color)
         render()
             fan(type);
 

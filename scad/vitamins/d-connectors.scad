@@ -21,7 +21,7 @@ module d_pillar(type) {
     height = 4.5;
     screw = 2.5;
     screw_length = 8;
-    color([0.9,0.9,0.9]) render() translate([0,0, d_flange_thickness(type)]) difference() {
+    color(d_pillar_color) render() translate([0,0, d_flange_thickness(type)]) difference() {
         union() {
             cylinder(r = rad, h = height, $fn = 6);
             translate([0,0, - screw_length + eta])
@@ -73,7 +73,7 @@ module d_plug(type, socket = false) {
     //
     // Shell
     //
-    color([0.8, 0.8, 0.8]) render() difference() {
+    color(d_plug_shell_color) render() difference() {
         union() {
             rounded_rectangle([flange_length, flange_width, d_flange_thickness(type)], 2, center = false);
             linear_extrude(height = d_height, convexity = 5)
@@ -93,7 +93,7 @@ module d_plug(type, socket = false) {
     //
     // Insulator
     //
-    color([0.2,0.2,0.2]) render() {
+    color(d_plug_insulator_color) render() {
         translate([0,0, d_flange_thickness(type) + eta])
             rotate([0, 180, 0])
                 linear_extrude(height = back_height + 1 + d_flange_thickness(type), convexity = 5)

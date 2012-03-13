@@ -32,7 +32,7 @@ module nut(type, nyloc = false) {
     if(exploded && nyloc)
         cylinder(r = 0.2, h = 10);
 
-    color([0.7, 0.7, 0.7]) render() translate([0, 0, (exploded && nyloc) ? 10 : 0]) difference() {
+    color(nut_color) render() translate([0, 0, (exploded && nyloc) ? 10 : 0]) difference() {
         union() {
             cylinder(r = outer_rad, h = thickness, $fn = 6);
             if(nyloc)
@@ -71,7 +71,7 @@ module wingnut(type) {
     if(exploded)
         cylinder(r = 0.2, h = 10);
 
-    color([0.7,0.7,0.7]) render() translate([0, 0, exploded ? 10 : 0]) difference() {
+    color(nut_color) render() translate([0, 0, exploded ? 10 : 0]) difference() {
         union() {
             cylinder(r1 = bottom_rad, r2 = top_rad, h = thickness);
             for(rot = [0, 180])

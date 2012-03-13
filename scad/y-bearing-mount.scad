@@ -44,7 +44,7 @@ module bearing_mount(bearing, height, endstop) {
     endstop_h = height - bar_clamp_switch_z_offset() + microswitch_thickness() / 4;
 
     stl(str("y_bearing_mount", endstop ? "_switch" : ""));
-    color([1,0,0]) union() {
+    color(y_bearing_mount_color) union() {
         bearing_holder(bearing, height);
         for(end = [-1, 1])
             translate([end * (bearing_holder_width(bearing) / 2 - eta), -end * (bearing_holder_length(bearing) - bearing_clamp_tab)/2, -height])
@@ -62,13 +62,13 @@ module bearing_mount_holes(height)
     for(end = [-1, 1])
         translate([end * (bearing_holder_width(Y_bearings) / 2 + tab_length / 2),
                   -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab) / 2, 0])
-             cylinder(r = screw_clearance_radius, h = 100, center = true);;
+             cylinder(r = screw_clearance_radius, h = 100, center = true);
 
 module y_bearing_assembly(height, endstop = false)
 {
     //assembly("y_bearing_assembly");
 
-    color([1,0,0]) render() bearing_mount(Y_bearings, height, endstop);
+    color(y_bearing_mount_color) render() bearing_mount(Y_bearings, height, endstop);
 
     rotate([0,0,90]) {
         linear_bearing(Y_bearings);

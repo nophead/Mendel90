@@ -65,7 +65,7 @@ module cable_clip(screw, cable1, cable2 = 0) {
 }
 
 module cable_clip_assembly(screw, screw_length, cable1, cable2 = 0) {
-    color([1,0,0]) render() translate([0, cable_clip_width(screw) / 2, 0]) rotate([90, 0, 0])
+    color(clip_color) render() translate([0, cable_clip_width(screw) / 2, 0]) rotate([90, 0, 0])
         cable_clip(screw, cable1, cable2);
 
     translate([0, 0, max(cable_clip_height(cable1), cable_clip_height(cable2))])

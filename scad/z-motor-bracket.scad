@@ -36,7 +36,7 @@ module z_motor_bracket(y_offset, rhs) {
     cutout = y_offset - length / 2 - back_thickness;
 
     stl(rhs? "z_motor_bracket_rhs" : "z_motor_bracket_lhs");
-        color([0,1,0]) {
+        color(z_motor_bracket_color) {
             difference() {
                 union() {
                     //
@@ -132,7 +132,7 @@ module z_motor_bracket_holes(gantry_setback)
 module z_motor_assembly(gantry_setback, rhs, standalone = false) {
     assembly("z_motor_assembly");
 
-    color([0,1,0]) render() z_motor_bracket(gantry_setback, rhs);
+    color(z_motor_bracket_color) render() z_motor_bracket(gantry_setback, rhs);
     //
     // Clamp screw and washer
     //

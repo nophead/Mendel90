@@ -20,13 +20,14 @@ M3_rubber_washer= [3,  10, 1.5, true];
 function washer_diameter(type) =  type[1];
 function washer_thickness(type) = type[2];
 function washer_soft(type) = type[3];
+function washer_color(type) = washer_soft(type) ? soft_washer_color : hard_washer_color;
 
 module washer(type) {
     if(washer_soft(type))
         vitamin(str("WR", type[0] * 10, type[1], type[2] * 10, ": Rubber washer M",type[0], " x ", type[1], " x ", type[2]));
     else
         vitamin(str("WA", type[0] * 10, type[1], type[2] * 10, ": Washer M",type[0], " x ", type[1], " x ", type[2]));
-    color(washer_soft(type) ?  [0.2,0.2,0.2] : [0.8,0.8,0.8])  render() difference() {
+    color(washer_color(type))  render() difference() {
         cylinder(r = washer_diameter(type) / 2, h = washer_thickness(type));
         cylinder(r = type[0] / 2, h = 2 * washer_thickness(type) + 1, center = true);
     }
@@ -38,7 +39,7 @@ module star_washer(type) {
     inner = (hole + rad) / 2;
     spoke  = rad - hole;
     vitamin(str("WS", type[0] * 10, type[1], type[2] * 10, ": Star washer M",type[0], " x ", type[1], " x ", type[2]));
-    color([0.8,0.8,0.4]) render() difference() {
+    color(star_washer_color) render() difference() {
         cylinder(r = rad, h = washer_thickness(type));
         cylinder(r = hole, h = 2 * washer_thickness(type) + 1, center = true);
         for(a = [0:30:360])

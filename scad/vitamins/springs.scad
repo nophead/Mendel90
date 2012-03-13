@@ -54,7 +54,7 @@ module comp_spring(spring, l = 0) {
 
     vitamin(str("SPR",  spring[0], spring[1] * 100, spring[2], ": Spring ", spring[0], " x ", spring[1], " x ", spring[2] ));
 
-    color([0.2, 0.2, 0.2]) render() coil(r1 = (spring[0] - spring[1])/ 2, r2 = spring[1] / 2, h = l, twists = spring[3]);
+    color(spring_color) render() coil(r1 = (spring[0] - spring[1])/ 2, r2 = spring[1] / 2, h = l, twists = spring[3]);
 
 }
 

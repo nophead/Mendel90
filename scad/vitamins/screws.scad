@@ -66,7 +66,7 @@ module screw(type, length) {
             assign(head_height = rad * 2,
                    socket_rad = type[5] / cos(30) / 2,
                    socket_depth = 2 * rad / 3)
-            color([0.2,0.2,0.2]) render() difference() {
+            color(screw_cap_color) render() difference() {
                 union() {
                     cylinder(r = head_rad, h = head_height);
                     translate([0,0, - length + eta])
@@ -79,14 +79,14 @@ module screw(type, length) {
         if(head_type == hs_grub) {
             assign(socket_rad = type[4] / 2,
                    socket_depth = type[5])
-            color([0.2,0.2,0.2]) render() difference() {
+            color(screw_grub_color) render() difference() {
                 cylinder(r = rad, h = length);
                 cylinder(r = socket_rad, h = socket_depth  * 2, $fn = 6, center = true);
             }
         }
         if(head_type == hs_hex) {
             assign(head_height =type[5])
-            color([0.8,0.8,0.8]) render() union() {
+            color(screw_hex_color) render() union() {
                 cylinder(r = head_rad, h = head_height, $fn = 6);
                 translate([0,0, - length + eta])
                     cylinder(r = rad, h = length);
@@ -96,7 +96,7 @@ module screw(type, length) {
             assign(head_height = type[5],
                    socket_rad = 0.6 * head_rad,
                    socket_depth = 0.5 * type[5])
-            color([0.8,0.8,0.4]) render() difference() {
+            color(screw_pan_color) render() difference() {
                 union() {
                     rounded_cylinder(r = head_rad, h = head_height, r2 = head_height / 2);
                     translate([0,0, - length + eta])
@@ -113,7 +113,7 @@ module screw(type, length) {
                    socket_rad = 0.6 * head_rad,
                    socket_depth = 0.3 * head_rad,
                    socket_width = 1)
-            color([0.8,0.8,0.4]) render() difference() {
+            color(screw_cs_color) render() difference() {
                 union() {
                     translate([0,0, -head_height])
                         cylinder(h = head_height, r1 = 0, r2 = head_rad);
