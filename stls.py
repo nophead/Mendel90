@@ -12,7 +12,8 @@ def stls(machine, parts = None):
     target_dir = machine + "/stls"
     if os.path.isdir(target_dir):
         if not parts:
-            shutil.rmtree(target_dir)
+            shutil.rmtree(target_dir)   #if making the BOM clear the directory first
+            os.makedirs(target_dir)
     else:
         os.makedirs(target_dir)
 
