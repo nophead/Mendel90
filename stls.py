@@ -7,12 +7,9 @@ source_dir = "scad"
 
 def stls(machine, parts = None):
     #
-    # Make the target directory
+    # Set target directory name
     #
     target_dir = machine + "/stls"
-    if os.path.isdir(target_dir):
-        shutil.rmtree(target_dir)
-    os.makedirs(target_dir)
 
     #
     # Set the target machine
@@ -25,14 +22,29 @@ def stls(machine, parts = None):
     # Make a list of all the stls in the BOM
     #
     targets = []
-    for line in open(machine + "/bom/bom.txt", "rt").readlines():
-        words = line.split()
-        if words:
-            last_word = words[-1]
-            if len(last_word) > 4 and last_word[-4:] == ".stl":
-                if not parts or (last_word in parts):
-                    targets.append(last_word.replace(".stl", "_stl"))
+    if not parts:
+        #
+        # clean target directory for full rebuild
+        #
+        if os.path.isdir(target_dir):
+            shutil.rmtree(target_dir)
 
+        for line in open(machine + "/bom/bom.txt", "rt").readlines():
+            words = line.split()
+            if words:
+                last_word = words[-1]
+                if len(last_word) > 4 and last_word[-4:] == ".stl":
+                    targets.append(last_word.replace(".stl", "_stl"))
+    else:
+        for part in parts:
+            targets.append(part.replace(".stl", "_stl"))
+
+    #
+    # make target directory if need
+    #
+
+    if not os.path.isdir(target_dir):
+        os.makedirs(target_dir)
 
     #
     # Find all the scad files
