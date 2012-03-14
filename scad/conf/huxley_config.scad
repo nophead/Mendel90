@@ -23,7 +23,8 @@ Z_travel = 110;
 bed_depth = 150;
 bed_width = 150;
 bed_pillars = M3x20_pillar;
-bed_thickness = 1.6 + sheet_thickness(glass);    // PCB heater plus glass sheet
+bed_glass = glass2;
+bed_thickness = 1.6 + sheet_thickness(bed_glass);    // PCB heater plus glass sheet
 bed_holes = 146;
 
 base = PMMA10;               // Sheet material used for the base. Needs to be thick enough to screw into.

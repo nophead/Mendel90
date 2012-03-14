@@ -16,8 +16,6 @@ eta = 0.01;                     // small fudge factor to stop CSG barfing on coi
 $fa = 5;
 $fs = 0.5;
 
-glass_thickness = 2;
-
 //
 // Hole sizes
 //

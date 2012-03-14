@@ -13,15 +13,15 @@
 
 // The "Color" parameter is a quad-array: [R, G, B, Alpha]
 
-//		   [ Code, Description, Thickness, Color, Soft]
+//         [ Code, Description, Thickness, Color, Soft]
 
-MDF6     = [ "MD", "MDF sheet",     6, MDF_brown, true];	// ~1/4"
-MDF10    = [ "MD", "MDF sheet",    10, MDF_brown, true];	// ~3/8"
-MDF12    = [ "MD", "MDF sheet",    12, MDF_brown, true];	// ~1/2"
-PMMA6    = [ "AC", "Acrylic sheet", 6, acrylic_clear, false];	// ~1/4"
-PMMA8    = [ "AC", "Acrylic sheet", 8, acrylic_clear, false];	// ~5/16"
-PMMA10   = [ "AC", "Acrylic sheet",10, acrylic_clear, false];	// ~3/8"
-glass    = [ "GL", "Glass sheet",   glass_thickness, glass_clear, false];
+MDF6     = [ "MD", "MDF sheet",     6, MDF_brown, true];    // ~1/4"
+MDF10    = [ "MD", "MDF sheet",    10, MDF_brown, true];    // ~3/8"
+MDF12    = [ "MD", "MDF sheet",    12, MDF_brown, true];    // ~1/2"
+PMMA6    = [ "AC", "Acrylic sheet", 6, acrylic_clear, false];   // ~1/4"
+PMMA8    = [ "AC", "Acrylic sheet", 8, acrylic_clear, false];   // ~5/16"
+PMMA10   = [ "AC", "Acrylic sheet",10, acrylic_clear, false];   // ~3/8"
+glass2   = [ "GL", "Glass sheet",   2, glass_clear, false];
 DiBond   = [ "DB", "Dibond sheet",  3, dibond_grey, false];
 
 function sheet_thickness(type) = type[2];
