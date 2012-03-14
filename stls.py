@@ -11,8 +11,10 @@ def stls(machine, parts = None):
     #
     target_dir = machine + "/stls"
     if os.path.isdir(target_dir):
-        shutil.rmtree(target_dir)
-    os.makedirs(target_dir)
+        if not parts:
+            shutil.rmtree(target_dir)
+    else:
+        os.makedirs(target_dir)
 
     #
     # Set the target machine
@@ -24,16 +26,16 @@ def stls(machine, parts = None):
     #
     # Make a list of all the stls in the BOM
     #
-    targets = []
-    for line in open(machine + "/bom/bom.txt", "rt").readlines():
-        words = line.split()
-        if words:
-            last_word = words[-1]
-            if len(last_word) > 4 and last_word[-4:] == ".stl":
-                if not parts or (last_word in parts):
-                    targets.append(last_word.replace(".stl", "_stl"))
-
-
+    if parts:
+        targets = parts
+    else:
+        targets = []
+        for line in open(machine + "/bom/bom.txt", "rt").readlines():
+            words = line.split()
+            if words:
+                last_word = words[-1]
+                if len(last_word) > 4 and last_word[-4:] == ".stl":
+                    targets.append(last_word)
     #
     # Find all the scad files
     #
@@ -46,7 +48,8 @@ def stls(machine, parts = None):
                 words = line.split()
                 if(len(words) and words[0] == "module"):
                     module = words[1].split('(')[0]
-                    if module in targets:
+                    stl = module.replace("_stl", ".stl")
+                    if stl in targets:
                         #
                         # make a file to use the module
                         #
@@ -60,7 +63,7 @@ def stls(machine, parts = None):
                         #
                         stl_name = target_dir + "/" + module[:-4] + ".stl"
                         openscad.run("-o", stl_name, stl_maker_name)
-                        targets.remove(module)
+                        targets.remove(stl)
 
     #
     # List the ones we didn't find
