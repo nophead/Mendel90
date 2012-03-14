@@ -19,7 +19,7 @@ function insulator_depth(type)       = type[1];
 function insulator_screw_pitch(type) = type[2];
 function insulator_clamped(type)     = type[3];
 
-hot_end = Mendel90_12mm;
+hot_end = Stoffle15_16mm;
 
 clamp_width = 2 * (insulator_screw_pitch(hot_end) + screw_clearance_radius(M3_cap_screw) + min_wall);
 
