@@ -8,6 +8,8 @@
 // Reusable color definitions
 //
 
+use_actual_colors = false;
+
 // Named colors
 white                           = [1, 1, 1];
 black                           = [0, 0, 0];
@@ -15,6 +17,7 @@ red                             = [1, 0, 0];
 dark_red                        = [0.7, 0, 0];
 green                           = [0, 1, 0];
 yellow                          = [1, 1, 0];
+blue                            = [0, 0, 1];
 fuchsia                         = [1, 0, 1];
 orange                          = [1, 0.7, 0];
 grey20                          = [0.2, 0.2, 0.2];
@@ -23,11 +26,18 @@ grey70                          = [0.7, 0.7, 0.7];
 grey80                          = [0.8, 0.8, 0.8];
 grey90                          = [0.9, 0.9, 0.9];
 
+printed_plastic_color           = black;
+
+function plastic_color(color) = use_actual_colors ? printed_plastic_color : color;
+
 // Material colors
-MDF_brown                       = [0.4, 0.4, 0.2, 1    ];
+MDF_color                       = [0.4, 0.4, 0.2, 1    ];
 acrylic_clear                   = [1,   1,   1,   0.5  ];
+acrylic_blue_2424               = [0,   0,   1,   0.75  ];
+acrylic_color                   = acrylic_clear;
 glass_clear                     = [1,   1,   1,   0.25 ];
-dibond_grey                     = [0.5, 0.5, 0.5, 1    ];
+glass_color                     = glass_clear;
+dibond_color                    = grey70;
 
 // Object colors
 rod_color                        = grey80;
@@ -55,39 +65,42 @@ sanguinololu_color               = red;
 stepper_body_color               = black;
 stepper_cap_color                = grey50;
 small_ziptie_color               = white;
-
-// Assembly colors
-clamp_color                      = green;
 bed_color                        = dark_red;
-clip_color                       = red;
-d_shell_color                    = green;
-d_shell_lid_color                = red;
-d_motor_bracket_color            = green;
-d_motor_bracket_lid_color        = red;
 d_pillar_color                   = grey90;
 d_plug_shell_color               = grey80;
 d_plug_insulator_color           = grey20;
-fixing_block_color               = green;
-ribbon_clamp_color               = red;
-fan_guard_color                  = green;
-pcb_spacer_color                 = green;
-pulley_color                     = red;
-ribbon_clamp_color               = red;
-wades_big_gear_color             = green;
-wades_small_gear_color           = red;
-wades_idler_block_color          = green;
-wades_gear_spacer_color          = red;
 filament_viz_color               = [0.6, 0.5, 0.2];
 extruder_nozzle_color            = yellow;
-x_carriage_color                 = red;
-x_belt_clamp_color               = green;
-x_end_bracket_color              = green;
-y_bearing_mount_color            = red;
-y_belt_anchor_color              = green;
-y_belt_clip_color                = red;
-y_idler_bracket_color            = green;
-y_motor_bracket_color            = green;
-z_coupling_color                 = red;
-z_limit_switch_bracket_color     = green;
-z_motor_bracket_color            = green;
-cable_strip_color                = fuchsia;
+cable_strip_color                = use_actual_colors ? grey70 : fuchsia;
+belt_color                       = use_actual_colors ? grey20 : yellow;
+bulldog_color                    = use_actual_colors ? black : yellow;
+
+// Assembly colors
+clamp_color                      = plastic_color(green);
+clip_color                       = plastic_color(red);
+d_shell_color                    = plastic_color(green);
+d_shell_lid_color                = plastic_color(red);
+d_motor_bracket_color            = plastic_color(green);
+d_motor_bracket_lid_color        = plastic_color(red);
+fixing_block_color               = plastic_color(green);
+ribbon_clamp_color               = plastic_color(red);
+fan_guard_color                  = plastic_color(green);
+pcb_spacer_color                 = plastic_color(green);
+pulley_color                     = plastic_color(red);
+ribbon_clamp_color               = plastic_color(red);
+wades_block_color                = plastic_color(yellow);
+wades_big_gear_color             = plastic_color(green);
+wades_small_gear_color           = plastic_color(red);
+wades_idler_block_color          = plastic_color(green);
+wades_gear_spacer_color          = plastic_color(red);
+x_carriage_color                 = plastic_color(red);
+x_belt_clamp_color               = plastic_color(green);
+x_end_bracket_color              = plastic_color(green);
+y_bearing_mount_color            = plastic_color(red);
+y_belt_anchor_color              = plastic_color(green);
+y_belt_clip_color                = plastic_color(red);
+y_idler_bracket_color            = plastic_color(green);
+y_motor_bracket_color            = plastic_color(green);
+z_coupling_color                 = plastic_color(red);
+z_limit_switch_bracket_color     = plastic_color(green);
+z_motor_bracket_color            = plastic_color(green);
