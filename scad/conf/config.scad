@@ -12,7 +12,7 @@ bom = 2;                        // 0 no bom, 1 assemblies and stls, 2 vitamins a
 exploded = false;               // true for exploded view
 
 // Real-world colors for various parts & vitamins
-use_realistic_colors = true;    // true for "real" colors, false for "distinct" colors (useful during design)
+use_realistic_colors = false;    // true for "real" colors, false for "distinct" colors (useful during design and for build instructions)
 printed_plastic_color = "blue";
 cable_strip_real_color = "fuchsia";
 belt_real_color = "yellow";
