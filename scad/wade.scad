@@ -341,15 +341,13 @@ module wades_assembly() {
 
     end("wades_assembly");
 }
+
 if(1)
     rotate([90, 0, 0])
         wades_assembly();
 
-
 else {
-
     wades_block_stl();
     *wades_idler_block_stl();
     *wades_gear_spacer_stl();
-
 }

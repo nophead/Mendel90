@@ -312,15 +312,7 @@ module d_motor_bracket_assembly(motor) {
                         screw_and_washer(M3_cap_screw, 45);
 }
 
-
-if(1) {
-    NEMA(NEMA17);
-    d_motor_bracket_assembly(NEMA17);
-    translate([0, 0, exploded ? - 20 : 0])
-        d_shell_assembly(NEMA17);
-
-}
-else {
+module d_motor_brackets_stl() {
     d_motor_bracket_stl(NEMA17);
     translate([11, 35, 0])
         d_motor_bracket_lid_stl(NEMA17);
@@ -335,3 +327,13 @@ else {
         ribbon_clamp(extruder_ways, cable_screw);
 
 }
+
+if(1) {
+    NEMA(NEMA17);
+    d_motor_bracket_assembly(NEMA17);
+    translate([0, 0, exploded ? - 20 : 0])
+        d_shell_assembly(NEMA17);
+
+}
+else
+    d_motor_brackets_stl();

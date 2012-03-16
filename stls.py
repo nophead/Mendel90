@@ -1,9 +1,24 @@
+#!/usr/bin/env python
+
 import os
 import openscad
 import shutil
 import sys
 
 source_dir = "scad"
+
+def bom_to_stls(machine):
+    #
+    # Make a list of all the stls in the BOM
+    #
+    stl_files = []
+    for line in open(machine + "/bom/bom.txt", "rt").readlines():
+        words = line.split()
+        if words:
+            last_word = words[-1]
+            if len(last_word) > 4 and last_word[-4:] == ".stl":
+                stl_files.append(last_word)
+    return stl_files
 
 def stls(machine, parts = None):
     #
@@ -25,21 +40,16 @@ def stls(machine, parts = None):
     f.close()
 
     #
-    # Make a list of all the stls in the BOM
+    # Decide which fils to make
     #
     if parts:
-        targets = parts
+        targets = list(parts)           #copy the list so we dont modify the list passed in
     else:
-        targets = []
-        for line in open(machine + "/bom/bom.txt", "rt").readlines():
-            words = line.split()
-            if words:
-                last_word = words[-1]
-                if len(last_word) > 4 and last_word[-4:] == ".stl":
-                    targets.append(last_word)
+        targets = bom_to_stls(machine)
     #
     # Find all the scad files
     #
+    used = []
     for filename in os.listdir(source_dir):
         if filename[-5:] == ".scad":
             #
@@ -65,12 +75,18 @@ def stls(machine, parts = None):
                         stl_name = target_dir + "/" + module[:-4] + ".stl"
                         openscad.run("-o", stl_name, stl_maker_name)
                         targets.remove(stl)
-
+                        #
+                        # Add the files on the BOM to the used list for plates.py
+                        #
+                        for line in open("openscad.log"):
+                            if line[:7] == 'ECHO: "' and line[-6:] == '.stl"\n':
+                                used.append(line[7:-2])
     #
     # List the ones we didn't find
     #
     for module in targets:
         print "Could not find", module
+    return used
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

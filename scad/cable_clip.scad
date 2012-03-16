@@ -74,22 +74,24 @@ module cable_clip_assembly(screw, screw_length, cable1, cable2 = 0) {
 
 module cable_clip_AB_stl() cable_clip(base_clip_screw, endstop_wires, motor_wires);
 module cable_clip_AD_stl() cable_clip(frame_clip_screw, endstop_wires, fan_motor_wires);
-module cable_clip_CA_stl() cable_clip(base_clip_screw, thermistor_wires, bed_wires);
+module cable_clip_CA_stl() cable_clip(base_clip_screw, bed_wires, thermistor_wires);
 
 spacing = cable_clip_height(motor_wires) + 1;
 
-if(1)
-    cable_clip_assembly(base_clip_screw, base_screw_length, endstop_wires, motor_wires);
-else {
+module cable_clips_stl() {
     translate([0, -cable_clip_height(bed_wires) - 1, 0])
-        cable_clip(base_clip_screw, thermistor_wires, bed_wires);
+        cable_clip_CA_stl();
 
     for(i=[0:1])
         translate([0, spacing * i, 0])
-            cable_clip(base_clip_screw, endstop_wires, motor_wires);
+            cable_clip_AB_stl();
 
     for(i=[2:3])
         translate([0, spacing * i, 0])
-            cable_clip(frame_clip_screw, endstop_wires, fan_motor_wires);
-
+            cable_clip_AD_stl();
 }
+
+if(1)
+    cable_clip_assembly(base_clip_screw, base_screw_length, endstop_wires, motor_wires);
+else
+    cable_clips_stl();

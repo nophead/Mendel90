@@ -94,10 +94,14 @@ module y_bearing_assembly(height, endstop = false)
 module y_bearing_mount_stl() translate([0,0, Y_bearing_holder_height]) bearing_mount(Y_bearings, Y_bearing_holder_height, false);
 module y_bearing_mount_switch_stl() translate([0,0, Y_bearing_holder_height]) bearing_mount(Y_bearings, Y_bearing_holder_height, true);
 
-if(1)
-    y_bearing_assembly(Y_bearing_holder_height, false);
-else {
+module y_bearing_mounts_stl()
+{
     y_bearing_mount_stl();
     translate([  bearing_mount_width(Y_bearings) - tab_length + 2,  0, 0]) y_bearing_mount_stl();
     translate([-(bearing_mount_width(Y_bearings) - tab_length + 2), 0, 0]) y_bearing_mount_switch_stl();
-};
+}
+
+if(1)
+    y_bearing_assembly(Y_bearing_holder_height, false);
+else
+    y_bearing_mounts_stl();

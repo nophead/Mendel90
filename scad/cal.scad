@@ -9,7 +9,7 @@
 //
 include <conf/config.scad>
 
-module cal() {
+module cal_stl() {
     difference() {
         union() {
             cube([10,40,5]);
@@ -31,4 +31,4 @@ module cal() {
     }
 }
 
-cal();
+cal_stl();
