@@ -14,7 +14,7 @@ def render(machine):
 	for i in li:
 		stls.append(i[:-4])
 	for i in stls:
-		command = 'blender utils'+os.sep+'render.blender -P utils'+os.sep+'viz.py -- '+machine+os.sep+'stls'+os.sep+i+'.stl '+machine+os.sep+'render'+os.sep+i+'.png'
+		command = 'blender utils'+os.sep+'render.blend -P utils'+os.sep+'viz.py -- '+machine+os.sep+'stls'+os.sep+i+'.stl '+machine+os.sep+'render'+os.sep+i+'.png'
 		print command
 
 if __name__ == '__main__':
