@@ -1,33 +1,21 @@
 import os
 import sys
 import shutil
-import openscad
-
-class RENDER:
-    def __init__(self):
-        self.count = 1
-        self.vitamins = {}
-        self.printed = {}
-        self.assemblies = {}
-
-    def add_part(self, s):
-        if s[-4:] == ".stl":
-            parts = self.printed
-        else:
-            parts = self.vitamins
-        if s in parts:
-            parts[s] += 1
-        else:
-            parts[s] = 1
-
-    def add_assembly(self, ass):
-        if ass in self.assemblies:
-            self.assemblies[ass].count += 1
-        else:
-            self.assemblies[ass] = RENDER()
 
 def render(machine):
-    bom_dir = machine + "/render"
+	render_dir = machine + "/render"
+	print render_dir 
+	try:
+		os.stat(render_dir)
+	except:
+		os.mkdir(render_dir)
+	li = os.listdir(machine+'/stls')
+	stls = []
+	for i in li:
+		stls.append(i[:-4])
+	for i in stls:
+		command = 'blender -P utils/viz.py -- '+machine+'/stls/'+i+'.stl '+machine+'/render/'+i+'.png'
+		print command
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
