@@ -25,6 +25,7 @@ module belt(type, x1, y1, r1, x2, y2, r2, gap = 0) {
     length = pi * (r1 + r2) + 2 * sqrt(dx * dx + dy * dy) - gap;
     vitamin(str("BT", belt_pitch(type),width, round(length), ": Belt T", belt_pitch(type)," x ", width, " x ", round(length)));
 
+    color(belt_color)
     linear_extrude(height = width, center = true, convexity = 6) {
         difference() {
             hull() {                                                    // outside of belt
@@ -49,6 +50,7 @@ module twisted_belt(type, x1, y1, r1, x2, y2, r2, gap = 0) {
 
     angle = atan2(dy, dx) - atan2((r2 - r1), dx);
 
+    color(belt_color)
     union() {
         difference() {
             belt(type, x1, y1, r1, x2, y2, r2, gap);

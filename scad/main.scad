@@ -49,6 +49,7 @@ module x_axis_assembly(show_extruder) {
         rotate([180, 0, 180])
             x_carriage_assembly(show_extruder);
 
+    color(belt_color)
     translate([0, -gantry_setback - belt_width(X_belt) / 2, Z + Z0])
         rotate([90, 0, 0]) render()
             union() {
@@ -228,6 +229,7 @@ module y_axis_assembly(show_bed) {
         y_rails();
 
         translate([Y_belt_line - X_origin, Y_motor_end, y_motor_height()]) rotate([90,0,-90]) {
+            color(belt_color)
             render() difference() {
                 twisted_belt(Y_belt,
                              Y_motor_end - Y_idler_end,

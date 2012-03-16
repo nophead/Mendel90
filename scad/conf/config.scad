@@ -8,10 +8,9 @@
 // Configuration file
 //
 
-include <colors.scad>
-
 bom = 2;                        // 0 no bom, 1 assemblies and stls, 2 vitamins as well
 exploded = false;               // true for exploded view
+use_realistic_colors = true;    // true for "real" colors, false for "distinct" colors (useful during design)
 eta = 0.01;                     // small fudge factor to stop CSG barfing on coincident faces.
 $fa = 5;
 $fs = 0.5;
@@ -56,6 +55,7 @@ min_wall = 2 * filament_width + eta;
 
 pcb_thickness = 1.6;
 
+include <colors.scad>
 include <utils.scad>
 include <vitamins.scad>
 

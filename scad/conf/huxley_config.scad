@@ -8,6 +8,13 @@
 // Configuration file
 //
 echo("Huxley:");
+
+// Real-world colors for various parts & vitamins
+printed_plastic_color = "blue";
+cable_strip_real_color = "fuchsia";
+belt_real_color = "yellow";
+bulldog_real_color ="black";
+
 Z_bearings = LM6UU;
 Y_bearings = LM6UU;
 X_bearings = LM6UU;

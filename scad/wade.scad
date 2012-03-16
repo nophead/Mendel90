@@ -69,6 +69,7 @@ module wades_block_stl() {
     insulator_depth = insulator_depth(hot_end);
 
 
+    color(wades_block_color)
     difference(){
         union(){
             cube([81, 52, thickness]);                            // motor plate
@@ -250,7 +251,7 @@ module wade_idler_assembly() {
 module wades_assembly() {
     assembly("wades_assembly");
 
-    render() wades_block_stl();
+    color(wades_block_color) render() wades_block_stl();
 
     // idler screws, washers and springs
     for(i = [0,1])
@@ -330,7 +331,7 @@ module wades_assembly() {
 
     translate([75, 5 - nozzle_length / 4, 15])
         rotate([-90, 0, 0]) {
-            color(filament_viz_color) cylinder(h = nozzle_length / 2 + 10, r = insulator_diameter(hot_end) / 2, center = true);
+            color(extruder_insulator_color) cylinder(h = nozzle_length / 2 + 10, r = insulator_diameter(hot_end) / 2, center = true);
             translate([0, 0, -nozzle_length /2 - 5])
                 color(extruder_nozzle_color) cylinder(h = nozzle_length / 2, r = 3, center = true);
         }
