@@ -10,7 +10,14 @@
 
 bom = 2;                        // 0 no bom, 1 assemblies and stls, 2 vitamins as well
 exploded = false;               // true for exploded view
+
+// Real-world colors for various parts & vitamins
 use_realistic_colors = true;    // true for "real" colors, false for "distinct" colors (useful during design)
+printed_plastic_color = "blue";
+cable_strip_real_color = "fuchsia";
+belt_real_color = "yellow";
+bulldog_real_color ="black";
+
 eta = 0.01;                     // small fudge factor to stop CSG barfing on coincident faces.
 $fa = 5;
 $fs = 0.5;

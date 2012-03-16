@@ -9,12 +9,6 @@
 //
 echo("Mendel:");
 
-// Real-world colors for various parts & vitamins
-printed_plastic_color = "blue";
-cable_strip_real_color = "fuchsia";
-belt_real_color = "yellow";
-bulldog_real_color ="black";
-
 Z_bearings = LM8UU;
 Y_bearings = LM8UU;
 X_bearings = LM8UU;
