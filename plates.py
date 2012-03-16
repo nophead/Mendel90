@@ -21,7 +21,7 @@ def plates(machine):
     #
     # Make the target directory
     #
-    target_dir = machine + "/stls/plates"
+    target_dir = machine + "/stls/printed"
     if os.path.isdir(target_dir):
         shutil.rmtree(target_dir)
     os.makedirs(target_dir)
@@ -34,15 +34,15 @@ def plates(machine):
     for file in plate_list:
         shutil.move(machine + "/stls/"+ file, target_dir + "/" + file)
     #
-    # Move all the stls that are not in the plates to the plates directory
+    # Copy all the stls that are not in the plates to the plates directory
     #
     for file in bom_to_stls(machine):
         path = machine + "/stls/"+ file
         if not file in used:
             if os.path.isfile(path):
-                shutil.move(path, target_dir + "/" + file)
+                shutil.copy(path, target_dir + "/" + file)
             else:
-                print "can't find %s to move" % path
+                print "can't find %s to copy" % path
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
