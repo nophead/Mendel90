@@ -54,6 +54,7 @@ module bulldog(type, open = 4) {
 
     vitamin(str("BD00", bulldog_length(type), ": ", bulldog_length(type), "mm bulldog clip"));
 
+    color(bulldog_color)
     render() translate([depth / 2 - thickness - eta, 0, 0])
         union() {
             difference() {

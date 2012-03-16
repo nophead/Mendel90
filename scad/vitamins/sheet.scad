@@ -8,21 +8,26 @@
 // Flat sheets
 //
 
-// The "Soft" parameter determines if the sheet material will hold threads.
-// If not, nuts will be used to retain screws.
-
-// The "Color" parameter is a quad-array: [R, G, B, Alpha]
-
+// If you'd like to add a new material type, or a different color of an existing material type
+// simply add a new line here (or in your machine config file).
+//
+// The "Soft" parameter determines if the sheet material needs machine screws or wood screws
+// if "soft", wood screws will be used, with a pilot hole.
+// If "not soft", either tapped holes or a clearance hole and nuts will be used to retain screws.
+//
+// The "Color" parameter is a quad-array: [R, G, B, Alpha], or can be a named color
+// see http://en.wikibooks.org/wiki/OpenSCAD_User_Manual/The_OpenSCAD_Language#color
+//
 //         [ Code, Description, Thickness, Color, Soft]
-
-MDF6     = [ "MD", "MDF sheet",     6, MDF_brown, true];    // ~1/4"
-MDF10    = [ "MD", "MDF sheet",    10, MDF_brown, true];    // ~3/8"
-MDF12    = [ "MD", "MDF sheet",    12, MDF_brown, true];    // ~1/2"
-PMMA6    = [ "AC", "Acrylic sheet", 6, acrylic_clear, false];   // ~1/4"
-PMMA8    = [ "AC", "Acrylic sheet", 8, acrylic_clear, false];   // ~5/16"
-PMMA10   = [ "AC", "Acrylic sheet",10, acrylic_clear, false];   // ~3/8"
-glass2   = [ "GL", "Glass sheet",   2, glass_clear, false];
-DiBond   = [ "DB", "Dibond sheet",  3, dibond_grey, false];
+//
+MDF6     = [ "MD", "MDF sheet",     6, [0.4, 0.4, 0.2, 1    ], true];    // ~1/4"
+MDF10    = [ "MD", "MDF sheet",    10, [0.4, 0.4, 0.2, 1    ], true];    // ~3/8"
+MDF12    = [ "MD", "MDF sheet",    12, [0.4, 0.4, 0.2, 1    ], true];    // ~1/2"
+PMMA6    = [ "AC", "Acrylic sheet", 6, [1,   1,   1,   0.5  ], false];   // ~1/4"
+PMMA8    = [ "AC", "Acrylic sheet", 8, [1,   1,   1,   0.5  ], false];   // ~5/16"
+PMMA10   = [ "AC", "Acrylic sheet",10, [1,   1,   1,   0.5  ], false];   // ~3/8"
+glass2   = [ "GL", "Glass sheet",   2, [1,   1,   1,   0.25 ], false];
+DiBond   = [ "DB", "Dibond sheet",  3, [0.7, 0.7, 0.7, 1    ], false];
 
 function sheet_thickness(type) = type[2];
 function sheet_is_soft(type) = type[4];
