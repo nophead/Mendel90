@@ -117,6 +117,8 @@ module belt_loop() {
     d = x_carriage_offset() - pulley_inner_radius - belt_thickness(X_belt);
     height = d + 2 * belt_thickness(X_belt);
     length = lug_width + 12.5;
+
+    color(belt_color)
     translate([d / 2, 0, 0])
         linear_extrude(height = belt_width(X_belt), convexity = 5, center = true)
             difference() {
