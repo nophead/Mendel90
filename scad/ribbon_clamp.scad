@@ -77,10 +77,7 @@ module ribbon_clamp_22_33_stl() translate([0,0,thickness]) ribbon_clamp(22, M3_c
 module ribbon_clamp_22_40_stl() translate([0,0,thickness]) ribbon_clamp(22, No6_screw);
 module ribbon_clamp_22_44_stl() translate([0,0,thickness]) ribbon_clamp(22, M4_cap_screw);
 
-if(1)
-    ribbon_clamp_assembly(20, M4_cap_screw, 20, 4);
-
-else {
+module ribbon_clamps_stl() {
     translate([0,-12,0]) ribbon_clamp(bed_ways, cap_screw);
     translate([0,0,0])   ribbon_clamp(bed_ways, cap_screw);
     translate([0,12,0])  ribbon_clamp(bed_ways, base_screw);
@@ -89,3 +86,9 @@ else {
     translate([0,48,0]) ribbon_clamp(extruder_ways, M3_cap_screw);
     translate([0,59,0]) ribbon_clamp(extruder_ways, M3_cap_screw);
 }
+
+if(1)
+    ribbon_clamp_assembly(20, M4_cap_screw, 20, 4);
+
+else
+    ribbon_clamps_stl();

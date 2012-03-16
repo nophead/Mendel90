@@ -36,6 +36,7 @@ module bar_clamp_holes(d)
             child();
 
 module bar_clamp(d, h, w, switch = false, yaxis = false) {
+    stl(str(yaxis ? "y_bar_clamp" : "z_bar_clamp", switch ? "_switch" : ""));
     gap = 1.5;
     inner_rad = bar_clamp_inner_rad(d);
     outer_rad = bar_clamp_outer_rad(d);
@@ -133,14 +134,12 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
     }
 }
 
-module bar_clamp_assembly(d, h, w, name, switch = false, yaxis = true) {
+module bar_clamp_assembly(d, h, w, switch = false, yaxis = true) {
     inner_rad = bar_clamp_inner_rad(d);
     outer_rad = bar_clamp_outer_rad(d);
     length = bar_clamp_length(d);
     rail_offset = bar_rail_offset(d);
 
-    //assembly(name);
-    stl(str(name, switch ? "_switch" : ""));
     color(clamp_color) render() bar_clamp(d, h, w, switch, yaxis);
     //
     // screw and washer for clamp
@@ -183,16 +182,15 @@ module bar_clamp_assembly(d, h, w, name, switch = false, yaxis = true) {
                         screw_and_washer(No2_screw, 13);
                 }
 
-    //end(name);
 }
 
 
 module y_bar_clamp_assembly(d, h, w, switch = false) {
-     bar_clamp_assembly(d, h, w, "y_bar_clamp", switch, yaxis = true);
+     bar_clamp_assembly(d, h, w, switch, yaxis = true);
 }
 
 module z_bar_clamp_assembly(d, h, w, switch = false) {
-     bar_clamp_assembly(d, h, w, "z_bar_clamp", switch, yaxis = false);
+     bar_clamp_assembly(d, h, w, switch, yaxis = false);
 }
 
 //bar_clamp(Z_bar_dia, gantry_setback, bar_clamp_depth, true);
@@ -203,14 +201,18 @@ module y_bar_clamp_switch_stl() translate([0,0,bar_clamp_depth/2]) rotate([0,90,
 module z_bar_clamp_stl()        translate([0,0,bar_clamp_depth/2]) rotate([0,90,0]) bar_clamp(Z_bar_dia, gantry_setback, bar_clamp_depth, false, false);
 module z_bar_clamp_switch_stl() translate([0,0,bar_clamp_depth/2]) rotate([0,90,0]) bar_clamp(Z_bar_dia, gantry_setback, bar_clamp_depth, true, false);
 
-if(0) {
+module bar_clamps_stl() {
                                             z_bar_clamp_switch_stl();
     translate([gantry_setback + 15, 0, 0])  z_bar_clamp_stl() ;
+
     translate([10, 40, 0])                  y_bar_clamp_switch_stl();
     translate([gantry_setback + 25, 40, 0]) y_bar_clamp_stl();
     translate([gantry_setback + 15, 80, 0]) y_bar_clamp_stl();
     translate([0, 80, 0])                   y_bar_clamp_stl();
 }
+
+if(0)
+    bar_clamps_stl();
 else {
     z_bar_clamp_assembly(Z_bar_dia, gantry_setback, bar_clamp_depth, true);
     //bar_clamp(Z_bar_dia, gantry_setback, bar_clamp_depth, true, false);

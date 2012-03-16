@@ -446,13 +446,14 @@ module x_carriage_assembly(show_extruder = false) {
     end("x_carriage_assembly");
 }
 
-
-if(0) {
+module x_carriage_parts_stl() {
     x_belt_clamp_stl();
     translate([-(lug_width + 2),0,0]) x_belt_grip_stl();
     x_carriage_stl();
     translate([6, 8, 0]) rotate([0, 0, -90]) x_belt_tensioner_stl();
 }
+
+if(0)
+    x_carriage_parts_stl();
 else
     x_carriage_assembly(true);
-//belt_lug(false);

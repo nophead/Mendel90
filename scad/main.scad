@@ -29,7 +29,7 @@ include <positions.scad>
 
 X = 0 * X_travel / 2; //sin(360 * $t) * bed_width / 2;
 Y = 0 * Y_travel / 2; //cos(360 * $t) * bed_depth / 2;
-Z = 0 * Z_travel;
+Z = 0.5 * Z_travel;
 
 
 //

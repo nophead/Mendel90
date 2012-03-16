@@ -171,12 +171,15 @@ module z_motor_assembly(gantry_setback, rhs, standalone = false) {
 
 }
 
-module z_motor_bracket_lhs_stl() z_motor_bracket(gantry_setback, false);
-module z_motor_bracket_rhs_stl()mirror([1,0,0]) z_motor_bracket(gantry_setback, true);
+module z_motor_bracket_lhs_stl()                 z_motor_bracket(gantry_setback, false);
+module z_motor_bracket_rhs_stl() mirror([1,0,0]) z_motor_bracket(gantry_setback, true);
 
-if(0) {
+module z_motor_brackets_stl() {
     translate([length + 2, 0, 0]) z_motor_bracket_lhs_stl();
     z_motor_bracket_rhs_stl();
 }
+
+if(0)
+    z_motor_brackets_stl();
 else
     z_motor_assembly(gantry_setback, false);

@@ -137,11 +137,14 @@ module y_belt_anchor_toothed_stl() y_belt_anchor(Y_belt_clamp_height, true);
 module y_belt_clip_stl()           y_belt_clip(false);
 module y_belt_clip_toothed_stl()   y_belt_clip(true);
 
-if(1)
-    y_belt_anchor_assembly(Y_belt_clamp_height, true);
-else {
+module y_belt_anchors_stl() {
     translate([0,  0, 0]) y_belt_anchor_toothed_stl();
     translate([0, 25, 0]) y_belt_anchor_stl();
     translate([15, 5, 0]) rotate([0,0,90])y_belt_clip_toothed_stl();
     translate([15,30, 0]) rotate([0,0,90]) y_belt_clip_stl();
 }
+
+if(1)
+    y_belt_anchor_assembly(Y_belt_clamp_height, true);
+else
+    y_belt_anchors_stl();
