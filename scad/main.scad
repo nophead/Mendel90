@@ -554,10 +554,10 @@ module frame_stay(left, bodge = 0) {
                     sanguinololu_screw_positions()
                         cylinder(r = M3_tap_radius, h = 100, center = true);
 
-            translate([x,  psu_y, psu_z])
+            translate([x, psu_y, psu_z])
                 rotate([0, -90, 180])
                     psu_screw_positions(psu)
-                        cylinder(r = M3_clearance_radius, h = 100, center = true);
+                        cylinder(r = psu_screw_hole_radius(psu), h = 100, center = true);
 
             //
             // Wiring holes
@@ -636,7 +636,7 @@ module electronics_assembly() {
             psu_screw_positions(psu) group() {
                 translate([0, 0, -sheet_thickness(frame)])
                     rotate([180, 0, 0])
-                        screw_and_washer(M3_cap_screw, psu_screw, true);
+                        screw_and_washer(psu_screw_type(psu), psu_screw, true);
             }
             psu(psu);
         }
