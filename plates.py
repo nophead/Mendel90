@@ -11,6 +11,7 @@ plate_list = [
     "cable_clips.stl",
     "d_motor_brackets.stl",
     "ribbon_clamps.stl",
+    "wades_extruder.stl",
     "x_carriage_parts.stl",
     "y_bearing_mounts.stl",
     "y_belt_anchors.stl",
