@@ -44,14 +44,14 @@ def sheets(machine):
                         #
                         dxf_maker_name = target_dir + "/" + module + ".scad"
                         f = open(dxf_maker_name, "w")
-                        f.write("use <%s/%s>\n" % (source_dir, filename))
+                        f.write("use <../../%s/%s>\n" % (source_dir, filename))
                         f.write("%s();\n" % module);
                         f.close()
                         #
                         # Run openscad on the created file
                         #
                         dxf_name = target_dir + "/" + module[:-4] + ".dxf"
-                        openscad.run("-o", dxf_name, dxf_maker_name)
+                        openscad.run("-x", dxf_name, dxf_maker_name)
                         dxf_to_svg(dxf_name)
 
 if __name__ == '__main__':
