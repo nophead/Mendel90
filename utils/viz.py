@@ -13,7 +13,7 @@ def load_stl(file_path):
     ob = bpy.context.selected_objects[0]
     print(ob)
     bpy.ops.object.select_all(action='DESELECT')
-    ob.select = True 
+    ob.select = True
     # remove doubles and clean
     #py.ops.object.editmode_toggle()
     #bpy.ops.mesh.select_all(action='TOGGLE')
@@ -26,20 +26,16 @@ def load_stl(file_path):
     print(z_dim)
     bpy.ops.transform.translate(value=(0,0,z_dim/2.0))
     cam_target = (0,0,z_dim/3.0)
-    # assign material 
+    # assign material
     ob.material_slots.data.active_material = bpy.data.materials[mat]
-    
+
 def place_camera():
     global cam_target
-    max_dim = 0
-    for i in ob.dimensions:
-        print(i)
-        if i > max_dim:
-            max_dim = i
+    max_dim = max(ob.dimensions[0] * 0.75, ob.dimensions[1] * 0.75,  ob.dimensions[2])
     print(max_dim)
     bpy.data.objects['target'].location = cam_target
-    cam = bpy.data.objects['Camera'].location.x = max_dim*2.4
-    
+    cam = bpy.data.objects['Camera'].location.x = max_dim * 2.4
+
 def render_thumb(image,gl=False,anim=False):
     if gl:
         if anim:
