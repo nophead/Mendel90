@@ -79,6 +79,7 @@ wades_big_gear_color             = plastic_part_color("lime");
 wades_small_gear_color           = plastic_part_color("red");
 wades_idler_block_color          = plastic_part_color("lime");
 wades_gear_spacer_color          = plastic_part_color("red");
+wades_clamp_color                = plastic_part_color("red");
 x_carriage_color                 = plastic_part_color("red");
 x_belt_clamp_color               = plastic_part_color("lime");
 x_end_bracket_color              = plastic_part_color("lime");

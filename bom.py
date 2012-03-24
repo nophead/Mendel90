@@ -119,7 +119,8 @@ def boms(machine):
                     stack.pop()
                 else:
                     main.add_part(s)
-                    main.assemblies[stack[-1]].add_part(s)
+                    if stack:
+                        main.assemblies[stack[-1]].add_part(s)
 
     main.print_bom(True, open(bom_dir + "/bom.txt","wt"))
 
