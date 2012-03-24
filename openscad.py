@@ -22,12 +22,10 @@ def run(*args):
             if "-o" in args:
                 idx = args.index("-o")
                 ext = args[idx+1].split('.')[-1]
-                print ext
                 if  ext == "dxf":
                     args[idx] = "-x"
                 elif ext == "stl":
                     args[idx] = "-s"
-        print args
 
         log = open("openscad.log", "w")
         subprocess.call(["openscad"] + args, stdout = log, stderr = log)
