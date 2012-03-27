@@ -51,7 +51,7 @@ def sheets(machine):
                         # Run openscad on the created file
                         #
                         dxf_name = target_dir + "/" + module[:-4] + ".dxf"
-                        openscad.run("-o", dxf_name, dxf_maker_name)
+                        openscad.run("-x", dxf_name, dxf_maker_name)
                         dxf_to_svg(dxf_name)
 
 if __name__ == '__main__':
