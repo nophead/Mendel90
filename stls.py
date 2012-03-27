@@ -40,7 +40,7 @@ def stls(machine, parts = None):
     f.close()
 
     #
-    # Decide which fils to make
+    # Decide which files to make
     #
     if parts:
         targets = list(parts)           #copy the list so we dont modify the list passed in
@@ -66,7 +66,7 @@ def stls(machine, parts = None):
                         #
                         stl_maker_name = source_dir + "/stl.scad"
                         f = open(stl_maker_name, "w")
-                        f.write("use <%s/%s>\n" % (source_dir, filename))
+                        f.write("use <%s>\n" % filename)
                         f.write("%s();\n" % module);
                         f.close()
                         #

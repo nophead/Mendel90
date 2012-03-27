@@ -44,7 +44,7 @@ def sheets(machine):
                         #
                         dxf_maker_name = target_dir + "/" + module + ".scad"
                         f = open(dxf_maker_name, "w")
-                        f.write("use <%s/%s>\n" % (source_dir, filename))
+                        f.write("use <../../%s/%s>\n" % (source_dir, filename))
                         f.write("%s();\n" % module);
                         f.close()
                         #

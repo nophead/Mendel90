@@ -4,6 +4,8 @@ Currently only supports mendel and sturdy machine variants, the huxley version n
 
 Use
 ---
+Add the directory of the OpenScad executable to your search. For Windows OpenSCAD-2012.02 or later is required. For Linux it will need to be OpenScad-2011.12 or later.
+
 To make all the files for a machine run
     make_machine.py machine_name
 
