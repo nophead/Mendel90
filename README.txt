@@ -4,7 +4,7 @@ Currently only supports mendel and sturdy machine variants, the huxley version n
 
 Use
 ---
-Add the directory of the OpenScad executable to your search. For Windows OpenSCAD-2012.02 or later is required. For Linux it will need to be OpenScad-2011.12 or later.
+Add the directory of the OpenScad executable to your search path. For Windows OpenSCAD-2012.02 or later is required. For Linux it will need to be openscad-2011.12 or later.
 
 To make all the files for a machine run
     make_machine.py machine_name
@@ -13,9 +13,11 @@ To make just the bom, sheets or stls run bom.py, sheets.py or stls.py machine_na
 
 machine_name can be mendel or sturdy. To make your own variant copy scad\conf\mendel_config.scad or scad\conf\sturdy_config.scad to yourname_config.scad.  Then run make_machine yourname.
 
-To view the model of the whole machine, open scad\main.scad. It will take several minutes to render (about about 8 miniutes on my computer) but after that you can pan and zoom it at reasonable speed and changes takes less time to render.  (Note: main.scad will only render correctly if conf\machine.scad exists, which is created by the make_machine.py script.)
+To view the model of the whole machine, open scad\main.scad. It will take several minutes to render (about about 8 minutes on my computer) but after that you can pan and zoom it at reasonable speed and changes takes less time to render.  (Note: main.scad will only render correctly if conf\machine.scad exists, which is created by the make_machine.py script.)
 
 To view a sub-assembly, open the individual scad files. Set the exploded flag in config.scad to make exploded views.
+
+To get blender renders of all the parts put blender in your search path and run render.py machine_name.
 
 Credits
 -------
