@@ -1,2 +1,2 @@
-use <scad/main.scad>
+use <../../scad/main.scad>
 frame_left_dxf();

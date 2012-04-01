@@ -5,6 +5,7 @@ Currently only supports mendel and sturdy machine variants, the huxley version n
 Use
 ---
 Add the directory of the OpenScad executable to your search path. For Windows OpenSCAD-2012.02 or later is required. For Linux it will need to be openscad-2011.12 or later.
+To get PDF versions of the sheet drawings add InkScape to your search path.
 
 To make all the files for a machine run
     make_machine.py machine_name
@@ -32,3 +33,5 @@ x-end.scad and wade.scad use some elements of the Prusa ones by Josef Prusa, GPL
 z_couplings originally based on http://www.thingiverse.com/thing:7153 by Griffin_Nicoll, GPL license.
 
 Bearing holders originally based on http://www.thingiverse.com/thing:7755 by Jolijar, CC license.
+
+InkCL.py based on code from http://kaioa.com/node/42

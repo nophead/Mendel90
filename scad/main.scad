@@ -37,7 +37,7 @@ Z = 0.5 * Z_travel;
 //
 X_bar_length = motor_end - idler_end + 2 * x_end_bar_length();
 module x_axis_assembly(show_extruder) {
-    X_belt_gap = x_carriage_belt_gap() - 10;
+    X_belt_gap = x_carriage_belt_gap() - 15;
 
     assembly("x_axis_assembly");
     for(side = [-1,1])
@@ -200,22 +200,52 @@ module y_carriage() {
 
         translate([Y_bar_spacing / 2, 0, 0])
             rotate([0,180,0])
-                bearing_mount_holes();
+                bearing_mount_holes()
+                    cylinder(r = screw_clearance_radius(cap_screw), h = 100, center = true);
 
         for(end = [-1, 1])
             translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
                 rotate([0,180,0])
-                    bearing_mount_holes();
+                    bearing_mount_holes()
+                        cylinder(r = screw_clearance_radius(cap_screw), h = 100, center = true);
 
         for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
             translate([Y_belt_line - X_origin, end[0], 0])
                 rotate([0, 180, end[1]])
-                    y_belt_anchor_holes();
+                    y_belt_anchor_holes()
+                        cylinder(r = M3_clearance_radius, h = 100, center = true);
 
         for(x = [-bed_holes / 2, bed_holes / 2])
             for(y = [-bed_holes / 2, bed_holes / 2])
                 translate([x, y, 0])
                     cylinder(r = 2.5/2, h = 100, center = true);
+    }
+}
+
+module y_heatsheild() {
+    difference() {
+        sheet(Cardboard, Y_carriage_width - 2 * bar_clamp_tab, Y_carriage_depth);
+
+        translate([Y_bar_spacing / 2, 0, 0])
+            rotate([0,180,0])
+                bearing_mount_holes()
+                    cube([10,10, 100], center = true);
+
+        for(end = [-1, 1])
+            translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
+                rotate([0,180,0])
+                    bearing_mount_holes()
+                        cube([10,10, 100], center = true);
+
+        for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
+            translate([Y_belt_line - X_origin, end[0], 0])
+                rotate([0, 180, end[1]])
+                    hull()
+                        y_belt_anchor_holes()
+                            cube([10, 10, 100],center =true);
+
+        translate([0, Y_carriage_depth / 2, 0])
+            cube([ribbon_clamp_length(bed_ways, cap_screw), 60, 100], center = true);
     }
 }
 
@@ -275,9 +305,12 @@ module y_axis_assembly(show_bed) {
                 rotate([180, 0, 0])
                     ribbon_clamp_assembly(bed_ways, cap_screw, 25, sheet_thickness(Y_carriage) + ribbon_clamp_thickness(), false, true);
 
-            if(show_bed)
-                translate([0, 0, Y_carriage_height + sheet_thickness(Y_carriage) / 2])
+            translate([0, 0, Y_carriage_height + sheet_thickness(Y_carriage) / 2]) {
+                if(show_bed)
                     bed_assembly();
+                translate([0, 0, sheet_thickness(Cardboard) / 2])
+                    y_heatsheild();
+            }
 
 
             translate([0, 0, Y_carriage_height + eta * 2])
@@ -729,6 +762,8 @@ module frame_gantry_dxf() projection(cut = true)
     translate([0,0, gantry_setback + sheet_thickness(frame) / 2]) rotate([-90, 0, 0]) frame_gantry();
 
 module y_carriage_dxf() projection(cut = true) y_carriage();
+
+module y_heatsheild_dxf() projection(cut = true) y_heatsheild();
 
 
 

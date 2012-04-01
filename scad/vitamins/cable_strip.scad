@@ -63,7 +63,7 @@ module elliptical_cable_strip(width, p1, p2, pmax, extra = 15) {
     delta = p2 - p1;
 
     A = abs(max_delta[0] / 2);
-    B = 50;
+    B = 75;
 
     length = ceil(PI * pow((pow(A,1.5) + pow(B,1.5))/2, 1/1.5));
     total = length + 2 * extra;

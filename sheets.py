@@ -2,13 +2,12 @@
 
 import os
 import openscad
+import InkCL
 import shutil
 import sys
 from dxf import *
 
 source_dir = "scad"
-
-
 
 def sheets(machine):
     #
@@ -50,9 +49,17 @@ def sheets(machine):
                         #
                         # Run openscad on the created file
                         #
-                        dxf_name = target_dir + "/" + module[:-4] + ".dxf"
+                        base_name = target_dir + "/" + module[:-4]
+                        dxf_name = base_name + ".dxf"
                         openscad.run("-o", dxf_name, dxf_maker_name)
+                        #
+                        # Make SVG drill template
+                        #
                         dxf_to_svg(dxf_name)
+                        #
+                        # Make PDF for printing
+                        #
+                        InkCL.run("-f", base_name + ".svg", "-A", base_name + ".pdf")
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:

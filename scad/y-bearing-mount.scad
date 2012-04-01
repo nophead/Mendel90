@@ -58,11 +58,11 @@ module bearing_mount(bearing, height, endstop) {
     }
  }
 
-module bearing_mount_holes(height)
+module bearing_mount_holes()
     for(end = [-1, 1])
         translate([end * (bearing_holder_width(Y_bearings) / 2 + tab_length / 2),
                   -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab) / 2, 0])
-             cylinder(r = screw_clearance_radius, h = 100, center = true);
+             child();
 
 module y_bearing_assembly(height, endstop = false)
 {
