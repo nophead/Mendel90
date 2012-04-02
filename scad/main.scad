@@ -222,28 +222,35 @@ module y_carriage() {
     }
 }
 
-module y_heatsheild() {
+module y_heatshield() {
+    width =  Y_carriage_width - 2 * bar_clamp_tab;
     difference() {
-        sheet(Cardboard, Y_carriage_width - 2 * bar_clamp_tab, Y_carriage_depth);
+        group() {
+            difference() {
+                sheet(Cardboard, width, Y_carriage_depth);
 
-        translate([Y_bar_spacing / 2, 0, 0])
-            rotate([0,180,0])
-                bearing_mount_holes()
-                    cube([10,10, 100], center = true);
+                translate([Y_bar_spacing / 2, 0, 0])
+                    rotate([0,180,0])
+                        bearing_mount_holes()
+                            cube([10,10, 100], center = true);
 
-        for(end = [-1, 1])
-            translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
-                rotate([0,180,0])
-                    bearing_mount_holes()
-                        cube([10,10, 100], center = true);
+                for(end = [-1, 1])
+                    translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
+                        rotate([0,180,0])
+                            bearing_mount_holes()
+                                cube([10,10, 100], center = true);
 
-        for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
-            translate([Y_belt_line - X_origin, end[0], 0])
-                rotate([0, 180, end[1]])
-                    hull()
-                        y_belt_anchor_holes()
-                            cube([10, 10, 100],center =true);
+                for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
+                    translate([Y_belt_line - X_origin, end[0], 0])
+                        rotate([0, 180, end[1]])
+                            hull()
+                                y_belt_anchor_holes()
+                                    cube([10, 10, 100],center =true);
 
+            }
+            translate([0, 0, sheet_thickness(Cardboard) / 2])
+                taped_area(FoilTape, 50, width, Y_carriage_depth, 5);
+        }
         translate([0, Y_carriage_depth / 2, 0])
             cube([ribbon_clamp_length(bed_ways, cap_screw), 60, 100], center = true);
     }
@@ -309,7 +316,7 @@ module y_axis_assembly(show_bed) {
                 if(show_bed)
                     bed_assembly();
                 translate([0, 0, sheet_thickness(Cardboard) / 2])
-                    y_heatsheild();
+                    y_heatshield();
             }
 
 
@@ -745,6 +752,7 @@ module machine_assembly() {
 
 
 machine_assembly();
+//y_heatshield();
 //frame_assembly();
 
 module frame_base_dxf() projection(cut = true) translate([0,0, sheet_thickness(base) / 2]) frame_base();

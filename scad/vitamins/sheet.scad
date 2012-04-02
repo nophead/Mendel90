@@ -29,9 +29,10 @@ PMMA10   = [ "AC", "Acrylic sheet",       10, [1,   1,   1,   0.5  ], false];   
 glass2   = [ "GL", "Glass sheet",          2, [1,   1,   1,   0.25 ], false];
 DiBond   = [ "DB", "Dibond sheet",         3, [0.7, 0.7, 0.7, 1    ], false];
 Cardboard= [ "CB", "Corrugated cardboard", 6, [0.6, 0.6, 0.2, 1    ], false];
-FoilTape = [ "AF", "Aluminium foil tape", .2, [0.9, 0.9, 0.9, 1    ], false];
+FoilTape = [ "AF", "Aluminium foil tape",0.05,[0.9, 0.9, 0.9, 1    ], false];
 
 function sheet_thickness(type) = type[2];
+function sheet_colour(type) = type[3];
 function sheet_is_soft(type) = type[4];
 
 module corner(r) {
@@ -50,8 +51,8 @@ module corner(r) {
 
 module sheet(type, w, d, corners = [0, 0, 0, 0]) {
     t = sheet_thickness(type);
-    vitamin(str(type[0], t, round(w), round(d),": ",type[1]," ",  round(w), " x ", round(d), " x ", t));
-    color(type[3])
+    vitamin(str(type[0], ceil(t), round(w), round(d),": ",type[1]," ",  round(w), " x ", round(d), " x ", t));
+    color(sheet_colour(type))
         linear_extrude(height = t, center = true)
             hull() {
                 translate([-w/2,  d/2])
@@ -69,4 +70,22 @@ module sheet(type, w, d, corners = [0, 0, 0, 0]) {
                     rotate([0, 0, -270])
                         corner(corners[3]);
             }
+}
+
+module taped_area(type, tape_width, w, d, overlap) {
+    total_width = w + 2 * overlap;
+    strips = ceil(total_width / tape_width);
+    pitch = total_width / strips;
+    intersection() {
+        group() {
+            for(i = [0 : strips - 1])
+                assign(k = ((i % 2) ? 0.9 : 1), c = sheet_colour(type))
+                    translate([-w / 2 - overlap + tape_width / 2 + i * pitch, 0, sheet_thickness(type) / 2 + i * eta])
+                        explode([0, 0, d / 2 + i * 10])
+                            color([c[0] * k, c[1] * k, c[2] * k, c[3]])
+                                sheet(type, tape_width, d + 2 * overlap);
+        }
+        if(!exploded)
+            cube([w + 2 * eta, d + 2 * eta, 100], center = true);
+    }
 }
