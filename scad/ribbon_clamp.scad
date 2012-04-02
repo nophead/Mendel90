@@ -81,10 +81,9 @@ module ribbon_clamps_stl() {
     translate([0,-12,0]) ribbon_clamp(bed_ways, cap_screw);
     translate([0,0,0])   ribbon_clamp(bed_ways, cap_screw);
     translate([0,12,0])  ribbon_clamp(bed_ways, base_screw);
-    translate([0,25,0]) ribbon_clamp(x_end_ways, frame_screw);
-    translate([0,37,0]) ribbon_clamp(x_end_ways, M3_cap_screw);
-    translate([0,48,0]) ribbon_clamp(extruder_ways, M3_cap_screw);
-    translate([0,59,0]) ribbon_clamp(extruder_ways, M3_cap_screw);
+    translate([0,25,0])  ribbon_clamp(x_end_ways, frame_screw);
+    translate([0,37,0])  ribbon_clamp(x_end_ways, M3_cap_screw);
+    translate([0,48,0])  ribbon_clamp(extruder_ways, M3_cap_screw);
 }
 
 if(1)
