@@ -34,52 +34,47 @@ class BOM:
         return ass.replace("assembly", "assemblies")
 
     def print_bom(self, breakdown, file = None):
+        print >> file, "Vitamins:"
         if breakdown:
             longest = 0
             for ass in self.assemblies:
                 name = ass.replace("_assembly","")
                 longest = max(longest, len(name))
             for i in range(longest):
-                print >> file, " " * 14,
                 for ass in sorted(self.assemblies):
-                    name = ass.replace("_assembly","").replace("_"," ")
-                    if longest - i > len(name):
+                    name = ass.replace("_assembly","").replace("_"," ").capitalize()
+                    index = i - (longest - len(name))
+                    if index < 0:
                         print >> file, "  ",
                     else:
-                        print >> file, " %s" % name[i - (longest - len(name))],
+                        print >> file, " %s" % name[index],
                 print >> file
 
-        print >> file, "Vitamins:"
         for part in sorted(self.vitamins):
             if ': ' in part:
                 part_no, description = part.split(': ')
             else:
                 part_no, description = "", part
-            print >> file, "%3d %-10s" % (self.vitamins[part], part_no),
             if breakdown:
                 for ass in sorted(self.assemblies):
                     bom = self.assemblies[ass]
                     if part in bom.vitamins:
-                        print >> file, "%2d" % bom.vitamins[part],
+                        file.write("%2d|" % bom.vitamins[part])
                     else:
-                        print >> file, "  ",
-
-            print >> file, description
+                        file.write("  |")
+            print >> file, "%3d" % self.vitamins[part], description
 
         print >> file
         print >> file, "Printed:"
         for part in sorted(self.printed):
-            print >> file, "%3d" % self.printed[part],
             if breakdown:
-                print >> file, " " * 10,
                 for ass in sorted(self.assemblies):
                     bom = self.assemblies[ass]
                     if part in bom.printed:
-                        print >> file, "%2d" % bom.printed[part],
+                        file.write("%2d|" % bom.printed[part])
                     else:
-                        print >> file, "  ",
-
-            print >> file, part
+                        file.write("  |")
+            print >> file, "%3d" % self.printed[part], part
 
         print >> file
         if self.assemblies:

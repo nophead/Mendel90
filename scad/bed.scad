@@ -30,7 +30,7 @@ module bed_assembly() {
     }
 
     translate([0, 0, washer_thickness(M3_washer)]) {
-        vitamin(str("BED", bed_width, bed_depth,": PCB bed ", bed_width, " x ", bed_depth));
+        vitamin(str("BED", bed_width, bed_depth,": PCB bed ", bed_width, "mm x ", bed_depth, "mm"));
         translate([0,0, pillar_height(bed_pillars) + pcb_thickness / 2])
             color(bed_color) cube([bed_width, bed_depth, pcb_thickness], center = true);
 

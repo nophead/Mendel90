@@ -14,7 +14,7 @@ function ball_bearing_diameter(type) = type[1];
 function ball_bearing_width(type) = type[2];
 
 module ball_bearing(type) {
-    vitamin(str("BB",type[3],": Ball bearing ",type[3]," ",type[0], " x ", type[1], " x ", type[2]));
+    vitamin(str("BB",type[3],": Ball bearing ",type[3]," ",type[0], "mm x ", type[1], "mm x ", type[2], "mm"));
     rim = type[1] / 10;
 
     color(bearing_color) render() difference() {

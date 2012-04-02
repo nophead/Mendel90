@@ -54,7 +54,7 @@ function screw_head_height(type) = type[2] == hs_cap ? type[4] :
 
 
 module screw(type, length) {
-    vitamin(str(type[0], length,": ",type[1], " x ", length));
+    vitamin(str(type[0], length,": ",type[1], " x ", length, "mm"));
 
     head_type = type[2];
     rad = screw_radius(type) - eta;

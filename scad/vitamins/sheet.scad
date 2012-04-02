@@ -51,7 +51,7 @@ module corner(r) {
 
 module sheet(type, w, d, corners = [0, 0, 0, 0]) {
     t = sheet_thickness(type);
-    vitamin(str(type[0], ceil(t), round(w), round(d),": ",type[1]," ",  round(w), " x ", round(d), " x ", t));
+    vitamin(str(type[0], ceil(t), round(w), round(d),": ",type[1]," ",  round(w), "mm x ", round(d), "mm x ", t, "mm"));
     color(sheet_colour(type))
         linear_extrude(height = t, center = true)
             hull() {

@@ -27,7 +27,7 @@ module fan(type) {
     corner_radius = width / 2 - hole_pitch;
     screw = fan_screw(type);
 
-    vitamin(str("FAN", fan_width(type), fan_depth(type), ": Fan ", fan_width(type), " x ", fan_depth(type)));
+    vitamin(str("FAN", fan_width(type), fan_depth(type), ": Fan ", fan_width(type), "mm x ", fan_depth(type), "mm"));
     difference() {
         linear_extrude(height = depth, center = true, convexity = 4)
             difference() {

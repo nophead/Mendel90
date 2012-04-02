@@ -18,7 +18,7 @@ module ziptie(type, r)
 {
     latch = type[2];
     length = ceil(2 * PI * r + type[4] + latch[2] + 1);
-    vitamin(str("ZT00", length, ": Ziptie ",length));
+    vitamin(str("ZT00", length, ": Ziptie ", length, "mm min length"));
 
     angle = asin((latch[0] / 2) / r) - asin(ziptie_thickness(type) / latch[0]);
     color(type[3]) render() union() {

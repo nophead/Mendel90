@@ -28,7 +28,7 @@ module pillar(type) {
 module hex_pillar(type) {
     height = pillar_height(type);
 
-    vitamin(str("HP0", type[0], height, " : Hex pillar M", type[0], " x ", height));
+    vitamin(str("HP0", type[0], height, " : Hex pillar M", type[0], " x ", height, "mm"));
     color(pillar_color) render() difference() {
         union() {
             cylinder(h = height, r = type[2] / 2, $fn = 6);

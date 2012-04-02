@@ -23,7 +23,7 @@ module belt(type, x1, y1, r1, x2, y2, r2, gap = 0) {
     dy = y2 - y1;
 
     length = pi * (r1 + r2) + 2 * sqrt(dx * dx + dy * dy) - gap;
-    vitamin(str("BT", belt_pitch(type),width, round(length), ": Belt T", belt_pitch(type)," x ", width, " x ", round(length)));
+    vitamin(str("BT", belt_pitch(type),width, round(length), ": Belt T", belt_pitch(type)," x ", width, "mm x ", round(length), "mm"));
 
     color(belt_color)
     linear_extrude(height = width, center = true, convexity = 6) {

@@ -8,8 +8,13 @@
 // Springs
 //
 
-extruder_spring = [7, 1, 10, 5];
+extruder_spring = [ 7,    1, 10, 5];
 hob_spring      = [12, 0.75, 10, 6];
+
+function spring_od(type)     = type[0];
+function spring_gauge(type)  = type[1];
+function spring_length(type) = type[2];
+function spring_coils(type)  = type[3];
 
 // taken from openscad example 20
 module coil(r1 = 100, r2 = 10, h = 100, twists)
@@ -49,12 +54,14 @@ module coil(r1 = 100, r2 = 10, h = 100, twists)
 }
 
 
-module comp_spring(spring, l = 0) {
-    l = (l == 0) ? spring[2] : l;
+module comp_spring(type, l = 0) {
+    l = (l == 0) ? spring_length(type) : l;
 
-    vitamin(str("SPR",  spring[0], spring[1] * 100, spring[2], ": Spring ", spring[0], " x ", spring[1], " x ", spring[2] ));
+    vitamin(str("SPR", spring_od(type), spring_gauge(type) * 100, type[2],
+                ": Spring ", spring_od(type), "mm OD x ", spring_gauge(type), "mm gauge x ", spring_length(type), "mm length" ));
 
-    color(spring_color) render() coil(r1 = (spring[0] - spring[1])/ 2, r2 = spring[1] / 2, h = l, twists = spring[3]);
+    color(spring_color) render()
+        coil(r1 = (spring_od(type) - spring_gauge(type)) / 2, r2 = spring_gauge(type) / 2, h = l, twists = spring_coils(type));
 
 }
 

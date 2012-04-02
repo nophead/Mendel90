@@ -29,7 +29,7 @@ module NEMA(motor) {
     boss_height = motor[5];
     shaft_rad = motor[6] / 2;
     cap = 8;
-    vitamin(str("NEMA", round(motor[0] / 2.54), length * 10, ": NEMA", round(motor[0] / 2.54), " x ", length, " stepper motor"));
+    vitamin(str("NEMA", round(motor[0] / 2.54), length * 10, ": NEMA", round(motor[0] / 2.54), " x ", length, "mm stepper motor"));
     union() {
         color(stepper_body_color) render()                                                     // black laminations
             translate([0,0, -length / 2])
