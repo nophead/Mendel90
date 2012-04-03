@@ -246,13 +246,12 @@ module y_heatshield() {
                             hull()
                                 y_belt_anchor_holes()
                                     cube([10, 10, 100],center =true);
-
             }
             translate([0, 0, sheet_thickness(Cardboard) / 2])
                 taped_area(FoilTape, 50, width, Y_carriage_depth, 5);
         }
         translate([0, Y_carriage_depth / 2, 0])
-            cube([ribbon_clamp_length(bed_ways, cap_screw), 60, 100], center = true);
+            cube([ribbon_clamp_length(bed_ways, cap_screw), 70, 100], center = true);
     }
 }
 
