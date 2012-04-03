@@ -770,7 +770,7 @@ module frame_gantry_dxf() projection(cut = true)
 
 module y_carriage_dxf() projection(cut = true) y_carriage();
 
-module y_heatsheild_dxf() projection(cut = true) y_heatsheild();
+module y_heatshield_dxf() projection(cut = true) y_heatshield();
 
 
 
