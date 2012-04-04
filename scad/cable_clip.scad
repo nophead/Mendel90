@@ -69,7 +69,7 @@ module cable_clip_assembly(screw, screw_length, cable1, cable2 = 0) {
         cable_clip(screw, cable1, cable2);
 
     translate([0, 0, max(cable_clip_height(cable1), cable_clip_height(cable2))])
-        screw_and_washer(screw, screw_length);
+        screw_and_washer(screw, screw_length, true);
 }
 
 module cable_clip_AB_stl() cable_clip(base_clip_screw, endstop_wires, motor_wires);

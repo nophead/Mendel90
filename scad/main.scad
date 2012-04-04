@@ -64,7 +64,7 @@ module x_axis_assembly(show_extruder) {
             }
 
 
-    elliptical_cable_strip(ribbon_clamp_slot(extruder_ways) - 1,
+    elliptical_cable_strip(ribbon_clamp_slot(extruder_ways),
                 [motor_end, 0, Z + Z0] + x_end_extruder_ribbon_clamp_offset(),
                 [-X + X_origin, 0, Z + Z0 + x_carriage_offset()] + extruder_connector_offset(),
                 [-X_travel / 2 + X_origin, 0, Z + Z0 + x_carriage_offset()] + extruder_connector_offset());
@@ -696,7 +696,7 @@ module frame_assembly(show_gantry = true) {
 
         translate([0, ribbon_clamp_width(frame_screw) / 2, 0])
             rotate([90, 0, 90])
-                cable_strip(ribbon_clamp_slot(x_end_ways) - 1, gantry_setback - x_end_ribbon_clamp_y(),
+                cable_strip(ribbon_clamp_slot(x_end_ways), gantry_setback - x_end_ribbon_clamp_y(),
                         (Z_travel + (ribbon_clamp_z - (Z_travel + Z0 + x_end_ribbon_clamp_z()))) * 2,
                         Z + Z0 + x_end_ribbon_clamp_z() - ribbon_clamp_z, 50);
         }
@@ -706,7 +706,7 @@ module frame_assembly(show_gantry = true) {
 
         translate([0, ribbon_clamp_width(base_screw), 0])
             rotate([90, 0, 90])
-                cable_strip(ribbon_clamp_slot(bed_ways) - 1, Y_carriage_height - sheet_thickness(Y_carriage) / 2, Y_travel, Y);
+                cable_strip(ribbon_clamp_slot(bed_ways), Y_carriage_height - sheet_thickness(Y_carriage) / 2, Y_travel, Y);
     }
 
     place_cable_clips();
