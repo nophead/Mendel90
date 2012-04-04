@@ -57,7 +57,7 @@ module ribbon_clamp_assembly(ways, screw_type, screw_length, panel_thickness = 0
 
     translate([0,0, thickness])
         ribbon_clamp_holes(ways, screw_type)
-            screw_and_washer(screw_type, screw_length);
+            screw_and_washer(screw_type, screw_length, panel_thickness == 0);
 
     if(panel_thickness != 0)
         translate([0,0, - panel_thickness])

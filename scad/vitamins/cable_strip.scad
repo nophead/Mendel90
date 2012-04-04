@@ -19,7 +19,7 @@ module cable_strip(width, depth, travel, x, extra = 15) {
     length = max(top, bottom);
 
     total = ceil(top + bottom + PI * depth);
-    w = ceil(width);
+    w = floor(width - 1);
 
     vitamin(str("PP", thickness * 10, w, total,": Polypropylene strip ", total, "mm x ", w, "mm x ", thickness, "mm"));
 
@@ -57,7 +57,7 @@ module ellipse(xr, yr, center = true)
 
 module elliptical_cable_strip(width, p1, p2, pmax, extra = 15) {
     thickness = 0.5;
-    w = ceil(width);
+    w = floor(width - 1);
 
     max_delta = pmax - p1;
     delta = p2 - p1;
