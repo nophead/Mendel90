@@ -173,7 +173,23 @@ module x_end_bracket(motor_end, assembly = false){
                 //
                 translate([-z_bar_offset(), 0, thickness / 2 - eta])
                     cylinder(r = anti_backlash_radius + anti_backlash_wall, h = anti_backlash_height() - thickness / 2, $fn = 6);
-
+                translate([-z_bar_offset() + anti_backlash_radius + anti_backlash_wall, - sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall), thickness / 2 - eta])
+                    mirror([1,0,0])
+                        right_triangle(width = (anti_backlash_radius + anti_backlash_wall) / 2 + eta, height = sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall) + eta, h  = anti_backlash_height() - thickness / 2, center = false);
+                translate([-z_bar_offset() + anti_backlash_radius + anti_backlash_wall, sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall), thickness / 2 - eta])
+                    rotate([0,0,180])
+                        right_triangle(width = (anti_backlash_radius + anti_backlash_wall) / 2 + eta, height = sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall) + eta, h  = anti_backlash_height() - thickness / 2, center = false);
+                if (motor_end) {
+                    translate([-z_bar_offset() - anti_backlash_radius - anti_backlash_wall, sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall), thickness / 2 - eta])
+                        mirror([1,0,0])
+                            rotate([0,0,180])
+                                right_triangle(width = (anti_backlash_radius + anti_backlash_wall) / 2 + eta, height = sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall) + eta, h  = mbracket_height - thickness, center = false);
+                    translate([-z_bar_offset() - anti_backlash_radius - anti_backlash_wall, - sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall), thickness / 2 - eta])
+                        rotate([0,0,0])
+                            right_triangle(width = (anti_backlash_radius + anti_backlash_wall) / 2 + eta, height = sqrt(3) / 2 * (anti_backlash_radius + anti_backlash_wall) + eta, h  = mbracket_height - thickness, center = false);
+                    translate([back, - bearing_width/2, thickness / 2 - eta])
+                        cube([2, bearing_width, mbracket_height - thickness]);
+                }
                 //
                 // Webs from bearing holder
                 //
