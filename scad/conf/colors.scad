@@ -20,7 +20,7 @@ grey50                          = [0.5, 0.5, 0.5];
 grey70                          = [0.7, 0.7, 0.7];
 grey80                          = [0.8, 0.8, 0.8];
 grey90                          = [0.9, 0.9, 0.9];
-brass                           = [0.8, 0.8, 0.4];
+brass                           = "gold";
 
 // use_realistic_colors is defined in config.scad
 function plastic_part_color(color) = use_realistic_colors ? printed_plastic_color : color;
@@ -30,6 +30,7 @@ rod_color                        = grey80;
 studding_color                   = grey50;
 tubing_color                     = [0.8, 0.8, 0.8, 0.75 ];
 nut_color                        = grey70;
+brass_nut_color                  = brass;
 soft_washer_color                = grey20;
 hard_washer_color                = grey80;
 star_washer_color                = brass;
@@ -57,7 +58,7 @@ d_plug_shell_color               = grey80;
 d_plug_insulator_color           = grey20;
 extruder_insulator_color         = "goldenrod";
 extruder_nozzle_color            = "yellow";
-cable_strip_color                = use_realistic_colors ? cable_strip_real_color : "fuchsia";
+cable_strip_color                = use_realistic_colors ? cable_strip_real_color : "green";
 belt_color                       = use_realistic_colors ? belt_real_color : "yellow";
 bulldog_color                    = use_realistic_colors ? bulldog_real_color : "yellow";
 

@@ -12,7 +12,6 @@ include <positions.scad>
 
 nut_trap_meat = 4;                  // how much plastic above the nut trap
 wall = 3;
-tab_height = 5;
 
 function bar_clamp_inner_rad(d) = d / 2;
 function bar_clamp_outer_rad(d) = bar_clamp_inner_rad(d) + bar_clamp_band;
@@ -37,6 +36,9 @@ module bar_clamp_holes(d)
 
 module bar_clamp(d, h, w, switch = false, yaxis = false) {
     stl(str(yaxis ? "y_bar_clamp" : "z_bar_clamp", switch ? "_switch" : ""));
+    nutty = cnc_sheets && (yaxis ? base_nuts : frame_nuts);
+    mount_screw = yaxis ? base_screw : frame_screw;
+    nut_depth = nut_trap_depth(screw_nut(mount_screw));
     gap = 1.5;
     inner_rad = bar_clamp_inner_rad(d);
     outer_rad = bar_clamp_outer_rad(d);
@@ -51,6 +53,9 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
     sbracket_length = -y_switch_x(w) + 4;
     sbracket_thickness = 7;
     sbracket_height = microswitch_length();
+
+    tab_height = part_base_thickness + (nutty ? nut_depth : 0);
+
 
     color(clamp_color) {
         translate([0, rail_offset, 0]) {
@@ -91,13 +96,16 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
                     //
                     // mounting holes
                     //
-                    translate([0, -rail_offset, 0])
+                    translate([0, -rail_offset, tab_height])
                         bar_clamp_holes(d)
                             rotate([0,0,90])
-                                tearslot( h = 100, r = screw_clearance_radius(frame_screw), center = true, w = 2); // mounting screw
+                                if(nutty)
+                                    nut_trap(screw_clearance_radius(mount_screw), nut_radius(screw_nut(mount_screw)), nut_depth, true);
+                                else
+                                    tearslot( h = 100, r = screw_clearance_radius(frame_screw), center = true, w = 2); // mounting screw
 
                     if(switch && !yaxis)
-                        translate([-w / 2 - axis_endstop_clearance,
+                        translate([-w / 2 - axis_end_clearance,
                                    outer_rad + microswitch_thickness() / 2 - rail_offset,
                                    h - outer_rad + microswitch_first_hole_x_offset()])
                             rotate([0, 90, 90])
@@ -124,9 +132,10 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
                             mirror([0,1,0]) rotate([0, 90, 90])
                                 microswitch_holes();
 
-                        translate([0, - 0.5 * bar_clamp_tab - 0.5,0]) // screwdriver access
-                            rotate([0,0,90])
-                                teardrop(h = 100, r = 3, center = true, truncate = false);
+                        if(!nutty)
+                            translate([0, - 0.5 * bar_clamp_tab - 0.5,0]) // screwdriver access
+                                rotate([0,0,90])
+                                    teardrop(h = 100, r = 3, center = true, truncate = false);
                     }
                 }
             }
@@ -156,11 +165,12 @@ module bar_clamp_assembly(d, h, w, switch = false, yaxis = true) {
     // mounting screws and washers
     //
     for(y = [rail_offset - length + 0.5 * bar_clamp_tab, rail_offset - 0.5 * bar_clamp_tab])
-        translate([0, y, tab_height])
-            if(yaxis)
-                base_screw();
-            else
-                frame_screw(tab_height);
+        translate([0, y, part_base_thickness])
+            rotate([0, 0, 90])
+                if(yaxis)
+                    base_screw(part_base_thickness);
+                else
+                    frame_screw(part_base_thickness);
     //
     // limit switch
     //
@@ -173,15 +183,15 @@ module bar_clamp_assembly(d, h, w, switch = false, yaxis = true) {
                         screw_and_washer(No2_screw, 13);
                 }
         else
-            translate([-w / 2 - axis_endstop_clearance,
-                       outer_rad + microswitch_thickness() / 2,
-                       h - outer_rad + microswitch_first_hole_x_offset()])
-                rotate([0, 90, 90]) {
-                    microswitch();
-                    microswitch_hole_positions()
-                        screw_and_washer(No2_screw, 13);
-                }
-
+            if(top_limit_switch)
+                translate([-w / 2 - limit_switch_offset,
+                           outer_rad + microswitch_thickness() / 2,
+                           h - outer_rad + microswitch_first_hole_x_offset()])
+                    rotate([0, 90, 90]) {
+                        microswitch();
+                        microswitch_hole_positions()
+                            screw_and_washer(No2_screw, 13);
+                    }
 }
 
 
@@ -202,13 +212,16 @@ module z_bar_clamp_stl()        translate([0,0,bar_clamp_depth/2]) rotate([0,90,
 module z_bar_clamp_switch_stl() translate([0,0,bar_clamp_depth/2]) rotate([0,90,0]) bar_clamp(Z_bar_dia, gantry_setback, bar_clamp_depth, true, false);
 
 module bar_clamps_stl() {
-                                            z_bar_clamp_switch_stl();
-    translate([gantry_setback + 15, 0, 0])  z_bar_clamp_stl() ;
+    y2 = bar_clamp_length(Z_bar_dia) - bar_clamp_tab + 2;
+    y3 = y2 + bar_clamp_length(Y_bar_dia) - bar_clamp_tab + 2;
+                                                                                         rotate([0, 0, 180]) z_bar_clamp_switch_stl();
+    translate([2, -2 * bar_rail_offset(Z_bar_dia) + bar_clamp_length(Z_bar_dia), 0])                         z_bar_clamp_stl();
 
-    translate([10, 40, 0])                  y_bar_clamp_switch_stl();
-    translate([gantry_setback + 25, 40, 0]) y_bar_clamp_stl();
-    translate([gantry_setback + 15, 80, 0]) y_bar_clamp_stl();
-    translate([0, 80, 0])                   y_bar_clamp_stl();
+    translate([-10, y2, 0])                                                              rotate([0, 0, 180]) y_bar_clamp_switch_stl();
+    translate([12, y2 -2 * bar_rail_offset(Y_bar_dia) + bar_clamp_length(Y_bar_dia), 0])                     y_bar_clamp_stl();
+
+    translate([0, y3, 0])                                                                rotate([0, 0, 180]) y_bar_clamp_stl();
+    translate([2, y3 -2 * bar_rail_offset(Y_bar_dia) + bar_clamp_length(Y_bar_dia), 0])                      y_bar_clamp_stl();
 }
 
 if(0)

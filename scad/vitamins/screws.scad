@@ -25,12 +25,14 @@ M3_grub_screw  = ["GB030", "M3 grub screw",      hs_grub,  3, 1.6, 2.5,   M3_was
 M4_cap_screw   = ["CS040", "M4 cap screw",       hs_cap,   4, 7.0, 3.0,   M4_washer, M4_nut, M4_tap_radius,    M4_clearance_radius];
 M4_hex_screw   = ["HX040", "M4 hex screw",       hs_hex,   4, 8.1, 2.925, M4_washer, M4_nut, M4_tap_radius,    M4_clearance_radius];
 M4_pan_screw   = ["PS040", "M4 pan screw",       hs_pan,   4, 7.8, 3.3,   M4_washer, M4_nut, M4_tap_radius,    M4_clearance_radius];
+M8_cap_screw   = ["CS080", "M8 cap screw",       hs_cap,   8, 13,  7.78,  M8_washer, M8_nut, M8_tap_radius,    M8_clearance_radius];
 M8_hex_screw   = ["HX080", "M8 hex screw",       hs_hex,   8, 15,  5.65,  M8_washer, M8_nut, M8_tap_radius,    M8_clearance_radius];
 
 No2_screw      = ["PSW02", "No2 pan wood screw", hs_pan, 2.2, 4.2, 1.7, M2p5_washer, false,  No2_pilot_radius, No2_clearance_radius];
 No4_screw      = ["PSW04", "No4 pan wood screw", hs_pan, 3.0, 5.5, 2.0, M3p5_washer, false,  No4_pilot_radius, No4_clearance_radius];
 No6_screw      = ["PSW06", "No6 pan wood screw", hs_pan, 3.5, 6.7, 2.2,   M4_washer, false,  No6_pilot_radius, No6_clearance_radius];
 No6_cs_screw   = ["PSW06", "No6 cs  wood screw", hs_cs,  3.5, 7.0, 0,     M4_washer, false,  No6_pilot_radius, No6_clearance_radius];
+No632_pan_screw =["PS063", "6-32 pan screw",     hs_pan, 3.5, 6.9, 2.5,   M4_washer, false,  No6_pilot_radius, No6_clearance_radius];
 
 function screw_washer(type) = type[6];
 function screw_nut(type)    = type[7];
@@ -38,6 +40,8 @@ function screw_pilot_hole(type)     = type[8];
 function screw_clearance_radius(type) = type[9];
 function screw_radius(type) = type[3] / 2;
 function screw_head_radius(type) = type[4] / 2;
+function screw_nut_radius(type) = screw_nut(type) ? nut_radius(screw_nut(type)) : 0;
+function screw_boss_diameter(type) = max(washer_diameter(screw_washer(type)) + 1, 2 * (screw_nut_radius(type) + 3 * filament_width));
 
 function screw_longer_than(x) = x <= 10 ? 10 :
                                 x <= 12 ? 12 :
@@ -80,7 +84,9 @@ module screw(type, length) {
             assign(socket_rad = type[4] / 2,
                    socket_depth = type[5])
             color(screw_grub_color) render() difference() {
-                cylinder(r = rad, h = length);
+                translate([0, 0, -length])
+                    cylinder(r = rad, h = length);
+
                 cylinder(r = socket_rad, h = socket_depth  * 2, $fn = 6, center = true);
             }
         }

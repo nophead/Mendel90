@@ -102,8 +102,8 @@ module z_coupler_assembly() {
 
                 }
 
-    translate([0,0, -9])
-        tubing(shaft_dia, 5, 16);
+    translate([0, 0, -9])
+        tubing(PVC64, 16, shaft_dia);
 
     //end("z_coupler_assembly");
 }

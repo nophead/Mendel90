@@ -7,10 +7,12 @@
 //
 // Washers
 //
-M3_nut = [3, 6.4, 2.4, 4, M3_washer, M3_nut_trap_depth];
-M4_nut = [4, 8.1, 3.2, 5, M4_washer, M4_nut_trap_depth];
-M6_nut = [6, 11.5,  5, 8, M6_washer, M6_nut_depth];
-M8_nut = [8, 15,  6.5, 8, M8_washer, M8_nut_depth];
+M2p5_nut  = [2.5, 5.8, 2.2, 3.8, M2p5_washer, M2p5_nut_trap_depth];
+M3_nut      = [3, 6.4, 2.4, 4, M3_washer, M3_nut_trap_depth];
+M4_nut      = [4, 8.1, 3.2, 5, M4_washer, M4_nut_trap_depth];
+M6_nut      = [6, 11.5,  5, 8, M6_washer, M6_nut_depth];
+M6_half_nut = [6, 11.5,  3, 8, M6_washer, 3];
+M8_nut      = [8, 15,  6.5, 8, M8_washer, M8_nut_depth];
 
 function nut_radius(type) = type[1] / 2;
 function nut_flat_radius(type) = nut_radius(type) * cos(30);
@@ -18,7 +20,7 @@ function nut_thickness(type, nyloc = false) = nyloc ? type[3] : type[2];
 function nut_washer(type) = type[4];
 function nut_trap_depth(type) = type[5];
 
-module nut(type, nyloc = false) {
+module nut(type, nyloc = false, brass = false) {
     hole_rad  = type[0] / 2;
     outer_rad = nut_radius(type);
     thickness = nut_thickness(type);
@@ -27,19 +29,22 @@ module nut(type, nyloc = false) {
     if(nyloc)
         vitamin(str("NYLOCM", type[0], ": Nyloc nut M", type[0]));
     else
-        vitamin(str("NUTM", type[0], ": Nut M", type[0]));
+        if(brass)
+            vitamin(str("NUTBM", type[0], ": Brass nut M", type[0]));
+        else
+            vitamin(str("NUTM", type[0], ": Nut M", type[0]));
 
     if(exploded && nyloc)
         cylinder(r = 0.2, h = 10);
 
-    color(nut_color) render() translate([0, 0, (exploded && nyloc) ? 10 : 0]) difference() {
+    color(brass? brass_nut_color : nut_color) render() translate([0, 0, (exploded && nyloc) ? 10 : 0]) difference() {
         union() {
             cylinder(r = outer_rad, h = thickness, $fn = 6);
             if(nyloc)
                 translate([0,0, eta])
                     rounded_cylinder(r = outer_rad * cos(30) , h = nyloc_thickness, r2 = (nyloc_thickness - thickness) / 2);
         }
-        translate([0,0,-1])
+        translate([0, 0, -1])
             cylinder(r = hole_rad, h = nyloc_thickness + 2);
     }
 }

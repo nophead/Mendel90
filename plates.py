@@ -7,10 +7,14 @@ from stls import stls, bom_to_stls
 
 plate_list = [
     "cal.stl",
+    "atx_brackets.stl",
     "bar_clamps.stl",
     "cable_clips.stl",
     "d_motor_brackets.stl",
+    "fixing_blocks.stl",
     "ribbon_clamps.stl",
+    "spool_holder_brackets.stl",
+    "spool_holder_tall_brackets.stl",
     "wades_extruder.stl",
     "x_carriage_parts.stl",
     "y_bearing_mounts.stl",
@@ -29,9 +33,12 @@ def plates(machine):
     #
     # Make the stls in the list
     #
+    if machine == "dibond":
+        plate_list.remove("cable_clips.stl");
     used = stls(machine, plate_list)
     #
     # Move them to the plates directory
+    #
     for file in plate_list:
         shutil.move(machine + "/stls/"+ file, target_dir + "/" + file)
     #

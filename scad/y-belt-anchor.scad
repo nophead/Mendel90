@@ -13,7 +13,7 @@ include <positions.scad>
 wall = 2;
 
 clearance = 2;
-thickness = M3_nut_trap_depth + wall;
+thickness = M3_nut_trap_depth + bearing_clamp_tab_height;
 rad = 3;
 
 clamp_thickness = 3;
@@ -51,7 +51,7 @@ module y_belt_anchor(height, toothed) {
 
                 for(side = [-1, 1])                                                                     // webs
                     for(end = [-1, 1])
-                        translate([side * (M3_nut_radius + wall / 2), eta + (end + 1) * (depth / 2 - 2 * eta), thickness - eta])
+                        translate([side * (M3_nut_radius + wall / 2 + eta), eta + (end + 1) * (depth / 2 - 2 * eta), thickness - eta])
                             rotate([90,0,90 * end])
                                 right_triangle(width = (length - depth) / 2 - rad, height = h - thickness, h = wall);
             }
@@ -116,7 +116,7 @@ module y_belt_anchor_assembly(height, toothed) {
             translate([side * (belt_width(Y_belt) / 2 + M3_clearance_radius), 0, 0]) {
                 screw_and_washer(M3_cap_screw, 16);
                 translate([0, 0, -2 * clamp_thickness - belt_thickness(Y_belt)])
-                    rotate([180, 0, 0])
+                    rotate([180, 0, 90/7 * (side + 1)])
                         nut(M3_nut, true);
             }
     }

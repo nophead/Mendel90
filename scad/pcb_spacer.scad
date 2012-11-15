@@ -7,10 +7,10 @@
 //
 include <conf/config.scad>
 
-pcb_screw_length = frame_nuts ?
-    screw_longer_than(2 * washer_thickness(M3_washer) + pcb_thickness + sheet_thickness(frame) + nut_thickness(M3_nut, true)) : 16;
+function pcb_spacer_height() = part_base_thickness - pcb_thickness;
 
-function pcb_spacer_height() = frame_nuts ? 3 : max(3, 16 - 2 * washer_thickness(M3_washer) - pcb_thickness - sheet_thickness(frame));
+pcb_screw_length = frame_screw_length;
+
 
 module pcb_spacer_stl(screw = M3_cap_screw, h = pcb_spacer_height()) {
     stl("pcb_spacer");

@@ -58,7 +58,7 @@ module comp_spring(type, l = 0) {
     l = (l == 0) ? spring_length(type) : l;
 
     vitamin(str("SPR", spring_od(type), spring_gauge(type) * 100, type[2],
-                ": Spring ", spring_od(type), "mm OD x ", spring_gauge(type), "mm gauge x ", spring_length(type), "mm length" ));
+                ": Spring ", spring_od(type), "mm OD, ", spring_gauge(type), "mm gauge x ", spring_length(type), "mm long" ));
 
     color(spring_color) render()
         coil(r1 = (spring_od(type) - spring_gauge(type)) / 2, r2 = spring_gauge(type) / 2, h = l, twists = spring_coils(type));

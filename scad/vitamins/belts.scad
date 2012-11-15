@@ -7,8 +7,9 @@
 //
 // Belt model
 //
-T5x6 =  [5, 6,  2.25];
-T5x10 = [5, 10, 2.25];
+T5x6 =  [  5,  6, 2.25];
+T5x10 = [  5, 10, 2.25];
+T2p5x6 =[2.5,  6,  1.7];
 
 function belt_pitch(type) = type[0];
 function belt_width(type) = type[1];
@@ -23,7 +24,7 @@ module belt(type, x1, y1, r1, x2, y2, r2, gap = 0) {
     dy = y2 - y1;
 
     length = pi * (r1 + r2) + 2 * sqrt(dx * dx + dy * dy) - gap;
-    vitamin(str("BT", belt_pitch(type),width, round(length), ": Belt T", belt_pitch(type)," x ", width, "mm x ", round(length), "mm"));
+    vitamin(str("BT", belt_pitch(type) * 10,width, round(length), ": Belt T", belt_pitch(type)," x ", width, "mm x ", round(length), "mm (PU & Kevlar)"));
 
     color(belt_color)
     linear_extrude(height = width, center = true, convexity = 6) {

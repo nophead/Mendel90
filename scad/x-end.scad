@@ -20,10 +20,12 @@ bearing_dia = Z_bearings[1] + 0.2;
 bearing_width = bearing_dia + 2 * bwall;
 bearing_depth = bearing_width / 2 + 1;
 bearing_length = Z_bearings[0];
-bearing_height = min(65, 2.8 * bearing_length);
 
 shelf_thickness = 2;
 shelf_clearance = 0.5;
+
+bearing_height = max( min(65, 2.8 * bearing_length), 2 * (bearing_length + shelf_clearance) + 3 * shelf_thickness);
+
 
 shelves = [ shelf_thickness / 2,
             shelf_thickness + bearing_length + shelf_clearance + shelf_thickness / 2,
@@ -93,9 +95,12 @@ slit = 1;
 bar_y = x_bar_spacing() / 2;
 
 belt_edge = -x_carriage_width() / 2 - X_carriage_clearance;
-idler_front = belt_edge - belt_width(X_belt) / 2 + ball_bearing_width(BB624) / 2 + washer_thickness(M4_washer) + washer_thickness(M5_penny_washer);
-idler_screw_length = 40;
-idler_depth = idler_screw_length - ball_bearing_width(BB624) - 2 * (washer_thickness(M4_washer) + washer_thickness(M5_penny_washer)) - 1;
+function x_belt_offset() = belt_edge - belt_width(X_belt) / 2;
+
+idler_stack = 2 * ball_bearing_width(BB624) + 2 * (washer_thickness(M4_washer) + washer_thickness(M5_penny_washer));
+idler_front = min(belt_edge - belt_width(X_belt) / 2 + idler_stack / 2, -bar_y - thickness / 2 - 0.25);
+idler_screw_length = 45;
+idler_depth = idler_screw_length - idler_stack - 1;
 idler_back = idler_front + idler_depth;
 idler_width = ceil(2 * (M4_nut_radius + wall));
 
@@ -108,7 +113,7 @@ mbracket_front = belt_edge + 14;
 mbracket_depth = NEMA_length(X_motor) + 2 * mbracket_thickness + 1;
 mbracket_centre = mbracket_front + mbracket_depth / 2 - mbracket_thickness;
 
-switch_op_x = Z_bearings[1] / 2 + 2;                            // switch operates 2mm before carriage hits the bearing
+switch_op_x = Z_bearings[1] / 2 + 3;                            // switch operates 2mm before carriage hits the bearing
 switch_op_z = x_carriage_offset() - x_carriage_thickness() / 2; // hit the edge of the carriage
 sbracket_top = switch_op_z + 12;
 sbracket_height = sbracket_top + thickness / 2;
@@ -123,6 +128,8 @@ function x_idler_overhang() = x_idler_offset() - washer_diameter(M5_penny_washer
 function x_end_bar_length() = -back;
 function x_end_height() = bearing_height - thickness / 2;
 function x_end_thickness() = thickness;
+function x_motor_height() = mbracket_height - thickness / 2;
+function x_end_clearance() = switch_op_x;
 
 ribbon_screw = M3_cap_screw;
 ribbon_nut = screw_nut(ribbon_screw);
@@ -138,7 +145,7 @@ ribbon_pillar_top = ribbon_clamp_z + ribbon_clamp_length(extruder_ways, ribbon_s
 
 function anti_backlash_height() = 24 + thickness / 2;
 anti_backlash_radius = Z_nut_radius + 0.2;
-anti_backlash_wall = 3;
+anti_backlash_wall = max(3, bearing_width / 2 - wall - cos(30) * anti_backlash_radius + 0.5);
 
 function x_end_ribbon_clamp_y() = mbracket_front + mbracket_depth - mbracket_thickness;
 function x_end_ribbon_clamp_z() = mbracket_height - thickness / 2 - mbracket_thickness - nut_radius(ribbon_nut);
@@ -288,10 +295,15 @@ module x_end_bracket(motor_end, assembly = false){
                         difference() {
                             cube([mbracket_width, mbracket_depth, mbracket_height], center = true);                     // outside
                             translate([0, 0, -mbracket_thickness])
-                                cube([mbracket_width - 2 * mbracket_thickness,                                          // inside
-                                      mbracket_depth - 2 * mbracket_thickness, mbracket_height], center = true);
+                                difference() {
+                                    cube([mbracket_width - 2 * mbracket_thickness,                                          // inside
+                                        mbracket_depth - 2 * mbracket_thickness, mbracket_height], center = true);
+                                    if(!assembly)
+                                        cube([mbracket_width - 30 + 4 * filament_width,                                         // support tube
+                                            mbracket_depth - 30 + 4 * filament_width, mbracket_height + 1], center = true);
+                                }
                             translate([0, 0, (mbracket_height - mbracket_thickness) / 2 + layer_height])
-                                cube([mbracket_width - 30, mbracket_depth - 30, assembly ? 10: mbracket_thickness], center = true);    // open top
+                                cube([mbracket_width - 30, mbracket_depth - 30, true ? 100: mbracket_thickness], center = true);    // open top
 
                         }
                         //
@@ -385,7 +397,7 @@ module x_end_bracket(motor_end, assembly = false){
                         ribbon_clamp_holes(x_end_ways, ribbon_screw)
                             difference() {
                                 nut_trap(screw_clearance_radius(ribbon_screw), nut_radius(ribbon_nut), ribbon_nut_trap_depth, true);
-                                translate([0,0, 10])
+                                translate([0,0, 5])
                                     cylinder(r = 10, h =100);
                             }
 
@@ -453,6 +465,7 @@ module x_end_bracket(motor_end, assembly = false){
 }
 
 module x_end_assembly(motor_end) {
+	 shift = exploded ? 2 : 0;
     if(motor_end)
         assembly("x_motor_assembly");
     else
@@ -473,7 +486,7 @@ module x_end_assembly(motor_end) {
     //
     translate([-z_bar_offset(), 0 , -thickness / 2 + Z_nut_depth])
         rotate([180, 0, 0])
-            nut(Z_nut);
+            nut(Z_nut, brass = true);
     //
     // bearing clamp fasteners
     //
@@ -516,18 +529,19 @@ module x_end_assembly(motor_end) {
                 ribbon_clamp_assembly(extruder_ways, ribbon_screw, 16, wall, true);
     }
     else {
-        translate([x_idler_offset(), belt_edge - belt_width(X_belt) / 2, 0]) {
-            rotate([90,0,0 ])
-                ball_bearing(BB624);
+        translate([x_idler_offset(), idler_front - idler_stack / 2 - shift * 4, 0]) {
             for(i = [-1, 1]) {
-                translate([0, (ball_bearing_width(X_idler_bearing) / 2) * i, 0])
+                translate([0, (ball_bearing_width(X_idler_bearing) / 2 + shift) * i, 0])
+                rotate([90,0,0 ])
+                    ball_bearing(BB624);
+                translate([0, (ball_bearing_width(X_idler_bearing) + shift * 2) * i, 0])
                     rotate([-i * 90, 0, 0])
                         washer(M4_washer);
-                translate([0, (ball_bearing_width(X_idler_bearing) / 2 + washer_thickness(M4_washer)) * i, 0])
+                translate([0, ((ball_bearing_width(X_idler_bearing) + washer_thickness(M4_washer)) + shift * 3) * i, 0])
                     rotate([-i * 90, 0, 0])
                         washer(M5_penny_washer);
             }
-            translate([0,-ball_bearing_width(X_idler_bearing) / 2 - washer_thickness(M4_washer) - washer_thickness(M5_penny_washer),0])
+            translate([0,-ball_bearing_width(X_idler_bearing) - washer_thickness(M4_washer) - washer_thickness(M5_penny_washer),0])
                 rotate([90,0,0])
                     screw(M4_cap_screw, idler_screw_length);
         }
@@ -541,11 +555,26 @@ module x_end_assembly(motor_end) {
         end("x_idler_assembly");
 }
 
-module x_motor_bracket_stl() translate([0, 0, thickness / 2]) mirror ([1,0,0]) x_end_bracket(true);
-module x_idler_bracket_stl() translate([0, 0, thickness / 2])                  x_end_bracket(false);
+module x_motor_bracket_stl() {
+    translate([0, 0, thickness / 2]) mirror ([1,0,0]) x_end_bracket(true);
+    for(side = [-1, 1])
+        translate([-back + mbracket_width, mbracket_centre + side * mbracket_depth / 2, 0])
+            rotate([0, 0, 135 + side * 45]) corner_shield(20, 20);
+}
 
-//x_end_bracket(false);
-//x_end_assembly(false);
+module x_idler_bracket_stl()
+    translate([0, 0, thickness / 2])
+        x_end_bracket(false);
 
-//mirror ([1,0,0]) x_end_bracket(true);
-mirror ([1,0,0]) x_end_assembly(true);
+if(1)
+	if(0)
+		x_end_bracket(false);
+	else
+		x_end_assembly(false);
+else
+	if(0)
+		mirror ([1,0,0]) x_end_bracket(true);
+	else	
+		mirror ([1,0,0]) x_end_assembly(true);
+
+//x_motor_bracket_stl();

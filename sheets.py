@@ -15,8 +15,12 @@ def sheets(machine):
     #
     target_dir = machine + "/sheets"
     if os.path.isdir(target_dir):
-        shutil.rmtree(target_dir)
-    os.makedirs(target_dir)
+        try:
+            shutil.rmtree(target_dir)
+        except:
+            pass
+    else:
+        os.makedirs(target_dir)
 
     #
     # Set the target machine

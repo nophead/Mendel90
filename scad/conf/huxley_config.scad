@@ -9,7 +9,6 @@
 //
 echo("Huxley:");
 
-
 Z_bearings = LM6UU;
 Y_bearings = LM6UU;
 X_bearings = LM6UU;
@@ -18,46 +17,57 @@ X_motor = NEMA14;
 Y_motor = NEMA14;
 Z_motor = NEMA14;
 
-X_travel = 140;
-Y_travel = 140;
-Z_travel = 110;
+hot_end = JHeadMk4;
 
-bed_depth = 150;
-bed_width = 150;
+X_travel = 150;
+Y_travel = 150;
+Z_travel = 150;
+
+bed_depth = 150 + 14;
+bed_width = 150 + 14;
 bed_pillars = M3x20_pillar;
 bed_glass = glass2;
-bed_thickness = 1.6 + sheet_thickness(bed_glass);    // PCB heater plus glass sheet
-bed_holes = 146;
+bed_thickness = pcb_thickness + sheet_thickness(bed_glass);    // PCB heater plus glass sheet
+bed_holes = bed_width - 5;
 
-base = PMMA10;               // Sheet material used for the base. Needs to be thick enough to screw into.
-base_corners = 50;
+base = DiBond;                  // Sheet material used for the base. Needs to be thick enough to screw into.
+base_corners = 25;
+base_nuts = true;
 
-frame = PMMA6;
+frame = DiBond;
 frame_corners = 25;
-frame_nuts = false;
+frame_nuts = true;
 
 case_fan = fan80x38;
+psu = External;
+controller = Melzi;
+
+spool = spool_200x55;
+bottom_limit_switch = false;
+top_limit_switch = true;
 
 single_piece_frame = true;
 stays_from_window = false;
+cnc_sheets = true;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
 
-Y_carriage = PMMA6;
+Y_carriage = DiBond;
 
-extruder_width = 30;        // actually 28 but offset
-nozzle_x_offset = 16;       // offset from centre of the extruder
-nozzle_length = 50;         // from base of extruder to nozzle tip
+extruder_width = 30;                            // actually 28 but offset
+nozzle_x_offset = 16;                           // offset from centre of the extruder
+nozzle_length = hot_end_length(hot_end);        // from base of extruder to nozzle tip
 
-X_belt = T5x6;
-Y_belt = T5x6;
+X_belt = T2p5x6;
+Y_belt = T2p5x6;
 motor_shaft = 5;
 Z_screw_dia = 6;            // Studding for Z axis
 
-Y_carriage_depth = bed_depth + 10;
-Y_carriage_width = bed_width + 10;
+Y_carriage_depth = bed_holes + 7;
+Y_carriage_width = bed_holes + 7;
 
 Z_nut_radius = M6_nut_radius;
 Z_nut_depth = M6_nut_depth;
 Z_nut = M6_nut;
+
 //
 // Default screw use where size doesn't matter
 //

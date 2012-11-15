@@ -8,16 +8,17 @@
 
 fan80x38 = [80, 38, 75, 35.75, M4_cap_screw, 40,   4.3, 84];
 fan60x25 = [60, 25, 57, 25,    M3_cap_screw, 31.5, 3.6, 64];
+fan30x10 = [30, 10, 27, 12,    M3_cap_screw, 17,   10, 100];
 
 function fan_width(type)          = type[0];
 function fan_depth(type)          = type[1];
 function fan_bore(type)           = type[2];
 function fan_hole_pitch(type)     = type[3];
+function fan_screw(type)          = type[4];
 function fan_hub(type)            = type[5];
 function fan_thickness(type)      = type[6];
 function fan_outer_diameter(type) = type[7];
 
-function fan_screw(type)        = type[4];
 
 module fan(type) {
     width = fan_width(type);
@@ -62,25 +63,33 @@ module fan(type) {
                     square([fan_bore(type) / 2 - 0.75, 1.5]);
 }
 
+module fan_hole_positions(type) {
+    //Mounting holes
+    hole_pitch = fan_hole_pitch(type);
+    for(x = [-hole_pitch, hole_pitch])
+        for(y = [-hole_pitch, hole_pitch])
+            translate([x, y, fan_depth(type) / 2])
+                child();
+}
+
 module fan_holes(type, poly = false) {
     //Mounting holes
     hole_pitch = fan_hole_pitch(type);
     screw = fan_screw(type);
-    for(x = [-hole_pitch, hole_pitch])
-        for(y = [-hole_pitch, hole_pitch])
-            translate([x, y, 0])
-                if(poly)
-                    poly_cylinder(r = screw_clearance_radius(screw), h = 100, center = true);
-                else
-                    cylinder(r = screw_clearance_radius(screw), h = 100, center = true);
+    fan_hole_positions(type)
+        if(poly)
+            poly_cylinder(r = screw_clearance_radius(screw), h = 100, center = true);
+        else
+            cylinder(r = screw_clearance_radius(screw), h = 100, center = true);
 
     cylinder(r = fan_bore(type) / 2, h = 100, center = true);
 }
 
-module fan_assembly(type, thickness) {
-    color(fan_color)
-        render()
-            fan(type);
+module fan_assembly(type, thickness, include_fan = false) {
+	if(include_fan)
+		color(fan_color)
+			render()
+				fan(type);
 
     hole_pitch = fan_hole_pitch(type);
     screw = fan_screw(type);
@@ -91,7 +100,7 @@ module fan_assembly(type, thickness) {
             translate([x, y, thickness + fan_depth(type) / 2])
                 screw_and_washer(screw, screw_longer_than(thickness + fan_thickness(type) +
                                  washer_thickness(washer) + nut_thickness(nut, true)));
-            translate([x, y, fan_depth(type) / 2 - fan_thickness(type)])
+            translate([x, y, fan_depth(type) / 2 - (include_fan ? fan_thickness(type) : 0)])
                 rotate([180, 0, 0])
                     nut(screw_nut(screw), true);
         }

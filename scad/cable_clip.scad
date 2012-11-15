@@ -64,17 +64,66 @@ module cable_clip(screw, cable1, cable2 = 0) {
     }
 }
 
-module cable_clip_assembly(screw, screw_length, cable1, cable2 = 0) {
-    color(clip_color) render() translate([0, cable_clip_width(screw) / 2, 0]) rotate([90, 0, 0])
-        cable_clip(screw, cable1, cable2);
 
-    translate([0, 0, max(cable_clip_height(cable1), cable_clip_height(cable2))])
-        screw_and_washer(screw, screw_length, true);
+stagger = 2.5;
+
+module tie_wrap_holes(cable, screw) {
+    offset = cable_clip_offset(screw, cable);
+    w =  cable_width(cable);
+    r = 3 / 2;
+    for(side = [-1,1])
+        translate([-offset + side * (w / 2 + r), stagger, 0])
+            cylinder(r = r, h = 100, center = true);
 }
 
-module cable_clip_AB_stl() cable_clip(base_clip_screw, endstop_wires, motor_wires);
-module cable_clip_AD_stl() cable_clip(frame_clip_screw, endstop_wires, fan_motor_wires);
-module cable_clip_CA_stl() cable_clip(base_clip_screw, bed_wires, thermistor_wires);
+module cable_clip_hole(frame, cable1, cable2 = 0) {
+    screw = frame ? frame_screw : base_screw;
+
+    if(frame ? frame_nuts : base_nuts) {
+        tie_wrap_holes(cable1, screw);
+        if(cable2)
+            rotate([0,0, 180]) tie_wrap_holes(cable2, screw);
+    }
+    else
+        if(frame)
+            frame_screw_hole();
+        else
+            base_screw_hole();
+}
+
+module cable_tie(cable, screw, isframe) {
+    offset = cable_clip_offset(screw, cable);
+    thickness = sheet_thickness(isframe ? frame : base);
+    w =  cable_width(cable);
+    translate([-offset, stagger, -thickness / 2])
+        rotate([isframe ? -90 : 90, 0, 0])
+            ziptie(small_ziptie, w / 2 + (cnc_sheets ? 0 : 1));
+}
+
+module cable_clip_assembly(frame, cable1, cable2 = 0) {
+    screw = frame ? frame_screw : base_screw;
+    height = max(cable_clip_height(cable1), cable_clip_height(cable2));
+
+    if(frame ? frame_nuts : base_nuts) {
+        cable_tie(cable1, screw, frame);
+        if(cable2)
+            rotate([0, 0, 180]) cable_tie(cable2, screw, frame);
+    }
+    else {
+        color(clip_color) render() translate([0, cable_clip_width(screw) / 2, 0]) rotate([90, 0, 0])
+            cable_clip(screw, cable1, cable2);
+
+        translate([0, 0, height])
+            if(frame)
+                frame_screw(height);
+            else
+                base_screw(height);
+    }
+}
+
+module cable_clip_AB_stl() cable_clip(base_screw, endstop_wires, motor_wires);
+module cable_clip_AD_stl() cable_clip(frame_screw, endstop_wires, fan_motor_wires);
+module cable_clip_CA_stl() cable_clip(base_screw, bed_wires, thermistor_wires);
 
 spacing = cable_clip_height(motor_wires) + 1;
 
@@ -92,6 +141,6 @@ module cable_clips_stl() {
 }
 
 if(1)
-    cable_clip_assembly(base_clip_screw, base_screw_length, endstop_wires, motor_wires);
+    cable_clip_assembly(true, endstop_wires, motor_wires);
 else
     cable_clips_stl();

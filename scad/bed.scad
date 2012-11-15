@@ -12,23 +12,37 @@ include <conf/config.scad>
 module bed_assembly() {
 
     assembly("bed_assembly");
-
+    //
+    // Screws pillars and washers
+    //
     for(x = [-bed_holes / 2, bed_holes /2]) {
         translate([x, bed_holes / 2, 0])
+            washer(M3_washer);
+
+        translate([x, -bed_holes / 2 - 5.5, 0])
             washer(M3_washer);
 
         for(y = [-bed_holes / 2, bed_holes /2])
             translate([x, y, washer_thickness(M3_washer)]) {
                 hex_pillar(bed_pillars);
 
-                translate([0,0, pillar_height(bed_pillars) + pcb_thickness]) {
-                    //star_washer(M3_washer);
-                    //translate([0,0, washer_thickness(M3_washer)])
-                        screw(M3_cap_screw, 10);
-                }
+                translate([0,0, pillar_height(bed_pillars) + pcb_thickness])
+                    screw(M3_cap_screw, 10);
             }
     }
 
+    //
+    // Mark the origin
+    //
+    translate([0, 0, pillar_height(bed_pillars) + pcb_thickness + sheet_thickness(bed_glass)])
+        color("green")
+            render()
+                sphere();
+
+
+    //
+    // PCB, glass and clips
+    //
     translate([0, 0, washer_thickness(M3_washer)]) {
         vitamin(str("BED", bed_width, bed_depth,": PCB bed ", bed_width, "mm x ", bed_depth, "mm"));
         translate([0,0, pillar_height(bed_pillars) + pcb_thickness / 2])
@@ -46,6 +60,10 @@ module bed_assembly() {
                         bulldog(small_bulldog, pcb_thickness + sheet_thickness(bed_glass));
     }
 
+
+    translate([0, 40, pillar_height(bed_pillars) - 1])
+        rotate([-90, 0, 0])
+            sleeved_resistor(Epcos, PTFE07);
     end("bed_assembly");
 }
 

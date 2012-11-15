@@ -12,14 +12,16 @@ include <positions.scad>
 use <bearing-holder.scad>
 use <bar-clamp.scad>
 
-slot = 2;
+nutty = cnc_sheets;
+
+slot = nutty ? 0 : 2;
 tab_length = bearing_clamp_tab + slot;
 
 function bearing_mount_width(bearing) = bearing_holder_width(bearing) + 2 * tab_length;
 function bearing_mount_length(bearing) = bearing_holder_length(bearing);
 
 module tab() {
-    linear_extrude(height = bearing_clamp_tab_height, center = false, convexity = 6)
+    linear_extrude(height = bearing_clamp_tab_height + (nutty ? nut_trap_depth(nut) : 0), center = false, convexity = 6)
         difference() {
             union() {
                 translate([(bearing_clamp_tab / 2 + slot) / 2, 0])
@@ -27,13 +29,14 @@ module tab() {
                 translate([bearing_clamp_tab / 2 + slot ,0])
                     circle(r = bearing_clamp_tab/ 2, center = true);
             }
-            translate([bearing_clamp_tab / 2, 0])
-                circle(r = screw_clearance_radius, center = true);
-            translate([bearing_clamp_tab / 2 + slot, 0, 0])
-                circle(r = screw_clearance_radius, center = true);
-            translate([bearing_clamp_tab / 2 + slot / 2, 0])
-                square([slot, screw_clearance_radius * 2], center = true);
-
+            if(!nutty) {
+                translate([bearing_clamp_tab / 2, 0])
+                    circle(r = screw_clearance_radius, center = true);
+                translate([bearing_clamp_tab / 2 + slot, 0, 0])
+                    circle(r = screw_clearance_radius, center = true);
+                translate([bearing_clamp_tab / 2 + slot / 2, 0])
+                    square([slot, screw_clearance_radius * 2], center = true);
+            }
         }
 }
 
@@ -48,8 +51,13 @@ module bearing_mount(bearing, height, endstop) {
         bearing_holder(bearing, height);
         for(end = [-1, 1])
             translate([end * (bearing_holder_width(bearing) / 2 - eta), -end * (bearing_holder_length(bearing) - bearing_clamp_tab)/2, -height])
-                rotate([0,0,90 - end * 90])
-                    tab();
+                difference() {
+                    rotate([0, 0, 90 - end * 90])
+                        tab();
+                    if(nutty)
+                        translate([end * tab_length / 2, 0, bearing_clamp_tab_height + nut_trap_depth(nut)])
+                            nut_trap(screw_clearance_radius, nut_radius, nut_trap_depth(nut));
+                }
         if(endstop)
             translate([-(bearing_holder_width(bearing) / 2 + endstop_w / 2),
                        -(bearing_holder_length(bearing) / 2 - endstop_d / 2),
@@ -82,7 +90,10 @@ module y_bearing_assembly(height, endstop = false)
     for(end = [-1, 1])
         translate([end * (bearing_holder_width(Y_bearings) / 2 + tab_length / 2),
                    -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab) / 2, -height + bearing_clamp_tab_height]) {
-            nut_and_washer(nut, true);
+            if(nutty)
+                nut(nut, true);
+            else
+                nut_and_washer(nut, true);
             translate([0,0, -bearing_clamp_tab_height - sheet_thickness(Y_carriage)])
                 rotate([180, 0, 0])
                     screw_and_washer(cap_screw, 16);
@@ -102,6 +113,6 @@ module y_bearing_mounts_stl()
 }
 
 if(1)
-    y_bearing_assembly(Y_bearing_holder_height, false);
+    y_bearing_assembly(Y_bearing_holder_height, true);
 else
     y_bearing_mounts_stl();

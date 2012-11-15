@@ -24,7 +24,13 @@ include <../vitamins/bulldog.scad>
 include <../vitamins/cable_strip.scad>
 include <../vitamins/fans.scad>
 include <../vitamins/electronics.scad>
-
+include <../vitamins/spools.scad>
+include <../vitamins/terminals.scad>
+include <../vitamins/o_rings.scad>
+include <../vitamins/tubing.scad>
+include <../vitamins/components.scad>
+include <../vitamins/hot_ends.scad>
+include <../vitamins/bars.scad>
 
 module rod(d , l) {
     vitamin(str("RD", d, round(l), ": Smooth rod ", d, "mm x ", round(l), "mm"));
@@ -36,13 +42,4 @@ module studding(d , l) {
     vitamin(str("ST", d, round(l),": Threaded rod M", d, " x ", round(l), "mm"));
     color(studding_color)
         cylinder(r = d / 2, h = l, center = true);
-}
-
-
-module tubing(od, id, length) {
-    vitamin(str("TB", od, id, length,": Tubing OD ",od, "mm ID ", id,"mm x ",length, "mm"));
-    color(tubing_color) render() difference() {
-        cylinder(r = od / 2, h = length,    center = true);
-        cylinder(r = id / 2, h = length + 1, center = true);
-    }
 }

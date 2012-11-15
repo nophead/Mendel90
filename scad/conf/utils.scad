@@ -11,6 +11,7 @@ include <../utils/bom.scad>
 include <../utils/polyholes.scad>
 include <../utils/teardrops.scad>
 include <../utils/cables.scad>
+include <../utils/shields.scad>
 
 module slot(h, r, l, center = true)
     linear_extrude(height = h, convexity = 6, center = center)
@@ -21,15 +22,22 @@ module slot(h, r, l, center = true)
                 circle(r = r, center = true);
         }
 
-module nut_trap(screw_r, nut_r, depth, horizontal = false) {
+module nut_trap(screw_r, nut_r, depth, horizontal = false, supported = false) {
     union() {
         if(horizontal) {
             teardrop_plus(r = screw_r, h = 200, center = true);
             cylinder(r = nut_r   + layer_height / 4, h = depth * 2, center = true, $fn = 6);
         }
         else {
-            poly_cylinder(r = screw_r, h = 200, center = true);
-            cylinder(r = nut_r, h = depth * 2, center = true, $fn = 6);
+            difference() {
+                union() {
+                    poly_cylinder(r = screw_r, h = 200, center = true);
+                    cylinder(r = nut_r, h = depth * 2, center = true, $fn = 6);
+                }
+                if(supported)
+                    translate([0, 0, depth - eta])
+                        cylinder(r = nut_r, h = layer_height, center = false);
+            }
         }
     }
 }
@@ -105,6 +113,22 @@ module tube(or, ir, h, center = true) {
 // Exploded view helper
 //
 module explode(v, offset = [0,0,0]) {
+    if(exploded) {
+        translate(v)
+            child();
+        render() hull() {
+            sphere(0.2);
+            translate(v + offset)
+                sphere(0.2);
+        }
+    }
+    else
+        child();
+}
+//
+// Same again as cant appear twice in the tree
+//
+module explode2(v, offset = [0,0,0]) {
     if(exploded) {
         translate(v)
             child();

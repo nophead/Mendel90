@@ -9,8 +9,10 @@
 //
 include <conf/config.scad>
 
-slot = 2;
-thickness = 5;
+
+slot = cnc_sheets ? 0 : 2;
+
+thickness = part_base_thickness;
 thin_wall = filament_width * 2 + eta;
 wall = 3;
 
@@ -42,8 +44,11 @@ module fixing_block_h_holes(h)
                 child();
 
 
-module fixing_block_stl() {
-    stl("fixing_block");
+module fixing_block(front) {
+    same = screw_clearance_radius(base_screw) == screw_clearance_radius(frame_screw) && (!cnc_sheets || (base_nuts == frame_nuts));
+    stl((front && !same) ? "front_fixing_block" : "fixing_block");
+    v_screw = front ? frame_screw : base_screw;
+
     difference() {
         translate([-(width - 2 * corner_rad) / 2, 0, 0])
             minkowski() {
@@ -61,20 +66,27 @@ module fixing_block_stl() {
 
 
         fixing_block_v_hole(height - counter_bore_depth)
-            rotate([0,0,90])
-                union() {
-                    slot(h = 100, r = screw_clearance_radius(frame_screw), l = slot, center = true);
-                    multmatrix(m = [ [1, 0, shear / counter_bore_depth, 0],
-                                     [0, 1, 0, 0],
-                                     [0, 0, 1, 0],
-                                     [0, 0, 0, 1] ])
-                        slot(h = 100, r = counter_bore_rad, l = slot, center = false);
-                }
+            if(cnc_sheets && (front? frame_nuts  : base_nuts))
+                translate([0, 0, counter_bore_depth])
+                    nut_trap(screw_clearance_radius(v_screw), nut_radius(screw_nut(v_screw)), height - thickness);
+            else
+                rotate([0,0,90])
+                    union() {
+                        slot(h = 100, r = screw_clearance_radius(base_screw), l = slot, center = true);
+                        multmatrix(m = [ [1, 0, shear / counter_bore_depth, 0],
+                                         [0, 1, 0, 0],
+                                         [0, 0, 1, 0],
+                                         [0, 0, 0, 1] ])
+                            slot(h = 100, r = counter_bore_rad, l = slot, center = false);
+                    }
 
 
         fixing_block_h_holes(depth - counter_bore_depth)
-            rotate([0,0,0])
-                union() {
+            if(cnc_sheets && frame_nuts)
+                 translate([0, 0, counter_bore_depth])
+                     nut_trap(screw_clearance_radius(frame_screw), nut_radius(screw_nut(frame_screw)), depth - thickness, true);
+            else
+               union() {
                     vertical_tearslot(h = 100, r = screw_clearance_radius(frame_screw), l = slot, center = true);
                     multmatrix(m = [ [1, 0, 0, 0],
                                      [0, 1, shear / counter_bore_depth, 0],
@@ -85,19 +97,30 @@ module fixing_block_stl() {
     }
 }
 
+module fixing_block_stl() fixing_block(false);
+
+module front_fixing_block_stl() fixing_block(true);
+
 module fixing_block_assembly(front = false) {
-    color(fixing_block_color) render() fixing_block_stl();
+    color(fixing_block_color) render() fixing_block(front);
     fixing_block_v_hole(height - counter_bore_depth)
         if(front)
-            frame_screw(thickness);
+                frame_screw(thickness);
         else
-            base_screw();
+            base_screw(thickness);
     fixing_block_h_holes(depth - counter_bore_depth)
         frame_screw(thickness);
 }
 
-if(0) {
-    fixing_block_stl();
-}
+module fixing_blocks_stl()
+    for(row = [0:1])
+        for(col = [0:4])
+            translate([(width + 2) * row, (depth + 2) * col, 0])
+                rotate([0, 0, col ? col * 180 : 180])
+                    translate([0, -depth / 2, 0])
+                        fixing_block(col > 2);
+
+if(1)
+    fixing_blocks_stl();
 else
     fixing_block_assembly();

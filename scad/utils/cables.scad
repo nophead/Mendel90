@@ -11,7 +11,7 @@ function cable_wires(cable)     = cable[0];
 function cable_wire_size(cable) = cable[1];
 
 // numbers from http://mathworld.wolfram.com/CirclePacking.html
-function cable_radius(cable) = ceil([0, 1, 2, 2.15, 2.41, 2.7, 3, 3][cable_wires(cable)] * cable_wire_size(cable)) / 2; // radius of a bundle
+function cable_radius(cable) = ceil([0, 1, 2, 2.15, 2.41, 2.7, 3, 3, 3.3][cable_wires(cable)] * cable_wire_size(cable)) / 2; // radius of a bundle
 
 function wire_hole_radius(cable) = cable_radius(cable) + 0.5;
 
