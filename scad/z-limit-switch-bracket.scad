@@ -26,10 +26,10 @@ switch_mount_height = switch_y - microswitch_thickness() / 2;
 hinge_height = thickness + washer_diameter(M3_washer) + 2;
 
 centre = max(washer_diameter(M3_washer), 2 * (nut_radius(M3_nut) + wall));
-screw_spacing = adjustment + centre + washer_diameter(screw_washer(frame_screw)) + 2;
+screw_spacing = adjustment + centre + washer_diameter(frame_washer) + 2;
 hinge_thickness = 2 * filament_width + eta;
 
-leg_width = 1 + washer_diameter(screw_washer(frame_screw));
+leg_width = 1 + washer_diameter(frame_washer);
 leg_length = adjustment + screw_spacing + leg_width + hinge_post;
 
 lever_width = 4;

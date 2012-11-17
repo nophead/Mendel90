@@ -17,6 +17,7 @@ def sheets(machine):
     if os.path.isdir(target_dir):
         try:
             shutil.rmtree(target_dir)
+            os.makedirs(target_dir)
         except:
             pass
     else:

@@ -7,11 +7,12 @@
 //
 // Resistor model for hot end
 //
-RWM04106R80J   = [ "RES6R8: RWM04106R80J 6R8 3W vitreous enamel resistor",    12,     5, 0.8,  30,  5.5, "green" , false];
-RIE1212UB5C5R6 = [ "RES5R6: UB5C 5R6F 5R6 3W vitreous enamel resistor",       13,   5.9, 0.96, 35,  6.0, "gray"  , false];
+RWM04106R80J   = [ "RES6R8: RWM04106R80J 6R8 3W vitreous enamel resistor",    12,     5, 0.8,  30,  5.5, "green",               false, false];
+RIE1212UB5C5R6 = [ "RES5R6: UB5C 5R6F 5R6 3W vitreous enamel resistor",       13,   5.9, 0.96, 35,  6.0, "gray",                false, false];
 
-Honewell       = [ "THRMH104: Honewell 135-104LAC-J01 100K 1% thermistor",    4.75, 1.8, 0.5,  28.6,  2, "red"   , false];
-Epcos          = [ "RHRME104: Epcos B57560G104F 100K 1% thermistor",          4.6,  2.5, 0.3,  67,  2.5, [0.8, 0.8, 0.8, 0.25], true];
+Honewell       = [ "THRMH104: Honewell 135-104LAC-J01 100K 1% thermistor",    4.75, 1.8, 0.5,  28.6,  2, "red",                        false];
+Epcos          = [ "THRME104: Epcos B57560G104F 100K 1% thermistor",          4.6,  2.5, 0.3,  67,  2.5, [0.8, 0.8, 0.8, 0.25], true,  false];
+EpcosBlue      = [ "THRMB104: Epcos B57861S104F40 100K 1% thermistor",        6.5,  2.41,0.25, 43.5,2.5, [0.8, 0.8, 0.8, 0.25], true,  true];
 
 function resistor_length(type)        = type[1];
 function resistor_diameter(type)      = type[2];
@@ -20,6 +21,7 @@ function resistor_wire_length(type)   = type[4];
 function resistor_hole(type)          = type[5];
 function resistor_colour(type)        = type[6];
 function resistor_radial(type)        = type[7];
+function resistor_sleeved(type)       = type[8];
 
 splay_angle = 5; // radial lead splay angle
 
@@ -28,10 +30,9 @@ module resistor(type, on_bom = true) {
 
     if(on_bom)
         vitamin(type[0]);
-    color(resistor_colour(type))
-        render()
-            cylinder(r = resistor_diameter(type) / 2, h = length, center = true);
-
+    //
+    // wires
+    //
     color([0.7, 0.7, 0.7])
         render()
             if(resistor_radial(type))
@@ -41,23 +42,58 @@ module resistor(type, on_bom = true) {
                             cylinder(r = resistor_wire_diameter(type) / 2, h = resistor_wire_length(type), center = false);
             else
                 cylinder(r = resistor_wire_diameter(type) / 2, h = length + 2 * resistor_wire_length(type), center = true);
+    //
+    // Sleeving
+    //
+    if(resistor_sleeved(type))
+        color([0.5, 0.5, 1])
+            render()
+                if(resistor_radial(type))
+                    for(side= [-1,1])
+                        translate([side *  resistor_diameter(type) / 6, 0, length / 2]) {
+                            rotate([0, splay_angle * side, 0])
+                                cylinder(r = resistor_wire_diameter(type) / 2 + 0.1, h = resistor_wire_length(type) - 5, center = false);                   }
+    //
+    // Body
+    //
+    color(resistor_colour(type))
+        render()
+            cylinder(r = resistor_diameter(type) / 2, h = length, center = true);
+
 }
 
-module sleeved_resistor(type, sleeving, bare = 10, on_bom = true) {
+module sleeved_resistor(type, sleeving, bare = 5, on_bom = true, heatshrink = false, exploded = exploded) {
     resistor(type, on_bom);
     sleeving_length = resistor_wire_length(type) - bare;
 
     for(side= [-1,1])
-        if(resistor_radial(type))
+        if(resistor_radial(type)) {
             translate([side *  resistor_diameter(type) / 6, 0, 0])
-                rotate([0, splay_angle * side, 0])
-                    translate([0, 0,  sleeving_length / 2])
-                        tubing(sleeving, sleeving_length);
-        else
-            translate([0, 0, side * (resistor_length(type) + sleeving_length) / 2])
+                rotate([0, splay_angle * side, 0]) {
+                    if(!resistor_sleeved(type))
+                        translate([0, 0,  sleeving_length / 2 + resistor_length(type) / 2 + 20 * exploded])
+                            tubing(sleeving, sleeving_length);
+
+                    if(heatshrink)
+                        translate([0, 0, sleeving_length + resistor_length(type) / 2 + bare / 2 + 30 * exploded])
+                            if(exploded)
+                                tubing(heatshrink);
+                            else
+                                %tubing(heatshrink);
+                }
+        }
+        else {
+            translate([0, 0, side * (resistor_length(type) + sleeving_length + 40 * exploded) / 2])
                 tubing(sleeving, sleeving_length);
 
+            if(heatshrink)
+                translate([0, 0, side * (resistor_length(type) /2  + sleeving_length + 30 * exploded)])
+                    if(exploded)
+                        tubing(heatshrink);
+                    else
+                        %tubing(heatshrink);
 
+        }
 }
 
 THS15 = [ "THS15 Aluminium clad resistor", 20, 21, 6, 14.3, 15.9, 2, 2.4, 2.45, 11, 35.6];
@@ -138,7 +174,17 @@ module al_clad_resistor(type, value) {
 }
 
 module al_clad_resistor_assembly(type, value) {
+    sleeving_length = 15;
+    sleeving = HSHRNK32;
+
     al_clad_resistor(type, value);
+
+    for(end = [-1, 1])
+        translate([end * (al_clad_length(type) + sleeving_length + 0) / 2, 0,  al_clad_height(type) / 2])
+            rotate([0, 90, 0])
+                scale([1.5, 0.66, 1])
+                    %tubing(sleeving, sleeving_length);
+
     al_clad_resistor_hole_positions(type) group() {
         if(sheet_is_soft(frame))
             screw(No2_screw);

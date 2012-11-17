@@ -8,8 +8,9 @@
 // Configuration file
 //
 bom = 2;                        // 0 no bom, 1 assemblies and stls, 2 vitamins as well
-exploded = false;               // true for exploded view
-show_jigs = false;              // show printed jigs required to build the machine
+exploded = 0;                   // 1 for exploded view
+
+show_jigs = true;               // show printed jigs required to build the machine
 show_support = true;            // show support structures, must be set when generating STLs
 
 // Real-world colors for various parts & vitamins
@@ -68,6 +69,8 @@ pcb_thickness = 1.6;
 feed_tube_rad = 5 / 2;              // Filament feed tube
 feed_tube_tape_rad = 6.2 / 2;
 feed_tube_tape = 12;
+nozzle_length = 54;                 // how far nozzle is below top of carriage
+
 
 include <colors.scad>
 include <utils.scad>
@@ -89,6 +92,7 @@ thermistor_wires_hole_radius = wire_hole_radius(thermistor_wires);
 
 cnc_sheets = false;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
 base_nuts = false;                  // Need something under the base if using nuts
+pulley_type = T5x8_plastic_pulley;
 include <machine.scad>              // this file is generated from the command line parameter to include one of the machine configs
 
 screw_clearance_radius = screw_clearance_radius(cap_screw);
@@ -98,7 +102,7 @@ nut_trap_depth = nut_trap_depth(nut);
 washer = screw_washer(cap_screw);
 
 bearing_clamp_tab = cnc_sheets ? (nut_radius(nut) + 3 * filament_width) * 2 : washer_diameter(washer) + 2;   // how much the lugs stick out and their width
-bearing_clamp_tab_height = 4;   // thickness of the lugs
+bearing_clamp_tab_height = 4;           // thickness of the lugs
 
 hole_edge_clearance = 5;                // how close a hole can be to the edge of a sheet
 base_clearance = cnc_sheets ? 1 : 2;    // how close we get to the edge of the base
@@ -109,9 +113,6 @@ X_carriage_clearance = 2;               // how close the X carriage is to the XZ
 Y_carriage_clearance = 2 + bulldog_handle_length(small_bulldog) - (Y_carriage_width - bed_width) / 2;
 Z_clearance = 10;                       // How close the top of the object gets to the gantry
 belt_clearance = 0.2;                   // clearance of belt clamp slots
-
-pulley_inner_radius = (14.4 / 2) - belt_thickness(T5x6); // measured from outer diameter
-
 
 X_bar_dia = X_bearings[2];      // rod sizes to match the bearings
 Y_bar_dia = Y_bearings[2];
@@ -124,43 +125,59 @@ extruder_ways = 4 + 6 + 2 + 1 + 1;      // motor + heater(x3) + thermistor + pro
 x_end_ways = extruder_ways + 4 + 2;     // motor plus limit switch = 20
 bed_ways = 24 + 2;                      // twelve each way for the current plus a thermistor
 
+module wire_hole_or_slot(r) {
+    if(cnc_sheets)
+        rotate([0, 0, 90])
+            slot(r = r, h = 100, l = 2 * r);
+    else
+        translate([0, r + hole_edge_clearance, 0])
+            wire_hole(r);
+}
+
 function z_bar_offset() = round(NEMA_width(Z_motor)) / 2;
 
 base_screw = sheet_is_soft(base) ? frame_soft_screw : (base_nuts ? frame_thin_screw : frame_thick_screw);
+base_nut = base_nuts ? screw_nut(base_screw) : false;
+base_nut_traps = base_nuts && cnc_sheets;
+base_washer = screw_washer(base_screw);
 base_screw_length = base_nuts ? screw_longer_than(
                                     sheet_thickness(base)
                                     + part_base_thickness +
-                                    (cnc_sheets ? 1 : 2) * washer_thickness(screw_washer(base_screw))
-                                    + nut_thickness(screw_nut(base_screw), true)
+                                    (cnc_sheets ? 1 : 2) * washer_thickness(base_washer)
+                                    + nut_thickness(base_nut, true)
                                   )
                               : screw_shorter_than(
                                     sheet_thickness(base)
                                     + part_base_thickness
-                                    + 2 * washer_thickness(screw_washer(base_screw))
+                                    + 2 * washer_thickness(base_washer)
                                  );
 
 
 frame_screw = sheet_is_soft(frame) ? frame_soft_screw : (frame_nuts ? frame_thin_screw : frame_thick_screw);
+frame_nut = frame_nuts ? screw_nut(frame_screw) : false;
+frame_nut_traps = frame_nuts && cnc_sheets;
+frame_washer = screw_washer(frame_screw);
 frame_screw_length = frame_nuts ? screw_longer_than(
                                       sheet_thickness(frame)
                                       + part_base_thickness +
-                                      (cnc_sheets ? 1 : 2) * washer_thickness(screw_washer(frame_screw))
-                                      + nut_thickness(screw_nut(frame_screw), true)
+                                      (cnc_sheets ? 1 : 2) * washer_thickness(frame_washer)
+                                      + nut_thickness(frame_nut, true)
                                   )
 
                                 : screw_shorter_than(
                                       sheet_thickness(frame)
                                       + part_base_thickness
-                                      + 2 * washer_thickness(screw_washer(frame_screw))
+                                      + 2 * washer_thickness(frame_washer)
                                   );
 
 echo("base screw length", base_screw_length);
 echo("frame screw length",frame_screw_length);
 
 
+
 module frame_screw(thickness) {
     if(frame_nuts && cnc_sheets) {
-        nut(screw_nut(frame_screw), true);
+        nut(frame_nut, true);
         translate([0, 0, -sheet_thickness(frame) - thickness])
             rotate([180, 0, 0])
                 screw_and_washer(frame_screw, frame_screw_length);
@@ -170,18 +187,19 @@ module frame_screw(thickness) {
         if(frame_nuts)
             translate([0, 0, -sheet_thickness(frame) - thickness])
                 rotate([180, 0, 0])
-                    nut_and_washer(screw_nut(frame_screw), true);
+                    nut_and_washer(frame_nut, true);
     }
 }
 
 module frame_screw_hole() {
     cylinder(r = frame_nuts ? screw_clearance_radius(frame_screw) : screw_pilot_hole(frame_screw), h = 100, center = true);
-
 }
+
+
 
 module base_screw(thickness) {
     if(base_nuts && cnc_sheets) {
-        nut(screw_nut(base_screw), true);
+        nut(base_nut, true);
         translate([0, 0, -sheet_thickness(base) - thickness])
             rotate([180, 0, 0])
                 screw_and_washer(base_screw, base_screw_length);
@@ -191,7 +209,7 @@ module base_screw(thickness) {
         if(base_nuts)
             translate([0, 0, -sheet_thickness(base) - thickness])
                 rotate([180, 0, 0])
-                    nut_and_washer(screw_nut(base_screw), true);
+                    nut_and_washer(base_nut, true);
     }
 }
 
@@ -199,6 +217,6 @@ module base_screw_hole() {
     cylinder(r = base_nuts ? screw_clearance_radius(base_screw) : screw_pilot_hole(base_screw), h = 100, center = true);
 }
 
-bar_clamp_depth = 4 + washer_diameter(screw_washer(base_screw));           // how thick the bar clamps are
-bar_clamp_tab = 3 + washer_diameter(screw_washer(base_screw));             // how much the lugs stick out
-bar_clamp_band = 3;                                                        // the thickness of the strap that clamps the bar.
+bar_clamp_depth = 4 + washer_diameter(base_washer);           // how thick the bar clamps are
+bar_clamp_tab = 3 + washer_diameter(base_washer);             // how much the lugs stick out
+bar_clamp_band = 3;                                           // the thickness of the strap that clamps the bar.

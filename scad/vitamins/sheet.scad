@@ -30,6 +30,7 @@ glass2   = [ "GL", "Glass sheet",          2, [1,   1,   1,   0.25 ], false];
 DiBond   = [ "DB", "Dibond sheet",         3, "RoyalBlue",            false];
 Cardboard= [ "CB", "Corrugated cardboard", 6, [0.6, 0.6, 0.2, 1    ], false];
 FoilTape = [ "AF", "Aluminium foil tape",0.05,[0.9, 0.9, 0.9, 1    ], false];
+Foam20   = [ "FM", "Foam sponge",          20, [0.3, 0.3, 0.3, 1    ], true];
 
 function sheet_thickness(type) = type[2];
 function sheet_colour(type) = type[3];

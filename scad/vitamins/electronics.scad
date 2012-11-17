@@ -45,6 +45,11 @@ module controller(type) {
                 translate([controller_width(type) / 2, controller_length(type) / 2, pcb_thickness / 2])
                     rounded_rectangle([controller_width(type), controller_length(type), pcb_thickness], r = controller_hole_inset(type));
     }
+    for(end = [-1, 1])
+        translate([-10, controller_length(type) / 2 + end * 10, 5])
+            rotate([0, 90, 0])
+                tubing(HSHRNK24);
+
 }
 
 PD_150_12 =

@@ -16,7 +16,7 @@ thickness = part_base_thickness;
 thin_wall = filament_width * 2 + eta;
 wall = 3;
 
-counter_bore_rad = washer_diameter(screw_washer(base_screw)) / 2 + 0.2;
+counter_bore_rad = washer_diameter(base_washer) / 2 + 0.2;
 width = 2 * wall + 2 * thin_wall + 6 * counter_bore_rad;
 shear = min(counter_bore_rad - screw_clearance_radius(frame_screw), 2.5);
 
@@ -84,7 +84,7 @@ module fixing_block(front) {
         fixing_block_h_holes(depth - counter_bore_depth)
             if(cnc_sheets && frame_nuts)
                  translate([0, 0, counter_bore_depth])
-                     nut_trap(screw_clearance_radius(frame_screw), nut_radius(screw_nut(frame_screw)), depth - thickness, true);
+                     nut_trap(screw_clearance_radius(frame_screw), nut_radius(frame_nut), depth - thickness, true);
             else
                union() {
                     vertical_tearslot(h = 100, r = screw_clearance_radius(frame_screw), l = slot, center = true);

@@ -9,8 +9,8 @@
 //
 include <conf/config.scad>
 
-slot_depth = 1.3;
-thickness = part_base_thickness;
+slot_depth = 1.2;
+thickness = 5.2;
 base_thickness = slot_depth + 2;
 min_gap = 1.5;
 nut_trap_meat = 4;
@@ -153,14 +153,16 @@ module ribbon_clamp_26_44_stl()    ribbon_clamp_stl(26, M4_cap_screw);
 module ribbon_clamp_26_44N_stl()   ribbon_clamp_stl(26, M4_cap_screw, nutty = true);
 
 module ribbon_clamps_stl() {
-    translate([0,1, 0])  ribbon_clamp_stl(bed_ways, cap_screw, nutty = true);
-    translate([0,13,0])  ribbon_clamp_stl(bed_ways, base_screw, nutty = (cnc_sheets && base_nuts));
-    translate([0,27,0])  ribbon_clamp_stl(x_end_ways, frame_screw, nutty = (cnc_sheets && frame_nuts));
-    translate([0,40,0])  ribbon_clamp_stl(bed_ways, cap_screw);
-    translate([0,51,0])  ribbon_clamp_stl(x_end_ways, M3_cap_screw);
-    translate([0,62,0])  ribbon_clamp_stl(extruder_ways, M3_cap_screw);
+    rotate([0, 0, 90]) {
+        translate([0,1, 0])  ribbon_clamp_stl(bed_ways, cap_screw, nutty = true);
+        translate([0,13,0])  ribbon_clamp_stl(bed_ways, base_screw, nutty = (cnc_sheets && base_nuts));
+        translate([0,27,0])  ribbon_clamp_stl(x_end_ways, frame_screw, nutty = (cnc_sheets && frame_nuts));
+        translate([0,40,0])  ribbon_clamp_stl(bed_ways, cap_screw);
+        translate([0,51,0])  ribbon_clamp_stl(x_end_ways, M3_cap_screw);
+        translate([0,62,0])  ribbon_clamp_stl(extruder_ways, M3_cap_screw);
+    }
 }
-if(0) {
+if(1) {
     ribbon_clamp_assembly(20, M4_cap_screw, 16, 4, nutty = true);
 
     translate([0, -15, 0]) ribbon_clamp_assembly(20, frame_screw, frame_screw_length, sheet_thickness(frame), nutty = false);

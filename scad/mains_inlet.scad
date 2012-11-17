@@ -10,7 +10,7 @@
 include <conf/config.scad>
 
 thickness = 4;
-tab = 2 + washer_diameter(screw_washer(frame_screw));
+tab = 2 + washer_diameter(frame_washer);
 foot = part_base_thickness;
 holes = tab / 2 + 1;
 

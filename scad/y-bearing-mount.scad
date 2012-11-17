@@ -40,6 +40,8 @@ module tab() {
         }
 }
 
+nut_offset = nutty ? -bearing_clamp_tab / 2 + nut_radius(nut) + 0.5 : 0;
+
 module bearing_mount(bearing, height, endstop) {
 
     endstop_w = bar_clamp_switch_x_offset() + microswitch_thickness() / 2 - bearing_holder_width(bearing) / 2;
@@ -55,7 +57,7 @@ module bearing_mount(bearing, height, endstop) {
                     rotate([0, 0, 90 - end * 90])
                         tab();
                     if(nutty)
-                        translate([end * tab_length / 2, 0, bearing_clamp_tab_height + nut_trap_depth(nut)])
+                        translate([end * (tab_length / 2 + nut_offset), 0, bearing_clamp_tab_height + nut_trap_depth(nut)])
                             nut_trap(screw_clearance_radius, nut_radius, nut_trap_depth(nut));
                 }
         if(endstop)
@@ -64,12 +66,12 @@ module bearing_mount(bearing, height, endstop) {
                        endstop_h / 2 - height])
                 cube([endstop_w, endstop_d, endstop_h], center = true);
     }
- }
+}
 
 module bearing_mount_holes()
     for(end = [-1, 1])
-        translate([end * (bearing_holder_width(Y_bearings) / 2 + tab_length / 2),
-                  -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab) / 2, 0])
+        translate([end * (bearing_holder_width(Y_bearings) / 2 + tab_length / 2 + nut_offset),
+                  -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab ) / 2, 0])
              child();
 
 module y_bearing_assembly(height, endstop = false)
@@ -87,9 +89,8 @@ module y_bearing_assembly(height, endstop = false)
     //
     // Fasterners
     //
-    for(end = [-1, 1])
-        translate([end * (bearing_holder_width(Y_bearings) / 2 + tab_length / 2),
-                   -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab) / 2, -height + bearing_clamp_tab_height]) {
+    bearing_mount_holes()
+        translate([0, 0, -height + bearing_clamp_tab_height]) {
             if(nutty)
                 nut(nut, true);
             else

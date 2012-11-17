@@ -57,8 +57,11 @@ function screw_head_height(type) = type[2] == hs_cap ? type[4] :
                                    type[2] == hs_cs  ? type[4] / 2 : type[5];
 
 
-module screw(type, length) {
-    vitamin(str(type[0], length,": ",type[1], " x ", length, "mm"));
+module screw(type, length, hob_point = 0) {
+    if(hob_point)
+        vitamin(str(type[0], length,": ",type[1], " x ", length, "mm, hobbed at ", hob_point));
+    else
+        vitamin(str(type[0], length,": ",type[1], " x ", length, "mm"));
 
     head_type = type[2];
     rad = screw_radius(type) - eta;

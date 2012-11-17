@@ -187,7 +187,6 @@ module d_motor_bracket_stl(motor = NEMA17) {
 //
 // Attaches connector to ribbon cable and plastic strip
 //
-
 function d_motor_connector_offset(motor) = [
     NEMA_width(motor) / 2 + thickness - cable_guide_thickness + ribbon_clamp_slot_depth(),
     -NEMA_length(motor) + overlap - length - d_mate_distance(connector) - shell_length + ribbon_clamp_width(cable_screw),
@@ -260,15 +259,12 @@ module d_shell_stl() {
 }
 
 module d_shell_assembly(motor) {
-    translate([-NEMA_width(motor) / 2 + slot_height / 2,  d_motor_bracket_offset(motor), -NEMA_length(motor) + overlap]) {
-        translate([0, 0, -length - d_mate_distance(connector)])
-            rotate([0, 0, 90])
-                explode([0, -15, 0])
-                    d_socket(connector, idc = idc);
-    }
-    translate([-NEMA_width(NEMA17) / 2 - thickness,
-               d_width / 2 + d_motor_bracket_offset(motor),
-                -NEMA_length(NEMA17) - length - shell_length  - d_mate_distance(connector) + overlap])
+    translate([slot_height / 2, 0, shell_length])
+        rotate([0, 0, 90])
+            explode([0, -15, 0])
+                d_socket(connector, idc = idc);
+
+    translate([-thickness, d_width / 2, 0])
         rotate([0, -90, 180])  {
             color(d_shell_color) render() d_shell_stl();
             translate([0, d_width / 2, height + lid_thickness])
@@ -295,7 +291,6 @@ module d_shell_assembly(motor) {
         }
 }
 
-
 module d_motor_bracket_assembly(motor) {
     rotate([0, 90, 0])
         translate([NEMA_length(NEMA17) - overlap, -NEMA_width(NEMA17) / 2 - thickness, -NEMA_width(NEMA17) / 2 - thickness]) {
@@ -313,34 +308,26 @@ module d_motor_bracket_assembly(motor) {
                 explode([0, -15, 0]) group() {
                     d_plug(connector, pcb = pcb);
                     if(pcb) {
+                        assembly("extruder_connection_pcb_assembly");
                         translate([0, -pcb_length / 2 + pcb_offset, -d_pcb_offset(connector) - pcb_thickness / 2]) {
                             vitamin("PCB0000: Extruder connection PCB");
                             color("green") cube([pcb_width, pcb_length, pcb_thickness], center = true);
 
-                            if(0) {
-                                translate([2.5 * 1.27, -pcb_length / 2 + 8.89, pcb_thickness / 2])
-                                    terminal_254(6);
+                            translate([2.5 * 1.27, -pcb_length / 2 + 8.89 - 1.5 * 2.54, pcb_thickness / 2])
+                                terminal_254(3);
 
-                                translate([-3.5 * 1.27, -pcb_length / 2 + 8.89, pcb_thickness / 2])
-                                    rotate([0, 0, 180])
-                                        terminal_254(6);
-                            }
-                            else {
-                                translate([2.5 * 1.27, -pcb_length / 2 + 8.89 - 1.5 * 2.54, pcb_thickness / 2])
+                            translate([2.5 * 1.27, -pcb_length / 2 + 8.89 + 1.5 * 2.54, pcb_thickness / 2])
+                                terminal_254(3);
+
+                            translate([-3.5 * 1.27, -pcb_length / 2 + 8.89 - 1.5 * 2.54, pcb_thickness / 2])
+                                rotate([0, 0, 180])
                                     terminal_254(3);
 
-                                translate([2.5 * 1.27, -pcb_length / 2 + 8.89 + 1.5 * 2.54, pcb_thickness / 2])
+                            translate([-3.5 * 1.27, -pcb_length / 2 + 8.89 + 1.5 * 2.54, pcb_thickness / 2])
+                                rotate([0, 0, 180])
                                     terminal_254(3);
-
-                                translate([-3.5 * 1.27, -pcb_length / 2 + 8.89 - 1.5 * 2.54, pcb_thickness / 2])
-                                    rotate([0, 0, 180])
-                                        terminal_254(3);
-
-                                translate([-3.5 * 1.27, -pcb_length / 2 + 8.89 + 1.5 * 2.54, pcb_thickness / 2])
-                                    rotate([0, 0, 180])
-                                        terminal_254(3);
-                            }
                         }
+                        end("extruder_connection_pcb_assembly");
                     }
                 }
 
@@ -386,7 +373,9 @@ module d_motor_brackets_stl() {
 if(01) {
     NEMA(NEMA17);
     d_motor_bracket_assembly(NEMA17);
-    translate([0, 0, exploded ? - 20 : 0])
+    translate([-NEMA_width(NEMA17) / 2,
+               d_motor_bracket_offset(NEMA17),
+               -NEMA_length(NEMA17) -length - d_mate_distance(connector)  - shell_length + overlap + (exploded ? - 20 : 0)])
         d_shell_assembly(NEMA17);
 
 }

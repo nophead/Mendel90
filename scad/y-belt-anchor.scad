@@ -27,6 +27,7 @@ tooth_height = belt_thickness(Y_belt) / 2;
 tooth_width = belt_pitch(Y_belt) / 2;
 
 function y_belt_anchor_width() = width;
+function y_belt_anchor_depth() = depth;
 
 module y_belt_anchor_holes() {
     for(side = [-1, 1])

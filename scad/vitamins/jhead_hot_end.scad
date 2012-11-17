@@ -6,16 +6,17 @@
 //
 include <../conf/config.scad>
 
-heater_width = 12.76;
-heater_length = 15.88;
-heater_height = 8.22;
+MK4_heater = [ 12.76, 15.88, 8.22, (15.88 / 2 - 4.5), (12.76 / 2 - 0.5 - 2.5 / 2),  (-15.88 / 2 + 5), 9.5];
+MK5_heater = [ 12.76, 12.76, 8.22, (12.76 / 2 - 3.75), (12.76 / 2 - 0.5 - 2.5 / 2), (-12.76 / 2 + 4), 7.5];
 
-resistor_x = heater_length / 2 - 4.5;
+function heater_width(type)  = type[0];
+function heater_length(type) = type[1];
+function heater_height(type) = type[2];
+function resistor_x(type)    = type[3];
+function thermistor_y(type)  = type[4];
+function nozzle_x(type)      = type[5];
+function nozzle_cone(type)   = type[6];
 
-thermistor_y = heater_width / 2 - 0.5 - 2.5 / 2;
-thermistor_z = -heater_height / 2 + 6;
-
-nozzle_x = -heater_length / 2 + 5;
 barrel_tap_dia = 5;
 
 barrel_dia = 6;
@@ -23,34 +24,36 @@ insulator_dia = 12;
 
 function jhead_groove_dia() = 12;
 
-
-module heater_block(resistor, thermistor) {
+module heater_block(type, resistor, thermistor) {
     color("gold") render() difference() {
-        cube([heater_length, heater_width, heater_height], center = true);
+        cube([heater_length(type), heater_width(type), heater_height(type)], center = true);
 
-        translate([-heater_length / 2, thermistor_y, thermistor_z])                     // hole for thermistor
+        translate([-heater_length(type) / 2, thermistor_y(type), 0])                     // hole for thermistor
             rotate([0, 90, 0])
                 cylinder(r = resistor_hole(thermistor) / 2, h = 2 * resistor_length(thermistor), center = true);
 
-        translate([resistor_x, 0, 0])                                                   // hole for resistor
+        translate([resistor_x(type), 0, 0])                                                   // hole for resistor
             rotate([90, 0, 0])
-                cylinder(r = resistor_hole(resistor) / 2, h = heater_width + 1, center = true);
+                cylinder(r = resistor_hole(resistor) / 2, h = heater_width(type) + 1, center = true);
 
-        translate([nozzle_x, 0, 0])
-            cylinder(r = barrel_tap_dia / 2, h = heater_height+ 1, center = true);
+        translate([nozzle_x(type), 0, 0])
+            cylinder(r = barrel_tap_dia / 2, h = heater_height(type) + 1, center = true);
     }
 }
 
 
 
-module jhead_hot_end(type) {
+module jhead_hot_end(type, exploded = exploded) {
     resistor = RIE1212UB5C5R6;
     thermistor = Epcos;
+    heater = type == JHeadMk5 ? MK5_heater : MK4_heater;
+
     insulator_length = hot_end_insulator_length(type);
     inset = hot_end_inset(type);
     barrel_length = hot_end_total_length(type) - insulator_length;
     cone_length = 3;
     cone_end = 1;
+    cone_start = nozzle_cone(heater);
 
     vitamin(hot_end_part(type));
 
@@ -65,31 +68,36 @@ module jhead_hot_end(type) {
 
         color("gold")  render() union() {
             translate([0, 0, -barrel_length + cone_length + eta]) {
-                cylinder(r = 9.5/2, h = barrel_length - cone_length);
+                cylinder(r = cone_start / 2, h = barrel_length - cone_length);
                 translate([0, 0, -cone_length + eta])
-                    cylinder(r1 = cone_end / 2, r = 9.5/2, h = cone_length);
+                    cylinder(r1 = cone_end / 2, r = cone_start / 2, h = cone_length);
             }
         }
     }
 
-    translate([0, 0, -5])
-        ziptie(small_ziptie, hot_end_insulator_diameter(type) / 2 + 1);
+    translate([0, -2.0, -5])
+        ziptie(small_ziptie, hot_end_insulator_diameter(type) / 2 + 2.0);
+
+    translate([0, -10, 20])
+        scale([1.5, 0.5])
+            tubing(HSHRNK64, 60);
+
+    wire("Red", 16, 170);
+    wire("Red", 16, 170);
 
     rotate([0, 0, 90])
-        translate([-nozzle_x, 0, -hot_end_length(type) + cone_length  + 1 + heater_height / 2]) {
-            heater_block(resistor, thermistor);
+        translate([-nozzle_x(heater), 0, -hot_end_length(type) + cone_length  + 1 + heater_height(heater) / 2]) {
+            heater_block(heater, resistor, thermistor);
 
-            translate([resistor_x, 0, 0])
+            translate([resistor_x(heater), -exploded * 15, 0])
                 rotate([90, 0, 0])
-                    explode([0, 0, 15])
-                        sleeved_resistor(resistor, PTFE20, bare = - 10, on_bom = false);
+                     sleeved_resistor(resistor, PTFE20, bare = - 10, on_bom = false, heatshrink = HSHRNK24, exploded = exploded);
 
-            translate([-heater_length / 2 + resistor_length(thermistor) / 2, thermistor_y, thermistor_z])
+            translate([-heater_length(heater) / 2 + resistor_length(thermistor) / 2 - exploded * 10, thermistor_y(heater), 0])
                 rotate([90, 0, -90])
-                    explode([0, 0, 10])
-                        sleeved_resistor(thermistor, PTFE07, on_bom = false);
+                     sleeved_resistor(thermistor, PTFE07, on_bom = false, heatshrink = HSHRNK16, exploded = exploded);
 
     }
 }
 
-jhead_hot_end(JHeadMk4);
+jhead_hot_end(JHeadMk5);

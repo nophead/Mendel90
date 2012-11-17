@@ -11,12 +11,10 @@ include <conf/config.scad>
 include <positions.scad>
 use <z-coupling.scad>
 
-nutty = cnc_sheets && frame_nuts;                   // Can use nut trap because can CNC a slot in the frame
-
 corner_rad = 5;
 length = ceil(NEMA_width(Z_motor));
 thickness = 4;
-back_thickness = part_base_thickness + (nutty ? nut_trap_depth(screw_nut(frame_screw)) : 0);
+back_thickness = part_base_thickness + (frame_nut_traps ? nut_trap_depth(frame_nut) : 0);
 back_height = 24;
 big_hole = NEMA_big_hole(Z_motor);
 clamp_height = washer_diameter(washer) + 3;
@@ -102,10 +100,10 @@ module z_motor_bracket(y_offset, rhs) {
                 // screw slots in the back
                 //
                 for(side = [-1, 1])
-                    translate([side * (length / 2 - z_slot_inset), width - length / 2 - back_thickness,  back_height / 2 + thickness / 2])
+                    translate([side * (length / 2 - z_slot_inset + z_nut_offset), width - length / 2 - back_thickness,  back_height / 2 + thickness / 2])
                         rotate([90, 0, 0])
-                            if(nutty)
-                                nut_trap(screw_clearance_radius(frame_screw), nut_radius(screw_nut(frame_screw)), back_thickness - part_base_thickness, true);
+                            if(frame_nut_traps)
+                                nut_trap(screw_clearance_radius(frame_screw), nut_radius(frame_nut), back_thickness - part_base_thickness, true);
                             else
                                 vertical_tearslot(h = back_thickness * 2 + 1, l = back_height - thickness - 2 * z_slot_inset,
                                     r = screw_clearance_radius(frame_screw), center = true);
@@ -123,7 +121,6 @@ module z_motor_bracket(y_offset, rhs) {
         }
 }
 
-
 module z_motor_bracket_hole_positions(gantry_setback)
     for(side = [-1, 1])
         translate([side * z_motor_bracket_hole_offset(), gantry_setback - part_base_thickness,  back_height / 2 + thickness / 2])
@@ -132,7 +129,7 @@ module z_motor_bracket_hole_positions(gantry_setback)
 
 module z_motor_bracket_holes(gantry_setback)
     z_motor_bracket_hole_positions(gantry_setback)
-        if(nutty)
+        if(frame_nut_traps)
             rotate([0, 0, 90])
                 slot(h = 100, l = back_height - thickness - 2 * z_slot_inset, r = screw_clearance_radius(frame_screw), center = true);
         else

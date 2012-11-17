@@ -52,10 +52,6 @@ cnc_sheets = true;                 // If sheets are cut by CNC we can use slots,
 
 Y_carriage = DiBond;
 
-extruder_width = 30;                            // actually 28 but offset
-nozzle_x_offset = 16;                           // offset from centre of the extruder
-nozzle_length = hot_end_length(hot_end);        // from base of extruder to nozzle tip
-
 X_belt = T2p5x6;
 Y_belt = T2p5x6;
 motor_shaft = 5;

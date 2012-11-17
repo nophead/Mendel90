@@ -31,6 +31,7 @@ include <../vitamins/tubing.scad>
 include <../vitamins/components.scad>
 include <../vitamins/hot_ends.scad>
 include <../vitamins/bars.scad>
+include <../vitamins/pullies.scad>
 
 module rod(d , l) {
     vitamin(str("RD", d, round(l), ": Smooth rod ", d, "mm x ", round(l), "mm"));
@@ -43,3 +44,9 @@ module studding(d , l) {
     color(studding_color)
         cylinder(r = d / 2, h = l, center = true);
 }
+
+module wire(color, strands, length)
+    vitamin(str("WR", strands, color[0], length, ": ",color, " wire ", strands, "/0.2 length ",length, "mm"));
+
+module ribbon_cable(ways, length)
+    vitamin(str("RC", ways, length, ": Ribbon cable ", ways, " way ", length, "mm"));

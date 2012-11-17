@@ -17,13 +17,14 @@ function belt_thickness(type) = type[2];
 
 module belt(type, x1, y1, r1, x2, y2, r2, gap = 0) {
     width = belt_width(type);
+    pitch = belt_pitch(type);
     thickness = belt_thickness(type);
 
     pi = 3.14159265;
     dx = x2 - x1;
     dy = y2 - y1;
 
-    length = pi * (r1 + r2) + 2 * sqrt(dx * dx + dy * dy) - gap;
+    length = round((pi * (r1 + r2 + thickness) + 2 * sqrt(dx * dx + dy * dy) - gap) / pitch) * pitch;
     vitamin(str("BT", belt_pitch(type) * 10,width, round(length), ": Belt T", belt_pitch(type)," x ", width, "mm x ", round(length), "mm (PU & Kevlar)"));
 
     color(belt_color)

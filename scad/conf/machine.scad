@@ -1,1 +1,1 @@
-include <mendel_config.scad>
+include <sturdy_config.scad>

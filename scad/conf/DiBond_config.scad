@@ -17,11 +17,11 @@ X_motor = NEMA17;
 Y_motor = NEMA17;
 Z_motor = NEMA17;
 
-hot_end = JHeadMk4;
+hot_end = JHeadMk5;
 
 X_travel = 200;
 Y_travel = 200;
-Z_travel = 200 + hot_end_length(JHeadMk4) - hot_end_length(hot_end);
+Z_travel = 200;
 
 bed_depth = 214;
 bed_width = 214;
@@ -48,12 +48,9 @@ top_limit_switch = true;
 single_piece_frame = true;
 stays_from_window = false;
 cnc_sheets = true;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
+pulley_type = T5x10_metal_pulley;
 
 Y_carriage = DiBond;
-
-extruder_width = 30;                            // actually 28 but offset
-nozzle_x_offset = 16;                           // offset from centre of the extruder
-nozzle_length = hot_end_length(hot_end);        // from base of extruder to nozzle tip
 
 X_belt = T5x6;
 Y_belt = T5x6;

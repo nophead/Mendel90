@@ -9,11 +9,10 @@
 //
 include <conf/config.scad>
 use <pulley.scad>
-nutty = cnc_sheets && base_nuts;                   // Using nut traps
 
 thickness = 4;
-tab = 2 + washer_diameter(screw_washer(base_screw));
-foot = part_base_thickness + (nutty ? nut_trap_depth(screw_nut(base_screw)) : 0);
+tab = 2 + washer_diameter(base_washer);
+foot = part_base_thickness + (base_nut_traps ? nut_trap_depth(base_nut) : 0);
 holes = tab / 2 + 1;
 
 function y_motor_bracket_height() = round(NEMA_width(Y_motor)) + 2;
@@ -23,10 +22,12 @@ function y_motor_bracket_top_width() = y_motor_bracket_width() - 2 * tab;
 
 depth = y_motor_bracket_height() + thickness - part_base_thickness;
 
+nut_offset = base_nut_traps ? -tab / 2 + nut_radius(base_nut) + 0.5 : 0;
+
 module y_motor_bracket_holes()
     for(side = [-1, 1])
         for(z = [thickness - depth + holes, thickness - holes])
-            translate([side * (y_motor_bracket_width() / 2 - tab / 2), -y_motor_bracket_height() / 2 + part_base_thickness, z])
+            translate([side * (y_motor_bracket_width() / 2 - tab / 2 + nut_offset), -y_motor_bracket_height() / 2 + part_base_thickness, z])
                 rotate([-90, 0, 0])
                     child();
 
@@ -64,9 +65,9 @@ module y_motor_bracket() {
                 // mounting screw holes
                 //
                 y_motor_bracket_holes()
-                    if(nutty)
+                    if(base_nut_traps)
                         translate([0, 0, foot - part_base_thickness])
-                            nut_trap(screw_clearance_radius(base_screw), nut_radius(screw_nut(base_screw)), foot - part_base_thickness, true);
+                            nut_trap(screw_clearance_radius(base_screw), nut_radius(base_nut), foot - part_base_thickness, true);
                     else
                         teardrop_plus(r = screw_clearance_radius(base_screw), h = foot * 2 + 1, center = true);
             }

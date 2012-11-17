@@ -52,10 +52,6 @@ stays_from_window = false;
 
 Y_carriage = PMMA6;
 
-extruder_width = 30;        // actually 28 but offset
-nozzle_x_offset = 16;       // offset from centre of the extruder
-nozzle_length = hot_end_length(hot_end);  // from base of extruder to nozzle tip
-
 X_belt = T5x6;
 Y_belt = T5x6;
 

@@ -28,15 +28,19 @@ function y_switch_z(h) = h + microswitch_button_x_offset();
 function bar_clamp_switch_x_offset() = y_switch_y(Y_bar_dia);
 function bar_clamp_switch_z_offset() = microswitch_button_x_offset();
 
-module bar_clamp_holes(d)
-    for(y = [bar_rail_offset(d) - bar_clamp_length(d) + 0.5 * bar_clamp_tab,
-             bar_rail_offset(d)                       - 0.5 * bar_clamp_tab])
+module bar_clamp_holes(d, yaxis) {
+    nut = yaxis ? base_nut : frame_nut;
+    nut_offset = (yaxis ? base_nut_traps : frame_nut_traps) ? -bar_clamp_tab / 2 + nut_radius(nut) + 0.5 : 0;
+
+    for(y = [bar_rail_offset(d) - bar_clamp_length(d) + 0.5 * bar_clamp_tab - nut_offset,
+             bar_rail_offset(d)                       - 0.5 * bar_clamp_tab + nut_offset])
         translate([0, y, 0])
             child();
+}
 
 module bar_clamp(d, h, w, switch = false, yaxis = false) {
     stl(str(yaxis ? "y_bar_clamp" : "z_bar_clamp", switch ? "_switch" : ""));
-    nutty = cnc_sheets && (yaxis ? base_nuts : frame_nuts);
+    nutty = yaxis ? base_nut_traps : frame_nut_traps;
     mount_screw = yaxis ? base_screw : frame_screw;
     nut_depth = nut_trap_depth(screw_nut(mount_screw));
     gap = 1.5;
@@ -97,7 +101,7 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
                     // mounting holes
                     //
                     translate([0, -rail_offset, tab_height])
-                        bar_clamp_holes(d)
+                        bar_clamp_holes(d, yaxis)
                             rotate([0,0,90])
                                 if(nutty)
                                     nut_trap(screw_clearance_radius(mount_screw), nut_radius(screw_nut(mount_screw)), nut_depth, true);
@@ -164,8 +168,8 @@ module bar_clamp_assembly(d, h, w, switch = false, yaxis = true) {
     //
     // mounting screws and washers
     //
-    for(y = [rail_offset - length + 0.5 * bar_clamp_tab, rail_offset - 0.5 * bar_clamp_tab])
-        translate([0, y, part_base_thickness])
+    bar_clamp_holes(d, yaxis)
+        translate([0, 0, part_base_thickness])
             rotate([0, 0, 90])
                 if(yaxis)
                     base_screw(part_base_thickness);

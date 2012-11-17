@@ -15,15 +15,12 @@ function jhead_groove_offset() = 5.1; //4.76;
 
 jhead_inset = jhead_groove() + jhead_groove_offset();
 
-m90_hot_end_12mm    = [m90,      "HEM90340: Mendel 90 hot end with 0.4mm nozzle for 3mm filament", 57, 10,          12,    40, "tan", 6     + 3/2 - 1, false];
-m90_hot_end_12p5mm  = [m90,      "HEM90340: Mendel 90 hot end with 0.4mm nozzle for 3mm filament", 57, 10,          12.5,  40, "tan", 6.25  + 3/2 - 1, false];
-m90_hot_end_12p75mm = [m90,      "HEM90340: Mendel 90 hot end with 0.4mm nozzle for 3mm filament", 57, 10,          12.75, 40, "tan", 6.375 + 3/2 - 1, false];
+m90_hot_end_12mm    = [m90,      "HEM90340: Mendel 90 hot end", 57, 10,          12,    40, "tan", 6     + 3/2 - 1, false];
+m90_hot_end_12p5mm  = [m90,      "HEM90340: Mendel 90 hot end", 57, 10,          12.5,  40, "tan", 6.25  + 3/2 - 1, false];
+m90_hot_end_12p75mm = [m90,      "HEM90340: Mendel 90 hot end", 57, 10,          12.75, 40, "tan", 6.375 + 3/2 - 1, false];
 
-Stoffel15_10mm      = [Stoffel, "HEST10340: Stoffle15 hot end, 10mm insulator",                    73, 13,          10,    32, "tan", 5, false];
-Stoffel15_16mm      = [Stoffel, "HEST16340: Stoffle15 hot end, 16mm insulator",                    58, 10.5,        16.3,  15, "tan", 13.75 / 2 + 3/2, false];
-
-JHeadMk4 =            [jhead,   "HEJH16340: JHead MK4 hot end",                                    64, jhead_inset, 16,    50, "black", 12, true, 10.19 + 4, [0, 2.94, -5]];
-JHeadMk5 =            [jhead,   "HEJH16340: JHead MK5 hot end",                                    54, jhead_inset, 16,    40, "black", 12, true, 10.19 + 4, [0, 2.94, -5]];
+JHeadMk4 =            [jhead,   "HEJH16340: JHead MK4 hot end", 64, jhead_inset, 16,    50, "black", 12,            true, 10.19 + 4, [0, 2.94, -5]];
+JHeadMk5 =            [jhead,   "HEJH16340: JHead MK5 hot end", 54, jhead_inset, 16,    40, "black", 12,            true, 9     + 4, [0, 2.38, -5]];
 
 function hot_end_style(type)              = type[0];
 function hot_end_part(type)               = type[1];

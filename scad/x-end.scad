@@ -465,10 +465,8 @@ module x_end_bracket(motor_end, assembly = false){
 }
 
 module x_end_assembly(motor_end) {
-	 shift = exploded ? 2 : 0;
-    if(motor_end)
-        assembly("x_motor_assembly");
-    else
+    shift = exploded ? 2 : 0;
+    if(!motor_end)
         assembly("x_idler_assembly");
     //
     // RP bit
@@ -481,12 +479,6 @@ module x_end_assembly(motor_end) {
         translate([0, 0, (shelves[i] + shelves[i+1])/2 - thickness / 2])
             rotate([0,90,0])
                 linear_bearing(Z_bearings);
-    //
-    // lead nut
-    //
-    translate([-z_bar_offset(), 0 , -thickness / 2 + Z_nut_depth])
-        rotate([180, 0, 0])
-            nut(Z_nut, brass = true);
     //
     // bearing clamp fasteners
     //
@@ -527,16 +519,25 @@ module x_end_assembly(motor_end) {
         translate([ribbon_clamp_x, ribbon_clamp_y, ribbon_clamp_z])
             rotate([-90, 90, 90])
                 ribbon_clamp_assembly(extruder_ways, ribbon_screw, 16, wall, true);
+        //
+        // Heatshrink for motor connections
+        //
+        for(i = [-1.5 : 1.5])
+            translate([i * 5 + back - mbracket_width / 2, 0, mbracket_height - thickness / 2])
+                rotate([90, 0, 0])
+                    tubing(HSHRNK24);
     }
     else {
         translate([x_idler_offset(), idler_front - idler_stack / 2 - shift * 4, 0]) {
             for(i = [-1, 1]) {
                 translate([0, (ball_bearing_width(X_idler_bearing) / 2 + shift) * i, 0])
-                rotate([90,0,0 ])
-                    ball_bearing(BB624);
+                    rotate([90, 0, 0])
+                        ball_bearing(BB624);
+
                 translate([0, (ball_bearing_width(X_idler_bearing) + shift * 2) * i, 0])
                     rotate([-i * 90, 0, 0])
                         washer(M4_washer);
+
                 translate([0, ((ball_bearing_width(X_idler_bearing) + washer_thickness(M4_washer)) + shift * 3) * i, 0])
                     rotate([-i * 90, 0, 0])
                         washer(M5_penny_washer);
@@ -549,9 +550,7 @@ module x_end_assembly(motor_end) {
             rotate([-90, 0, 0])
                 nut(M4_nut, true);
     }
-    if(motor_end)
-        end("x_motor_assembly");
-    else
+    if(!motor_end)
         end("x_idler_assembly");
 }
 
@@ -566,15 +565,18 @@ module x_idler_bracket_stl()
     translate([0, 0, thickness / 2])
         x_end_bracket(false);
 
-if(1)
-	if(0)
-		x_end_bracket(false);
-	else
-		x_end_assembly(false);
+module x_ends_stl() {
+    x_motor_bracket_stl();
+    translate([-4, bearing_width / 2, 0])
+        x_idler_bracket_stl();
+}
+
+if(0)
+    x_ends_stl();
 else
-	if(0)
-		mirror ([1,0,0]) x_end_bracket(true);
-	else	
-		mirror ([1,0,0]) x_end_assembly(true);
+    if(0)
+        x_end_assembly(false);
+    else
+        mirror ([1,0,0]) x_end_assembly(true);
 
 //x_motor_bracket_stl();

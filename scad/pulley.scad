@@ -9,21 +9,27 @@ include <conf/config.scad>
 
 module pulley_stl() {
     stl("pulley");
-    color(pulley_color)
-        translate([-10, -10, 0])
-            import("../imported_stls/pulley.stl");
+    import(pulley_type(pulley_type));
 }
 
 module pulley_assembly() {
-    color(pulley_color) render() pulley_stl();
-    rotate([90, 0, 0]) {
-        translate([0, 4, -5/2 - 6])
-            rotate([180, 0, 0])
-                screw(M3_grub_screw, 6);
-        translate([0, 4, -6])
-            rotate([0,0,30])
+    type = pulley_type;
+
+    translate(pulley_offset(type))
+        if(pulley_od(type))
+            metal_pulley(type);
+        else
+            color(pulley_color) render() pulley_stl();
+
+    translate([0, pulley_bore(type) / 2 + pulley_screw_length(type), pulley_screw_z(type) + pulley_offset(type)[2]])
+        rotate([-90, 0, 0])
+            screw(M3_grub_screw, pulley_screw_length(type));
+
+    if(pulley_nut_y(type))
+        translate([0, pulley_nut_y(type), pulley_screw_z(type) + pulley_offset(type)[2]])
+            rotate([90, 0, 0])
                 nut(M3_nut);
-    }
+
 }
 
 if(1)
