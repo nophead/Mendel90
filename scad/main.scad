@@ -71,7 +71,7 @@ module x_axis_assembly(show_extruder) {
 //
 module x_motor_assembly() {
     assembly("x_motor_assembly");
-    z_cable_extra = 50;
+    z_cable_extra = 100;
     z_cable_travel = (Z_travel + (ribbon_clamp_z - (Z_travel + Z0 + x_end_ribbon_clamp_z()))) * 2;
 
     pmax = [-X_travel / 2 + X_origin - motor_end, 0, x_carriage_offset()] + extruder_connector_offset();
