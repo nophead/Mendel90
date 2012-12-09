@@ -133,8 +133,8 @@ module dust_filter_stl() {
                         rotate([-90, 0, 90])
                             cylinder(r = feed_tube_tape_rad + wall, h = wall + feed_tube_tape, center = true);
 
-                        translate([-feed_tube_tape / 2, - wall / 2, - filament_z])
-                            cube([feed_tube_tape, wall, 1]);
+                        translate([-feed_tube_tape / 2, - wall, - filament_z])
+                            cube([feed_tube_tape, 2 * wall, 1]);
                     }
         }
         translate([box_x + sponge_wall, box_y + sponge_wall, sponge_wall])

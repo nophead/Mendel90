@@ -39,7 +39,7 @@ module bar_clamp_holes(d, yaxis) {
 }
 
 module bar_clamp(d, h, w, switch = false, yaxis = false) {
-    stl(str(yaxis ? "y_bar_clamp" : "z_bar_clamp", switch ? "_switch" : ""));
+    stl(str(yaxis ? "y_bar_clamp" : "z_bar_clamp", (switch && yaxis) ? "_switch" : ""));
     nutty = yaxis ? base_nut_traps : frame_nut_traps;
     mount_screw = yaxis ? base_screw : frame_screw;
     nut_depth = nut_trap_depth(screw_nut(mount_screw));
@@ -108,7 +108,7 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
                                 else
                                     tearslot( h = 100, r = screw_clearance_radius(frame_screw), center = true, w = 2); // mounting screw
 
-                    if(switch && !yaxis)
+                    if(!yaxis)
                         translate([-w / 2 - axis_end_clearance,
                                    outer_rad + microswitch_thickness() / 2 - rail_offset,
                                    h - outer_rad + microswitch_first_hole_x_offset()])

@@ -22,7 +22,7 @@ use <fan-guard.scad>
 use <wade.scad>
 use <cable_clip.scad>
 use <pcb_spacer.scad>
-use <ATX_psu_brackets.scad>
+use <ATX_PSU_brackets.scad>
 use <spool_holder.scad>
 use <tube_cap.scad>
 use <d-motor_bracket.scad>
@@ -318,7 +318,7 @@ module y_carriage_assembly(solid = true) {
 
     translate([Y_bar_spacing / 2, 0, Y_bar_height])
         rotate([0,180,0])
-            y_bearing_assembly(Y_bearing_holder_height, true);
+            y_bearing_assembly(Y_bearing_holder_height);
 
     for(end = [-1, 1])
         translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), Y_bar_height])

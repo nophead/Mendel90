@@ -17,7 +17,7 @@ X_motor = NEMA17;
 Y_motor = NEMA17;
 Z_motor = NEMA17;
 
-hot_end = JHeadMk4;
+hot_end = JHeadMk5;
 
 X_travel = 214;
 Y_travel = 214;
@@ -38,10 +38,10 @@ frame_corners = 0;
 frame_nuts = false;
 
 case_fan = fan80x38;
-//psu = ALPINE500;
-psu = KY240W;
-//controller = Melzi;
-controller = Sanguinololu;
+psu = ALPINE500;
+//psu = KY240W;
+controller = Melzi;
+//controller = Sanguinololu;
 spool = spool_300x85;
 bottom_limit_switch = false;
 top_limit_switch = true;

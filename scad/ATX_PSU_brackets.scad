@@ -102,7 +102,7 @@ module atx_short_bracket_stl() {
             cube([100, 100, sb_height]);
 
         translate([sb_corner_offset + sb_wall, -sb_frame_offset + sb_frame_thickness, sb_wall])        // Recess for screw
-            cube([sb_frame_width - 2 * wall, sb_frame_offset, sb_height - 2 * wall]);
+            cube([sb_frame_width - 2 * sb_wall, sb_frame_offset, sb_height - 2 * sb_wall]);
 
         if(sb_frame_screw)
             translate([sb_corner_offset + sb_frame_width / 2, -sb_frame_offset + sb_frame_thickness, sb_height / 2])
@@ -115,7 +115,7 @@ module atx_short_bracket_stl() {
         translate([-sb_base_offset + sb_base_thickness, sb_corner_offset + sb_wall, sb_wall])       // Recess for screw
             cube([sb_base_offset, sb_base_width - 2 * sb_wall, sb_height - 2 * sb_wall - layer_height]);
 
-        translate([-sb_base_offset + sb_base_thickness, sb_corner_offset + sb_base_width / 2, sb_height / 2])
+        translate([-sb_base_offset + sb_base_thickness, sb_corner_offset + sb_base_width / 2, sb_height / 2 - layer_height])
             rotate([90, 0, 90])
                 if(frame_nut_traps)
                     nut_trap(screw_clearance_radius(base_screw), nut_radius(base_nut), nut_trap_depth(base_nut), true);
@@ -128,7 +128,7 @@ module atx_screw_positions(psu, base = false) {
     if(base)
         translate([-psu_length(psu) / 2 - sb_base_offset + sb_base_thickness - (base_nut_traps ? nut_trap_depth(base_nut) : 0),
                     psu_width(psu) / 2 - sb_corner_offset - sb_base_width / 2,
-                    psu_height(psu) + sb_wall - sb_height / 2 + sb_clearance])
+                    psu_height(psu) + sb_wall - sb_height / 2 + layer_height + sb_clearance])
             rotate([90, 0, 90])
                 child();
 
@@ -219,21 +219,24 @@ module atx_brackets_stl() {
             atx_short_bracket_stl();
 }
 
-module pair() {
-     atx_brackets_stl();
-     translate([-offset * 2 + 8, 2, 0])
+module atx_brackets_x2_stl() {
+    atx_brackets_stl();
+    translate([-offset * 2 + 8, 2, 0])
         rotate([0, 0, 180])
             color("blue") atx_brackets_stl();
 }
 
+module atx_brackets_x4_stl() {
+    atx_brackets_x2_stl();
+    translate([0, 41, 0])
+        atx_brackets_x2_stl();
+
+}
 
 if(1)
     atx_bracket_assembly(true);
 else
-    if(0) {
-        pair();
-        translate([0, 41, 0])
-            pair();
-    }
+    if(0)
+        atx_brackets_x4_stl();
     else
         atx_brackets_stl();

@@ -187,7 +187,7 @@ module al_clad_resistor_assembly(type, value) {
 
     al_clad_resistor_hole_positions(type) group() {
         if(sheet_is_soft(frame))
-            screw(No2_screw);
+            screw(No2_screw,13);
         else
             screw(M2p5_pan_screw, 12);
 

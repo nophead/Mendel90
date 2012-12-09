@@ -49,6 +49,11 @@ M4_clearance_radius = 2.2;
 M4_nut_radius = 8.2 / 2;
 M4_nut_trap_depth = 4;
 
+M5_tap_radius = 4.2 / 2;
+M5_clearance_radius = 5.3 / 2;
+M5_nut_radius = 9.2 / 2;
+M5_nut_depth = 4;
+
 M6_tap_radius = 5 / 2;
 M6_clearance_radius = 6.4 / 2;
 M6_nut_radius = 11.6 / 2;

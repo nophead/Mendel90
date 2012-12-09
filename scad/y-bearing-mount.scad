@@ -42,13 +42,13 @@ module tab() {
 
 nut_offset = nutty ? -bearing_clamp_tab / 2 + nut_radius(nut) + 0.5 : 0;
 
-module bearing_mount(bearing, height, endstop) {
+module bearing_mount(bearing, height) {
 
     endstop_w = bar_clamp_switch_x_offset() + microswitch_thickness() / 2 - bearing_holder_width(bearing) / 2;
     endstop_d = 3;
-    endstop_h = height - bar_clamp_switch_z_offset() + microswitch_thickness() / 4;
+    endstop_h = 3; //height - bar_clamp_switch_z_offset() + microswitch_thickness() / 4;
 
-    stl(str("y_bearing_mount", endstop ? "_switch" : ""));
+    stl("y_bearing_mount");
     color(y_bearing_mount_color) union() {
         bearing_holder(bearing, height);
         for(end = [-1, 1])
@@ -60,11 +60,17 @@ module bearing_mount(bearing, height, endstop) {
                         translate([end * (tab_length / 2 + nut_offset), 0, bearing_clamp_tab_height + nut_trap_depth(nut)])
                             nut_trap(screw_clearance_radius, nut_radius, nut_trap_depth(nut));
                 }
-        if(endstop)
-            translate([-(bearing_holder_width(bearing) / 2 + endstop_w / 2),
+        hull() {
+            translate([-(bearing_holder_width(bearing) / 2 + endstop_w / 2 - eta),
                        -(bearing_holder_length(bearing) / 2 - endstop_d / 2),
-                       endstop_h / 2 - height])
+                       -bar_clamp_switch_z_offset()])
                 cube([endstop_w, endstop_d, endstop_h], center = true);
+
+            translate([-(bearing_holder_width(bearing) / 2 - eta),
+                       -(bearing_holder_length(bearing) / 2 - endstop_d / 2),
+                       - height + 3])
+                cube([eta, endstop_d, eta], center = true);
+        }
     }
 }
 
@@ -74,11 +80,9 @@ module bearing_mount_holes()
                   -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab ) / 2, 0])
              child();
 
-module y_bearing_assembly(height, endstop = false)
+module y_bearing_assembly(height)
 {
-    //assembly("y_bearing_assembly");
-
-    color(y_bearing_mount_color) render() bearing_mount(Y_bearings, height, endstop);
+    color(y_bearing_mount_color) render() bearing_mount(Y_bearings, height);
 
     rotate([0,0,90]) {
         linear_bearing(Y_bearings);
@@ -99,21 +103,18 @@ module y_bearing_assembly(height, endstop = false)
                 rotate([180, 0, 0])
                     screw_and_washer(cap_screw, 16);
         }
-
-    //end("y_bearing_assembly");
 }
 
-module y_bearing_mount_stl() translate([0,0, Y_bearing_holder_height]) bearing_mount(Y_bearings, Y_bearing_holder_height, false);
-module y_bearing_mount_switch_stl() translate([0,0, Y_bearing_holder_height]) bearing_mount(Y_bearings, Y_bearing_holder_height, true);
+module y_bearing_mount_stl() translate([0,0, Y_bearing_holder_height]) bearing_mount(Y_bearings, Y_bearing_holder_height);
 
 module y_bearing_mounts_stl()
 {
     y_bearing_mount_stl();
     translate([  bearing_mount_width(Y_bearings) - tab_length + 2,  0, 0]) y_bearing_mount_stl();
-    translate([-(bearing_mount_width(Y_bearings) - tab_length + 2), 0, 0]) y_bearing_mount_switch_stl();
+    translate([-(bearing_mount_width(Y_bearings) - tab_length + 2), 0, 0]) y_bearing_mount_stl();
 }
 
 if(1)
-    y_bearing_assembly(Y_bearing_holder_height, true);
+    y_bearing_assembly(Y_bearing_holder_height);
 else
     y_bearing_mounts_stl();
