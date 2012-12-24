@@ -8,7 +8,7 @@ def run(*args):
     for arg in args:
         print arg,
     print
-    run = subprocess.Popen(["inkscape"] + list(args), shell = True, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    run = subprocess.Popen(["inkscape"] + list(args) + [" -z"], shell = False, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out,err=[e.splitlines() for e in run.communicate()]
     return run.returncode, out, err
 
