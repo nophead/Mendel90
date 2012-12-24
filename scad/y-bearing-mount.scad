@@ -87,7 +87,8 @@ module y_bearing_assembly(height)
     rotate([0,0,90]) {
         linear_bearing(Y_bearings);
         rotate([0,90,0])
-            ziptie(small_ziptie, bearing_ziptie_radius(Y_bearings));
+            scale([bearing_radius(X_bearings) / bearing_ziptie_radius(X_bearings), 1])
+                ziptie(small_ziptie, bearing_ziptie_radius(Y_bearings));
     }
 
     //

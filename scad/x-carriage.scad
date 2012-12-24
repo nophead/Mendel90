@@ -634,13 +634,15 @@ module x_carriage_assembly(show_extruder = true, show_fan = true) {
     translate([base_offset, bar_y, bar_offset]) {
         linear_bearing(X_bearings);
         rotate([0,-90,0])
-            ziptie(small_ziptie, bearing_ziptie_radius(X_bearings));
+            scale([bearing_radius(X_bearings) / bearing_ziptie_radius(X_bearings), 1])
+                ziptie(small_ziptie, bearing_ziptie_radius(X_bearings));
     }
     for(end = [-1,1])
         translate([base_offset + bar_x * end, -bar_y, bar_offset]) {
             linear_bearing(X_bearings);
             rotate([90,-90,90])
-                ziptie(small_ziptie, bearing_ziptie_radius(X_bearings));
+                scale([bearing_radius(X_bearings) / bearing_ziptie_radius(X_bearings), 1])
+                    ziptie(small_ziptie, bearing_ziptie_radius(X_bearings));
         }
     //
     // Idler end belt clamp

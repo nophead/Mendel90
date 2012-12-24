@@ -16,7 +16,7 @@ clearance = 2;
 thickness = M3_nut_trap_depth + bearing_clamp_tab_height;
 rad = 3;
 
-clamp_thickness = 3;
+clamp_thickness = 2.8;
 
 width = belt_width(Y_belt) + 3 + washer_diameter(M3_washer) + clearance;
 inner_width = (M3_nut_radius + wall) * 2;
@@ -24,7 +24,8 @@ depth =  washer_diameter(M3_washer) + clearance;
 length = depth + 2 * (2 * M3_nut_radius * cos(30) + wall);
 
 tooth_height = belt_thickness(Y_belt) / 2;
-tooth_width = belt_pitch(Y_belt) / 2;
+tooth_pitch = belt_pitch(Y_belt);
+tooth_width = tooth_pitch / 2;
 
 function y_belt_anchor_width() = width;
 function y_belt_anchor_depth() = depth;
@@ -79,8 +80,10 @@ module y_belt_anchor(height, toothed) {
                 cylinder(r =  M3_clearance_radius + 0.5, h = layer_height + eta);
 
         if(toothed)
-            translate([0,depth / 2, height - eta + tooth_height / 2])
-                cube([belt_width(Y_belt), tooth_width, tooth_height], center = true);
+            for(i = [-1:1])
+                if(abs(i) * tooth_pitch + tooth_width / 2 < depth / 2)
+                    translate([0, depth / 2 + i * tooth_pitch, height - eta + tooth_height / 2])
+                        cube([belt_width(Y_belt), tooth_width, tooth_height], center = true);
     }
 }
 
@@ -96,8 +99,10 @@ module y_belt_clip(toothed) {
                     poly_cylinder(r = M3_clearance_radius, h = clamp_thickness + 1, center = true);
         }
         if(toothed)
-            translate([0,0, clamp_thickness - eta + tooth_height / 2])
-                cube([belt_width(Y_belt), tooth_width, tooth_height], center = true);
+            for(i = [-1:1])
+                if(abs(i) * tooth_pitch + tooth_width / 2 < depth / 2)
+                    translate([0, i * tooth_pitch, clamp_thickness - eta + tooth_height / 2])
+                        cube([belt_width(Y_belt), tooth_width, tooth_height], center = true);
     }
 
 }

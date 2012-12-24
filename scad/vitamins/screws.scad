@@ -22,10 +22,12 @@ M3_pan_screw   = ["PS030", "M3 pan screw",       hs_pan,   3, 5.4, 2.0,   M3_was
 M3_hex_screw   = ["HX030", "M3 hex screw",       hs_hex,   3, 6.4, 2.125, M3_washer, M3_nut, M3_tap_radius,    M3_clearance_radius];
 M3_grub_screw  = ["GB030", "M3 grub screw",      hs_grub,  3, 1.6, 2.5,   M3_washer, M3_nut, M3_tap_radius,    M3_clearance_radius];
 
+M4_grub_screw  = ["GB040", "M4 grub screw",      hs_grub,  4, 2.4, 2.5,   M4_washer, M4_nut, M4_tap_radius,    M4_clearance_radius];
 M4_cap_screw   = ["CS040", "M4 cap screw",       hs_cap,   4, 7.0, 3.0,   M4_washer, M4_nut, M4_tap_radius,    M4_clearance_radius];
 M4_hex_screw   = ["HX040", "M4 hex screw",       hs_hex,   4, 8.1, 2.925, M4_washer, M4_nut, M4_tap_radius,    M4_clearance_radius];
 M4_pan_screw   = ["PS040", "M4 pan screw",       hs_pan,   4, 7.8, 3.3,   M4_washer, M4_nut, M4_tap_radius,    M4_clearance_radius];
-M8_cap_screw   = ["CS080", "M8 cap screw",       hs_cap,   8, 13,  7.78,  M8_washer, M8_nut, M8_tap_radius,    M8_clearance_radius];
+M5_cap_screw   = ["CS050", "M5 cap screw",       hs_cap,   5, 8.5, 4,     M5_washer, M5_nut, M5_tap_radius,    M5_clearance_radius];
+M8_cap_screw   = ["CS080", "M8 cap screw",       hs_cap,   8, 13,  6.0,   M8_washer, M8_nut, M8_tap_radius,    M8_clearance_radius];
 M8_hex_screw   = ["HX080", "M8 hex screw",       hs_hex,   8, 15,  5.65,  M8_washer, M8_nut, M8_tap_radius,    M8_clearance_radius];
 
 No2_screw      = ["PSW02", "No2 pan wood screw", hs_pan, 2.2, 4.2, 1.7, M2p5_washer, false,  No2_pilot_radius, No2_clearance_radius];

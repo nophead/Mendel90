@@ -13,7 +13,7 @@ jhead   = 3;
 function jhead_groove() = 4.64;
 function jhead_groove_offset() = 5.1; //4.76;
 
-jhead_inset = jhead_groove() + jhead_groove_offset();
+jhead_inset = jhead_groove_offset();
 
 m90_hot_end_12mm    = [m90,      "HEM90340: Mendel 90 hot end", 57, 10,          12,    40, "tan", 6     + 3/2 - 1, false];
 m90_hot_end_12p5mm  = [m90,      "HEM90340: Mendel 90 hot end", 57, 10,          12.5,  40, "tan", 6.25  + 3/2 - 1, false];

@@ -48,12 +48,12 @@ top_limit_switch = true;
 single_piece_frame = true;
 stays_from_window = false;
 cnc_sheets = true;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
-pulley_type = T5x10_metal_pulley;
+pulley_type = T2p5x16_metal_pulley;
 
 Y_carriage = DiBond;
 
-X_belt = T5x6;
-Y_belt = T5x6;
+X_belt = T2p5x6;
+Y_belt = T2p5x6;
 
 motor_shaft = 5;
 Z_screw_dia = 6;            // Studding for Z axis

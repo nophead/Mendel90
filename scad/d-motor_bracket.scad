@@ -50,7 +50,7 @@ shell_length = shell_front + 12 + ribbon_clamp_width(cable_screw);
 shell_screw_x = shell_length - wall - No2_pilot_radius;
 
 pcb_width = 24.13;
-pcb_length = 27.94; // + 2.54;
+pcb_length = 33.02;
 pcb_offset = 3 * 1.27;
 
 
@@ -95,7 +95,7 @@ module d_motor_bracket_lid_stl(motor = NEMA17, nuts = true) {
                 rotate([0, 0, -side * 360 / 20])
                     poly_cylinder(r = No2_clearance_radius, h = 100, center = true);
 
-        if(pcb && nuts && pcb_length == 27.94)
+        if(pcb && nuts)
             cube([100, slot_width, 100], center = true);
     }
 }
@@ -306,27 +306,28 @@ module d_motor_bracket_assembly(motor) {
         translate([0, 0, -length])
             rotate([180, 0, -90])
                 explode([0, -15, 0]) group() {
+                    if(pcb)
+                        assembly("extruder_connection_pcb_assembly");
                     d_plug(connector, pcb = pcb);
                     if(pcb) {
-                        assembly("extruder_connection_pcb_assembly");
                         translate([0, -pcb_length / 2 + pcb_offset, -d_pcb_offset(connector) - pcb_thickness / 2]) {
                             vitamin("PCB0000: Extruder connection PCB");
                             color("green") cube([pcb_width, pcb_length, pcb_thickness], center = true);
 
-                            translate([2.5 * 1.27, -pcb_length / 2 + 8.89 - 1.5 * 2.54, pcb_thickness / 2])
-                                terminal_254(3);
+                            translate([2.5 * 1.27, -pcb_length / 2 + 8.89 - 2.54, pcb_thickness / 2])
+                                terminal_254(4);
 
-                            translate([2.5 * 1.27, -pcb_length / 2 + 8.89 + 1.5 * 2.54, pcb_thickness / 2])
-                                terminal_254(3);
+                            translate([2.5 * 1.27, -pcb_length / 2 + 8.89 + 2.75 * 2.54, pcb_thickness / 2])
+                                molex_254(3);
 
                             translate([-3.5 * 1.27, -pcb_length / 2 + 8.89 - 1.5 * 2.54, pcb_thickness / 2])
                                 rotate([0, 0, 180])
-                                    terminal_254(3);
+                                    molex_254(2);
 
-                            translate([-3.5 * 1.27, -pcb_length / 2 + 8.89 + 1.5 * 2.54, pcb_thickness / 2])
+                            translate([-3.5 * 1.27, -pcb_length / 2 + 8.89 + 2 * 2.54, pcb_thickness / 2])
                                 rotate([0, 0, 180])
-                                    terminal_254(3);
-                        }
+                                    terminal_254(4);
+                         }
                         end("extruder_connection_pcb_assembly");
                     }
                 }

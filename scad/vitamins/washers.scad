@@ -9,8 +9,10 @@
 //
 M2p5_washer=      [2.5, 5.9, 0.5, false,  5.4];
 M3_washer  =      [3,   7, 0.5, false,  5.8];
+M3_penny_washer  =[3,  12, 0.8, false,  5.8];
 M3p5_washer  =    [3.5, 8, 0.5, false,  6.9];
 M4_washer  =      [4,   9, 0.8, false,  7.9];
+M5_washer  =      [5,  10, 1.0, false,    9];
 M5_penny_washer = [5,  20, 1.4, false,  8.8];
 M6_washer  =      [6,  12, 1.5, false, 10.6];
 M8_washer =       [8,  17, 1.6, false, 13.8];

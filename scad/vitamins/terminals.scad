@@ -56,5 +56,34 @@ module terminal_254(ways) {
             }
 }
 
+module molex_254(ways) {
+    vitamin(str("MLXHDR", ways, ": ", ways, " way Molex KK header"));
+    pitch = 2.54;
+    width = ways * pitch;
+    depth = 6.35;
+    height = 8.15;
+    base = 3.18;
+    back = 1;
+    below = 2.3;
+    above = 9;
+    color("white") render()
+        difference() {
+            rotate([90, 0, 0])
+                linear_extrude(height = width, center = true, convexity = 5)
+                    union() {
+                        translate([-depth / 2, 0])
+                            square([depth, base]);
+
+                        translate([- depth / 2, 0])
+                            square([back, height]);
+                    }
+        }
+
+    color("silver") render()
+        for(i = [0: ways -1])
+            translate([0, i * pitch - width / 2 + pitch / 2, (above + below) / 2 - below]) {
+                cube([0.44, 0.75, above + below], center = true);
+            }
+}
 
 //terminal_254(6);

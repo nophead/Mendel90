@@ -13,8 +13,8 @@ module sanguinololu() {
     import("../imported_stls/sanguinololu.stl");
 }
 
-Sanguinololu = ["SANGUINOL: Electronics e.g. Sanguinolou", 4   * 25.4,    2 * 25.4, 1.5 * 2.54, []];
-Melzi =        ["MELZI: Electronics e.g. Melzi",           8.2 * 25.4, 1.95 * 25.4, 1.5 * 2.54, ["USBLEAD: USB A to Mini B lead",
+Sanguinololu = ["SANGUINOL: Sanguinolou electronics", 4   * 25.4,    2 * 25.4, 1.5 * 2.54, []];
+Melzi =        ["MELZI: Melzi electronics",           8.2 * 25.4, 1.95 * 25.4, 1.5 * 2.54, ["USBLEAD: USB A to Mini B lead",
                                                                                                  "SDCARD: Micro SD card",
                                                                                                  "SDUSB: Micro SD to USB adapter"]];
 

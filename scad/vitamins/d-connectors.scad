@@ -13,6 +13,7 @@ DCONN15 = [39.14, [26.25, 25.25], 33.32, [9.26, 8.38], 12.55, 10.72, 6.693, 1.12
 DCONN25 = [53.04, [40,    38.96], 47.04, [9.26, 8.38], 12.55, 10.72, 6.693, 1.12, 25];
 
 function  d_flange_length(type)    = type[0];
+function  d_hole_pitch(type)       = type[2];
 function  d_flange_width(type)     = type[4];
 function  d_flange_thickness(type) = type[7];
 function  d_mate_distance(type)    = 8.5;
@@ -45,7 +46,7 @@ module d_plug(type, socket = false, pcb = false, idc = false) {
 
     flange_length    = d_flange_length(type);
     d_length         = socket ? type[1][1] : type[1][0];
-    hole_pitch       = type[2];
+    hole_pitch       = d_hole_pitch(type);
     d_width          = socket ? type[3][1] : type[3][0];
     flange_width     = d_flange_width(type);
     d_height         = type[6];

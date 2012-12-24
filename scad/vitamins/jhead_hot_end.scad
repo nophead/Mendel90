@@ -25,7 +25,7 @@ insulator_dia = 12;
 function jhead_groove_dia() = 12;
 
 module heater_block(type, resistor, thermistor) {
-    color("gold") render() difference() {
+    color("gold") render(convexity = 10) difference() {
         cube([heater_length(type), heater_width(type), heater_height(type)], center = true);
 
         translate([-heater_length(type) / 2, thermistor_y(type), 0])                     // hole for thermistor
@@ -54,11 +54,12 @@ module jhead_hot_end(type, exploded = exploded) {
     cone_length = 3;
     cone_end = 1;
     cone_start = nozzle_cone(heater);
+    bundle = 3.2;
 
     vitamin(hot_end_part(type));
 
     translate([0, 0, inset - insulator_length]) {
-        color(hot_end_insulator_colour(type)) render()
+        color(hot_end_insulator_colour(type)) render(convexity = 10)
             difference() {
                 cylinder(r = hot_end_insulator_diameter(type) / 2, h = insulator_length);
                 cylinder(r = 3.2 / 2, h = insulator_length * 2 + 1, center = true);
@@ -66,7 +67,7 @@ module jhead_hot_end(type, exploded = exploded) {
                     tube(ir = jhead_groove_dia() / 2, or = 17 / 2, h = jhead_groove());
             }
 
-        color("gold")  render() union() {
+        color("gold")  render(convexity = 10) union() {
             translate([0, 0, -barrel_length + cone_length + eta]) {
                 cylinder(r = cone_start / 2, h = barrel_length - cone_length);
                 translate([0, 0, -cone_length + eta])
@@ -75,13 +76,17 @@ module jhead_hot_end(type, exploded = exploded) {
         }
     }
 
-    translate([0, -2.0, -5])
-        ziptie(small_ziptie, hot_end_insulator_diameter(type) / 2 + 2.0);
+    rotate([0, 0, 10]) {
+        scale([1, (bundle + hot_end_insulator_diameter(type)) / hot_end_insulator_diameter(type)])
+                translate([0, -bundle / 2, -7])
+            rotate([0, 0, -110])
+                    ziptie(small_ziptie, hot_end_insulator_diameter(type) / 2);
 
-    translate([0, -10, 20])
-        scale([1.5, 0.5])
-            tubing(HSHRNK64, 60);
+        translate([0, -hot_end_insulator_diameter(type) / 2 - bundle / 2, 20])
+            scale([0.7, bundle / 6.4])
+                tubing(HSHRNK64, 60);
 
+    }
     wire("Red", 16, 170);
     wire("Red", 16, 170);
 
@@ -91,7 +96,7 @@ module jhead_hot_end(type, exploded = exploded) {
 
             translate([resistor_x(heater), -exploded * 15, 0])
                 rotate([90, 0, 0])
-                     sleeved_resistor(resistor, PTFE20, bare = - 10, on_bom = false, heatshrink = HSHRNK24, exploded = exploded);
+                     sleeved_resistor(resistor, PTFE20, bare = - 10, on_bom = false, exploded = exploded);
 
             translate([-heater_length(heater) / 2 + resistor_length(thermistor) / 2 - exploded * 10, thermistor_y(heater), 0])
                 rotate([90, 0, -90])

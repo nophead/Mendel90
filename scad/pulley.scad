@@ -23,12 +23,12 @@ module pulley_assembly() {
 
     translate([0, pulley_bore(type) / 2 + pulley_screw_length(type), pulley_screw_z(type) + pulley_offset(type)[2]])
         rotate([-90, 0, 0])
-            screw(M3_grub_screw, pulley_screw_length(type));
+            screw(pulley_screw(type), pulley_screw_length(type));
 
     if(pulley_nut_y(type))
         translate([0, pulley_nut_y(type), pulley_screw_z(type) + pulley_offset(type)[2]])
             rotate([90, 0, 0])
-                nut(M3_nut);
+                nut(screw_nut(pulley_screw(type)));
 
 }
 

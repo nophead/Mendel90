@@ -22,7 +22,7 @@ module ziptie(type, r)
     vitamin(str("ZT00", len, ": Ziptie ", len, "mm min length"));
 
     angle = (r > latch[0] / 2) ? asin((latch[0] / 2) / r) - asin(ziptie_thickness(type) / latch[0]) : 0;
-    color(type[3]) render() union() {
+    color(type[3]) render(convexity = 5) union() {
         tube(ir = r, or = r + ziptie_thickness(type), h = ziptie_width(type));
         translate([0, -r, - latch[1] / 2])
             rotate([90, 0, angle]) {

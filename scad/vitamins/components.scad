@@ -76,10 +76,7 @@ module sleeved_resistor(type, sleeving, bare = 5, on_bom = true, heatshrink = fa
 
                     if(heatshrink)
                         translate([0, 0, sleeving_length + resistor_length(type) / 2 + bare / 2 + 30 * exploded])
-                            if(exploded)
-                                tubing(heatshrink);
-                            else
-                                %tubing(heatshrink);
+                            tubing(heatshrink);
                 }
         }
         else {
@@ -88,11 +85,7 @@ module sleeved_resistor(type, sleeving, bare = 5, on_bom = true, heatshrink = fa
 
             if(heatshrink)
                 translate([0, 0, side * (resistor_length(type) /2  + sleeving_length + 30 * exploded)])
-                    if(exploded)
-                        tubing(heatshrink);
-                    else
-                        %tubing(heatshrink);
-
+                    tubing(heatshrink);
         }
 }
 

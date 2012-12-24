@@ -7,8 +7,9 @@
 //
 pulley_inner_radius = (14.4 / 2) - belt_thickness(T5x6); // measured from outer diameter
 
-T5x10_metal_pulley  = ["T5",                          10, 15, 12.85 / 2,            11.6, 7.9, 7, 5, 19.3, 1.7, 3, 10.7, [0,     0, -2], 0];
-T5x8_plastic_pulley = ["../imported_stls/pulley.stl",  8,  0, pulley_inner_radius,    0,   0, 0, 5,    0,   0, 6,    4, [-10, -10,  0], 6];
+T5x10_metal_pulley  = ["T5",                          10, 15,    12.85 / 2,            11.6, 7.9, 7,   5, 19.3, 1.7, 3, 10.7, [0,     0, -2], 0, M3_grub_screw];
+T2p5x16_metal_pulley= ["T2.5",                        16, 12.16, 12.16 / 2 - 0.8,         8,  16, 5.7, 5, 16.0, 1.0, 6, 3.75, [0,     0,1.3], 0, M4_grub_screw];
+T5x8_plastic_pulley = ["../imported_stls/pulley.stl",  8,     0, pulley_inner_radius,     0,   0, 0,   5,    0,   0, 6,    4, [-10, -10,  0], 6, M3_grub_screw];
 
 function pulley_type(type)             = type[0];
 function pulley_teeth(type)            = type[1];
@@ -24,6 +25,7 @@ function pulley_screw_length(type)     = type[10];
 function pulley_screw_z(type)          = type[11];
 function pulley_offset(type)           = type[12];
 function pulley_nut_y(type)            = type[13];
+function pulley_screw(type)            = type[14];
 
 module metal_pulley(type) {
     teeth = pulley_teeth(type);
@@ -51,7 +53,7 @@ module metal_pulley(type) {
 
             translate([0, 0, pulley_screw_z(type)])
                 rotate([-90, 0, 0])
-                    cylinder(r = 3/2, h = 100);
+                    cylinder(r = screw_radius(pulley_screw(type)), h = 100);
         }
     }
 }
