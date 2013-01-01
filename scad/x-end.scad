@@ -294,17 +294,18 @@ module x_end_bracket(motor_end, assembly = false){
                     translate([back - mbracket_width / 2 + eta, mbracket_centre, mbracket_height / 2 - thickness / 2]) {
                         difference() {
                             cube([mbracket_width, mbracket_depth, mbracket_height], center = true);                     // outside
-                            translate([0, 0, -mbracket_thickness])
-                                difference() {
-                                    cube([mbracket_width - 2 * mbracket_thickness,                                          // inside
-                                        mbracket_depth - 2 * mbracket_thickness, mbracket_height], center = true);
-                                    if(!assembly)
-                                        cube([mbracket_width - 30 + 4 * filament_width,                                         // support tube
-                                            mbracket_depth - 30 + 4 * filament_width, mbracket_height + 1], center = true);
-                                }
-                            translate([0, 0, (mbracket_height - mbracket_thickness) / 2 + layer_height])
-                                cube([mbracket_width - 30, mbracket_depth - 30, true ? 100: mbracket_thickness], center = true);    // open top
-
+                            translate([0, 0, 0])
+                                cube([mbracket_width - 2 * mbracket_thickness,                                          // inside
+                                      mbracket_depth - 2 * mbracket_thickness,
+                                      mbracket_height + mbracket_thickness], center = true);
+                        }
+                        difference() {
+                            translate([0, 0, mbracket_height/2 - mbracket_thickness/2])
+                                cube([mbracket_width, mbracket_depth, mbracket_thickness], center = true);                     // outside
+                            translate([0, 0, (mbracket_height - mbracket_thickness) / 2])
+                                scale([mbracket_width/2, mbracket_depth/2, 10])
+                                    rotate([0, 0, 45])
+                                        cube([sqrt(2), sqrt(2), 1], center = true);    // open top
                         }
                         //
                         // Fillet to anchor the end wall to the bed while being printed
