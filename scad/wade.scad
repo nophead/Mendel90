@@ -125,11 +125,9 @@ module wades_block_stl() {
                                 teardrop(r = extension_rad, h = extension + 1, center = true);
                     }
         }
-        *translate([92,base_thickness + 1,-1])
-            rotate([0,0,45])
-                cube([10,9,30]);                                            // chamfer on fillet
 
         translate([-11,-1,30]) rotate([0,60,0]) cube([30, base_thickness + 2, 60]);             // slope on base
+
 
         translate([filament_x, 20, filament_z])
             rotate([90,0,0])
@@ -179,7 +177,18 @@ module wades_block_stl() {
         translate([motor_x - 40 + motor_leeway / 2 + 6, motor_y, -1])
             cube([40, 32, 7]);
 
-        translate([-5,-1,-1]) cube([16,60,30]);              // truncates tail
+        translate([-1,-1,-1]) cube([12,60,30]);              // truncates tail
+
+        translate([11, 0, -1])
+            fillet(4, 30);
+
+        translate([11, motor_y - NEMA_big_hole(NEMA17), -1])
+            rotate([0, 0, -90])
+                fillet(4, 30);
+
+        translate([motor_x + motor_leeway / 2 + 6, height, -1])
+            rotate([0, 0, -90])
+                fillet(4, 30);
 
         //
         // hole for hobbed bolt
@@ -196,7 +205,7 @@ module wades_block_stl() {
         //
         translate([driven_x,       driven_y, width - 7])       b608(8);                // top bearing socket
         translate([filament_x + 8, driven_y, filament_z - 4])  b608(8);                // clearance for idler
-        translate([driven_x,       driven_y, -1])              b608(8);                // bottom bearing socket
+        translate([driven_x,       driven_y, -1 + eta])        b608(8);                // bottom bearing socket
 
         //
         // Hole for hot end
@@ -274,9 +283,14 @@ module wades_big_gear_stl() {
 
 module wades_small_gear_stl() {
     stl("wades_small_gear");
-    color(wades_small_gear_color)
+    color(wades_small_gear_color) difference() {
         translate([-10, -10, 0])
-            import("../imported_stls/wades_gear.stl");
+            import("../imported_stls/wades_gear.stl", convexity = 10);
+        translate([0, 0, 4])
+            rotate([90, 0, -24 + 180])
+                teardrop_plus(r = M3_clearance_radius, h = 100);
+
+    }
 }
 
 module small_gear_assembly() {

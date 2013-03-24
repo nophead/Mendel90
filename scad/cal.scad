@@ -14,7 +14,7 @@ module cal_stl() {
         union() {
             cube([10,40,5]);
             cube([40,10,6]);
-            cube([20,20,10]);
+            cube([25,25,10]);
             translate([10, 10])
                 cylinder(r = 10, h = 15);
         }
@@ -25,9 +25,16 @@ module cal_stl() {
             rotate([0,0,90])
                 nut_trap(M3_clearance_radius, M3_nut_radius, M3_nut_trap_depth);
 
+        translate([0, 18, 5])
+            rotate([90,0, 90])
+                nut_trap(M3_clearance_radius, M3_nut_radius, M3_nut_trap_depth, true);
+
         translate([30,5,6])
             nut_trap(M4_clearance_radius, M4_nut_radius, M4_nut_trap_depth);
 
+        translate([18, 0, 5])
+            rotate([90, 0, 0])
+                nut_trap(M4_clearance_radius, M4_nut_radius, M4_nut_trap_depth, true);
     }
 }
 

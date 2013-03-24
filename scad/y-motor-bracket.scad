@@ -61,6 +61,11 @@ module y_motor_bracket() {
                     for(y = NEMA_holes(Y_motor))
                         translate([x,y,0])
                             poly_cylinder(r = M3_clearance_radius, h = 2 * thickness + 1, center = true);
+
+                for(side = [-1,1])
+                    translate([side * (width / 2 - tab), height / 2, 0])
+                        rotate([0, 0, -135 - side *45])
+                            fillet(r = 3, h = 100);
                 //
                 // mounting screw holes
                 //
@@ -103,6 +108,12 @@ module y_motor_assembly() {
 }
 
 module y_motor_bracket_stl() translate([0, 0, thickness]) rotate([0,180,0]) y_motor_bracket();
+
+module y_motor_bracket_x2_stl()
+    for(i = [0:1])
+        translate([0, -(y_motor_bracket_height() + 2) * i, 0])
+            rotate([0, 0, i * 180])
+                y_motor_bracket_stl();
 
 if(1)
     y_motor_assembly();

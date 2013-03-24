@@ -94,9 +94,6 @@ module d_motor_bracket_lid_stl(motor = NEMA17, nuts = true) {
             translate([screw_x,  side * screw_y, 0])
                 rotate([0, 0, -side * 360 / 20])
                     poly_cylinder(r = No2_clearance_radius, h = 100, center = true);
-
-        if(pcb && nuts)
-            cube([100, slot_width, 100], center = true);
     }
 }
 

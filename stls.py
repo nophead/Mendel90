@@ -4,6 +4,7 @@ import os
 import openscad
 import shutil
 import sys
+import c14n_stl
 
 source_dir = "scad"
 
@@ -74,6 +75,7 @@ def stls(machine, parts = None):
                         #
                         stl_name = target_dir + "/" + module[:-4] + ".stl"
                         openscad.run("-o", stl_name, stl_maker_name)
+                        c14n_stl.canonicalise(stl_name)
                         targets.remove(stl)
                         #
                         # Add the files on the BOM to the used list for plates.py

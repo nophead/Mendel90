@@ -105,6 +105,7 @@ idler_back = idler_front + idler_depth;
 idler_width = ceil(2 * (M4_nut_radius + wall));
 
 mbracket_thickness = 4;
+mbracket_corner = 7;
 motor_angle = 45;
 motor_w = ceil(min(max(sin(motor_angle) + cos(motor_angle)) * NEMA_width(X_motor), NEMA_radius(X_motor) * 2) + 1);
 mbracket_width = motor_w + 2 * mbracket_thickness;
@@ -137,11 +138,12 @@ ribbon_nut_trap_depth = nut_trap_depth(ribbon_nut);
 ribbon_pillar_depth = 12;
 ribbon_pillar_thickness = wall + ribbon_nut_trap_depth;
 ribbon_clamp_x = back - ribbon_pillar_depth;
-ribbon_clamp_y = mbracket_front + washer_diameter(screw_washer(ribbon_screw)) / 2 + 2;
-//ribbon_clamp_z = x_carriage_offset() + extruder_connector_height();
+ribbon_clamp_y = mbracket_front + washer_diameter(screw_washer(ribbon_screw)) / 2 + mbracket_corner + eta;
 ribbon_clamp_z = mbracket_height + ribbon_clamp_length(extruder_ways, ribbon_screw) / 2 - thickness / 2 + 0.5;
 ribbon_pillar_width = nut_radius(ribbon_nut) * 2 + 2 * wall + 0.5;
 ribbon_pillar_top = ribbon_clamp_z + ribbon_clamp_length(extruder_ways, ribbon_screw) / 2;
+mbracket_rim_width = max(ribbon_pillar_depth + eta, 15 * NEMA_width(X_motor) / NEMA_width(NEMA17));
+mbracket_rim_inner_rad = 5;
 
 function anti_backlash_height() = 24 + thickness / 2;
 anti_backlash_radius = Z_nut_radius + 0.2;
@@ -171,9 +173,15 @@ module x_end_bracket(motor_end, assembly = false){
                 //
                 // Anti-backlash nut holder
                 //
-                translate([-z_bar_offset(), 0, thickness / 2 - eta])
-                    cylinder(r = anti_backlash_radius + anti_backlash_wall, h = anti_backlash_height() - thickness / 2, $fn = 6);
+                translate([-z_bar_offset(), 0, thickness / 2 - eta]) union() {
+                    cylinder(r = anti_backlash_radius + anti_backlash_wall, h = anti_backlash_height() - thickness / 2 - eta, $fn = 6);
+                    translate([0, -(bearing_width - 2 * wall + 1) / 2, 0])
+                        cube([z_bar_offset() - bearing_depth + eta, bearing_width - 2 * wall + 1, anti_backlash_height() - thickness / 2]);
+                    if(motor_end)
+                        translate([back + z_bar_offset(), -(bearing_width - 2 * wall + 1) / 2, 0])
+                            cube([-back - z_bar_offset(), bearing_width - 2 * wall + 1, mbracket_height - thickness - eta]);
 
+                }
                 //
                 // Webs from bearing holder
                 //
@@ -293,17 +301,26 @@ module x_end_bracket(motor_end, assembly = false){
                 union() {
                     translate([back - mbracket_width / 2 + eta, mbracket_centre, mbracket_height / 2 - thickness / 2]) {
                         difference() {
-                            cube([mbracket_width, mbracket_depth, mbracket_height], center = true);                     // outside
+                            rounded_rectangle([mbracket_width, mbracket_depth, mbracket_height], center = true, r = mbracket_corner);  // outside
                             translate([0, 0, -mbracket_thickness])
                                 difference() {
                                     cube([mbracket_width - 2 * mbracket_thickness,                                          // inside
                                         mbracket_depth - 2 * mbracket_thickness, mbracket_height], center = true);
-                                    if(!assembly)
-                                        cube([mbracket_width - 30 + 4 * filament_width,                                         // support tube
-                                            mbracket_depth - 30 + 4 * filament_width, mbracket_height + 1], center = true);
+
+                                    if(!assembly) union() {
+                                        rounded_rectangle([mbracket_width - 2 * mbracket_rim_width + 4 * filament_width,                                     // support tube
+                                                           mbracket_depth - 2 * mbracket_rim_width + 4 * filament_width, mbracket_height + 1],
+                                                           r = mbracket_rim_inner_rad + 2 * filament_width);
+
+                                        translate([0, 0, - mbracket_height / 2 + mbracket_thickness + layer_height])
+                                            rounded_rectangle([mbracket_width - 2 * mbracket_rim_width + 8 * filament_width,                                                     // support base
+                                                               mbracket_depth - 2 * mbracket_rim_width + 8 * filament_width,
+                                                               layer_height * 2], r = mbracket_rim_inner_rad + 4 * filament_width);
+                                    }
                                 }
                             translate([0, 0, (mbracket_height - mbracket_thickness) / 2 + layer_height])
-                                cube([mbracket_width - 30, mbracket_depth - 30, true ? 100: mbracket_thickness], center = true);    // open top
+                                rounded_rectangle([mbracket_width - 2 * mbracket_rim_width,
+                                                   mbracket_depth - 2 * mbracket_rim_width, 100], r = mbracket_rim_inner_rad); // open top
 
                         }
                         //
@@ -311,7 +328,7 @@ module x_end_bracket(motor_end, assembly = false){
                         //
                         translate([-mbracket_width / 2 + mbracket_thickness - eta, 0, -mbracket_height / 2])
                             rotate([90, 0, 0])
-                                right_triangle(width = 4, height = 4, h = mbracket_depth - eta, center = true);
+                                right_triangle(width = 4, height = 4, h = mbracket_depth - mbracket_thickness, center = true);
                     }
                     //
                     // ribbon clamp pillar
@@ -381,11 +398,8 @@ module x_end_bracket(motor_end, assembly = false){
                         for(z = NEMA_holes(X_motor))
                             rotate([0, motor_angle, 0])
                             translate([x,0,z])
-                                rotate([90,  -motor_angle, 0]) {
+                                rotate([90,  -motor_angle, 0])
                                     teardrop_plus(r = M3_clearance_radius, h = 2 * mbracket_thickness + 1, center = true);
-                                    translate([0, 0, mbracket_thickness])
-                                         teardrop_plus(r = (washer_diameter(M3_washer) + 1) / 2, h = 2 * (mbracket_thickness - 3.999), center = true);
-                                }
                 }
                 //
                 // ribbon clamp holes
@@ -558,7 +572,7 @@ module x_motor_bracket_stl() {
     translate([0, 0, thickness / 2]) mirror ([1,0,0]) x_end_bracket(true);
     for(side = [-1, 1])
         translate([-back + mbracket_width, mbracket_centre + side * mbracket_depth / 2, 0])
-            rotate([0, 0, 135 + side * 45]) corner_shield(20, 20);
+            rotate([0, 0, 135 + side * 45]) corner_shield(20, mbracket_height - 1 - 2 * eta, mbracket_corner);
 }
 
 module x_idler_bracket_stl()
@@ -567,9 +581,29 @@ module x_idler_bracket_stl()
 
 module x_ends_stl() {
     x_motor_bracket_stl();
-    translate([-4, bearing_width / 2, 0])
+    translate([-5, bearing_width / 2, 0])
         x_idler_bracket_stl();
 }
+
+module x_motor_bracket_x2_stl() {
+    translate([back - mbracket_width / 2 - 1, -mbracket_centre + mbracket_depth / 2 + 1, thickness / 2]) mirror ([1,0,0]) x_end_bracket(true);
+    translate([mbracket_width / 2 - 1, mbracket_depth + 1, 0])
+        rotate([0, 0, 180])
+            corner_shield(20, mbracket_height - 1 - 2 * eta, mbracket_corner);
+
+    translate([mbracket_width / 2 - back,      mbracket_centre - mbracket_depth / 2 - 1, thickness / 2]) rotate([0, 0, 180]) mirror ([1,0,0]) x_end_bracket(true);
+    translate([-mbracket_width / 2, -mbracket_depth - 1, 0])
+        corner_shield(20, mbracket_height - 1 - 2 * eta, mbracket_corner);
+
+}
+
+module x_idler_bracket_x2_stl() {
+    for(a = [0, 180])
+        rotate([0, 0, a])
+            translate([-x_idler_offset() + 1, 0, 0])
+                x_idler_bracket_stl();
+}
+
 
 if(0)
     x_ends_stl();

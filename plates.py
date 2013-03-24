@@ -14,7 +14,6 @@ plate_list = [
     "fixing_blocks.stl",
     "ribbon_clamps.stl",
     "spool_holder_brackets.stl",
-    "spool_holder_tall_brackets.stl",
     "wades_extruder.stl",
     "x_carriage_parts.stl",
     "y_bearing_mounts.stl",

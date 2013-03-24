@@ -219,18 +219,26 @@ module atx_brackets_stl() {
             atx_short_bracket_stl();
 }
 
-module atx_brackets_x2_stl() {
-    atx_brackets_stl();
-    translate([-offset * 2 + 8, 2, 0])
-        rotate([0, 0, 180])
-            color("blue") atx_brackets_stl();
-}
-
 module atx_brackets_x4_stl() {
-    atx_brackets_x2_stl();
-    translate([0, 41, 0])
-        atx_brackets_x2_stl();
+    squeeze = 2 * (sb_base_width - sb_frame_offset - 1);
+    for(i = [0: 1]) {
+        translate([0, i * 2 * (atx_bracket_width + 2), 0]) {
+            translate([offset, 0, 0])
+                rotate([0, 0, 180])
+                    atx_long_bracket_stl();
+            translate([-offset, 2, 0])
+                atx_long_bracket_stl();
+        }
+        translate([sb_corner_offset + sb_frame_width - i * (2 * sb_corner_offset + 2 * sb_frame_width + sb_base_offset + 1 - squeeze) - squeeze / 2,
+                  -(atx_bracket_width + 2), 0]) {
+            translate([0, sb_corner_offset - sb_base_width - 2, 0])
+                rotate([0, 0, 180])
+                    atx_short_bracket_stl();
 
+            translate([sb_base_offset + 1, -sb_corner_offset - sb_base_width , 0])
+                atx_short_bracket_stl();
+        }
+    }
 }
 
 if(1)

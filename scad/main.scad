@@ -850,26 +850,10 @@ module frame_assembly(show_gantry = true) {
                     right_stay_x - fixing_block_height() / 2 - sheet_thickness(frame) / 2])
             explode2([0, 0, -4])
             translate([side, 0,  -sheet_thickness(base)]) {
-                color("silver") render() difference() {
-                    translate([0, 0, -tube_height(AL_square_tube) / 2])
-                        rotate([90, 0, 0])
-                            square_tube(AL_square_tube, base_depth - 2 * AL_tube_inset);
-
-                    for(end = [-1,1])
-                        translate([0, end * (base_depth / 2 - fixing_block_width() / 2 - base_clearance), -tube_height(AL_square_tube)]) {
-                            base_screw_hole();
-                            cylinder(r = screw_head_radius(base_screw) + 0.5, h = tube_thickness(AL_square_tube) * 2 + 1, center = true);
-                        }
-                }
-                if(show_jigs)
-                    translate([0, (base_depth / 2 - AL_tube_inset), -tube_height(AL_square_tube) - tube_jig_base_thicnkess() - eta])
-                        if(side > 0)
-                            rotate([0, 0, -90])
-                                color("lime") render()
-                                    tube_jig_stl();
+                color("silver") render() base_tube();
 
                 for(end = [-1, 1])
-                    translate([0, end * (base_depth / 2 - AL_tube_inset + tube_cap_base_thicnkess() + eta), -tube_height(AL_square_tube) / 2])
+                    translate([0, end * (base_depth / 2 - AL_tube_inset + tube_cap_base_thickness() + eta), -tube_height(AL_square_tube) / 2])
                         rotate([90, 0, 90 - 90 * end])
                             explode([0, 0, -20])
                                 color("lime") render()
@@ -988,6 +972,9 @@ module frame_stays_dxf() {
         frame_right_dxf();
 }
 
-echo("Width: ", base_width, " Depth: ", base_depth, " Height: ", height + sheet_thickness(base));
+total_height = height + sheet_thickness(base) + (base_nuts ? tube_height(AL_square_tube) : 0);
+spool_height = total_height - height + spool_z + spool_diameter(spool) / 2;
+
+echo("Width: ", base_width, " Depth: ", base_depth, " Height: ", total_height, " Spool Height:", spool_height);
 
 echo("X bar: ",  X_bar_length, " Y Bar 1: ", Y_bar_length, " Y Bar 2: ", Y_bar_length2, " Z Bar: ", Z_bar_length);

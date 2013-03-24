@@ -182,11 +182,23 @@ module z_motor_bracket_lhs_stl()                 z_motor_bracket(gantry_setback,
 module z_motor_bracket_rhs_stl() mirror([1,0,0]) z_motor_bracket(gantry_setback, true);
 
 module z_motor_brackets_stl() {
-    translate([length + 2, 0, 0]) z_motor_bracket_lhs_stl();
-    z_motor_bracket_rhs_stl();
+    translate([ length / 2 + 1, 0, 0]) z_motor_bracket_lhs_stl();
+    translate([-length / 2 - 1, 0, 0]) z_motor_bracket_rhs_stl();
+}
+
+module z_motor_bracketsX2_stl() {
+    translate([0, -gantry_setback - 1, 0])
+        z_motor_brackets_stl();
+    rotate([0, 0, 180])
+        translate([0, -gantry_setback - 1, 0])
+            z_motor_brackets_stl();
+
 }
 
 if(0)
-    z_motor_brackets_stl();
+    if(1)
+        z_motor_brackets_stl();
+    else
+        z_motor_bracketsX2_stl();
 else
     z_motor_assembly(gantry_setback, false);

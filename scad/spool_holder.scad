@@ -25,7 +25,6 @@ hook_r = 3;
 left = left_stay_x + sheet_thickness(frame) / 2;
 right =  right_stay_x - sheet_thickness(frame) / 2;
 spool_x = (left + right) / 2;
-spool_z = height - gantry_thickness + spool_diameter(spool) / 2 + 10;
 spool_y = gantry_Y + sheet_thickness(frame) + 10 + spool_height(spool) / 2;
 
 holes = psu_hole_list(psu);
@@ -153,31 +152,6 @@ module dust_filter_stl() {
                 teardrop(r = feed_tube_tape_rad, h = wall + feed_tube_tape, center = true);
     }
 }
-
-function feed_tube_connector_width() = 15;
-
-module feed_tube_connector_stl() {
-    stl("feed_tube_connector");
-
-    feed_tube_wall = 2;
-
-    w = feed_tube_connector_width();
-
-    difference() {
-        union() {
-            translate([0, 0, feed_tube_wall / 2])
-                rounded_rectangle([w, w, feed_tube_wall], r = 3);
-            translate([0, 0, eta])
-                cylinder(r = feed_tube_tape_rad + feed_tube_wall, h = feed_tube_tape + feed_tube_wall);
-        }
-        translate([0, 0, -eta]) {
-            poly_cylinder(r = feed_tube_tape_rad, h = feed_tube_tape);
-            translate([0, 0, feed_tube_tape + layer_height + eta])
-                poly_cylinder(r = feed_tube_rad, h = 100);
-        }
-    }
-}
-
 
 
 screw_tab = screw_boss_diameter(frame_screw);
@@ -414,15 +388,12 @@ module spool_assembly(show_spool = true) {
                                         cylinder(r = 40, h = 5);
                             }
 
-                            color(plastic_part_color("red")) render()
-                                translate([0, 0, -truncated + tube_length / 2])
-                                    feed_tube_connector_stl();
                         }
                 }
     }
 
 
-    vitamin("PLA3020: PLA sample 0.3mm ~20m");
+    vitamin("PLA3020: PLA sample 3mm ~20m");
 
     end("spool_holder_assembly");
 }
@@ -433,41 +404,41 @@ module spool_holder_holes()
             rotate([0, 90, 0])
                 frame_screw_hole();
 
+
 //
-// A pair laid out for building
+// All four laid out for building
 //
 module spool_holder_brackets_stl() {
-    gap = max(wall + 2 * tube_r + feed_clip_thickness + feed_tube_tape_rad + sponge_height / 2 + wall, sheet_thickness(frame) + hook ) + 2;
 
-    spool_bracket_female_stl();
-
-    translate([2 * bracket_width + gap, hook, 0])
-        rotate([0, 0, 180])
-            spool_bracket_female_stl();
-
-    translate([bracket_width + tube_r + wall, -bracket_height +hook + hook_overlap + tube_r + feed_clip_thickness + tube_spacing + 2, 0])
-        rotate([0, 0, -90])
-            dust_filter_stl();
-
-    translate([bracket_width - feed_tube_connector_width() / 2 - frame_bar_width - 2, feed_tube_connector_width(), 0])
-        feed_tube_connector_stl();
+    w = top_tube_y - bottom_tube_y;
+    gap = 2 * tube_r + 2;
+    h = w / 2 + gap / sqrt(2);
+    x = h - top_tube_x;
+    for(i = [0:3]) assign(odd = i % 2)
+        rotate([0, 0, i * 90])
+            translate([x, (odd ? -1 : 1)  * (top_tube_y + bottom_tube_y) / 2,0])
+                if(odd)
+                    spool_bracket_female_stl();
+                else
+                    spool_bracket_male_stl();
 }
 
-module spool_holder_tall_brackets_stl() {
 
-    spool_bracket_male_stl();
+module spool_holder_tall_brackets_x4_stl() {
 
-    translate([2 * bracket_width + 2, hook_overlap + 2, 0])
-        rotate([0, 0, 180])
-            spool_bracket_male_stl();
+    w = top_tube_y - bottom_tube_y;
+    gap = 2 * tube_r + 2;
+    h = w / 2 + gap / sqrt(2);
+    x = h - top_tube_x;
+    for(i = [0:3])
+        rotate([0, 0, i * 90])
+            translate([x, (top_tube_y + bottom_tube_y) / 2,0])
+                spool_bracket_male_stl();
 
 }
 
-if(1)
+if(0)
     translate([0, 0, - spool_z])
         spool_assembly();
 else
-    if(0)
-        spool_holder_tall_brackets_stl();
-    else
-        spool_holder_brackets_stl();
+    spool_holder_brackets_stl();
