@@ -289,6 +289,10 @@ module x_carriage_fan_duct_stl() {
 
     difference() {
         union() {
+            translate([0,0,layer_height / 2]) union() {
+                cube([or * 2 - duct_wall, 3, layer_height], center=true);
+                cube([3, or * 2 - duct_wall, layer_height], center=true);
+            }
             difference() {
                 union() {
                     // fan input
