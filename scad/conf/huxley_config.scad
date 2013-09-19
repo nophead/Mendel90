@@ -28,7 +28,8 @@ bed_width = 150 + 14;
 bed_pillars = M3x20_pillar;
 bed_glass = glass2;
 bed_thickness = pcb_thickness + sheet_thickness(bed_glass);    // PCB heater plus glass sheet
-bed_holes = bed_width - 5;
+X_bed_holes = bed_width - 5;
+Y_bed_holes = bed_depth - 5;
 
 base = DiBond;                  // Sheet material used for the base. Needs to be thick enough to screw into.
 base_corners = 25;
@@ -57,8 +58,8 @@ Y_belt = T2p5x6;
 motor_shaft = 5;
 Z_screw_dia = 6;            // Studding for Z axis
 
-Y_carriage_depth = bed_holes + 7;
-Y_carriage_width = bed_holes + 7;
+Y_carriage_depth = Y_bed_holes + 7;
+Y_carriage_width = X_bed_holes + 7;
 
 Z_nut_radius = M6_nut_radius;
 Z_nut_depth = M6_nut_depth;

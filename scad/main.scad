@@ -269,8 +269,8 @@ module y_carriage() {
                     y_belt_anchor_holes()
                         cylinder(r = M3_clearance_radius, h = 100, center = true);
 
-        for(x = [-bed_holes / 2, bed_holes / 2])
-            for(y = [-bed_holes / 2, bed_holes / 2])
+        for(x = [-X_bed_holes / 2, X_bed_holes / 2])
+            for(y = [-Y_bed_holes / 2, Y_bed_holes / 2])
                 translate([x, y, 0])
                     cylinder(r = 2.5/2, h = 100, center = true);
     }
