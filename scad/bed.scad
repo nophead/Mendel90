@@ -15,14 +15,14 @@ module bed_assembly(y = 0) {
     //
     // Screws pillars and washers
     //
-    for(x = [-bed_holes / 2, bed_holes /2]) {
-        translate([x, bed_holes / 2, 0])
+    for(x = [-X_bed_holes / 2, X_bed_holes /2]) {
+        translate([x, Y_bed_holes / 2, 0])
             washer(M3_washer);
 
-        translate([x, -bed_holes / 2 - washer_diameter(M3_washer) / 2 - 3 / 2, 0])
+        translate([x, -Y_bed_holes / 2 - washer_diameter(M3_washer) / 2 - 3 / 2, 0])
             washer(M3_washer);
 
-        for(y = [-bed_holes / 2, bed_holes /2])
+        for(y = [-Y_bed_holes / 2, Y_bed_holes /2])
             translate([x, y, washer_thickness(M3_washer)]) {
                 hex_pillar(bed_pillars);
 
