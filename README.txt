@@ -4,7 +4,7 @@ Currently only supports mendel and sturdy machine variants, the huxley version n
 
 Use
 ---
-Add the directory of the OpenScad executable to your search path. For Windows OpenSCAD-2012.02 or later is required. For Linux it will need to be openscad-2011.12 or later.
+Add the directory of the OpenScad executable to your search path. OpenSCAD-2013.06 or later is required.
 To get PDF versions of the sheet drawings add InkScape to your search path.
 
 To make all the files for a machine run
