@@ -7,8 +7,8 @@
 //
 // Configuration file
 //
-bom = 2;                        // 0 no bom, 1 assemblies and stls, 2 vitamins as well
-exploded = 0;                   // 1 for exploded view
+bom = $bom == undef ? 0: $bom;                 // 0 no bom, 1 assemblies and stls, 2 vitamins as well
+exploded = $exploded == undef ? 0 : $exploded; // 1 for exploded view
 
 show_jigs = true;               // show printed jigs required to build the machine
 show_support = true;            // show support structures, must be set when generating STLs
@@ -98,6 +98,9 @@ thermistor_wires_hole_radius = wire_hole_radius(thermistor_wires);
 cnc_sheets = false;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
 base_nuts = false;                  // Need something under the base if using nuts
 pulley_type = T5x8_plastic_pulley;
+clip_handles = true;
+include_fan = false;
+part_fan = fan60x15;
 include <machine.scad>              // this file is generated from the command line parameter to include one of the machine configs
 
 screw_clearance_radius = screw_clearance_radius(cap_screw);
@@ -115,7 +118,7 @@ axis_end_clearance = cnc_sheets ? 1 : 2;// how close we get to the end of an axi
 limit_switch_offset = 1;                // the over travel to reach the limit switch
 X_carriage_clearance = 2;               // how close the X carriage is to the XZ plane
                                         // how close the Y carriage is to the window in the XZ plane
-Y_carriage_clearance = 2 + bulldog_handle_length(small_bulldog) - (Y_carriage_width - bed_width) / 2;
+Y_carriage_clearance = 2 + (clip_handles ? (bulldog_handle_length(small_bulldog) - (Y_carriage_width - bed_width) / 2) : 0);
 Z_clearance = 10;                       // How close the top of the object gets to the gantry
 belt_clearance = 0.2;                   // clearance of belt clamp slots
 

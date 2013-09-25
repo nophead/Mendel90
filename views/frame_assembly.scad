@@ -6,8 +6,10 @@
 // hydraraptor.blogspot.com
 //
 // The frame assembly view
+// assembly 1032 965 -20 119 168 70 0 184 2700
 //
 use <../scad/main.scad>
 
-view([ -9.55, 26.75, 113.75 ], [ 50.10, 0.00, 202.80 ],2998.11)
 frame_assembly();
+
+$exploded = 1;

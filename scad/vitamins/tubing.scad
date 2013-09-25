@@ -9,6 +9,8 @@
 //
 
 PVC64     = ["PVC aquarium tubing", 6,        4, tubing_color];
+PVC85     = ["PVC aquarium tubing", 8,        5, tubing_color];
+NEOP85    = ["Neoprene tubing",     8,        5, [0.2,0.2,0.2]];
 PTFE07    = ["PTFE sleeving",       1.2,   0.71, tubing_color];
 PTFE20    = ["PTFE sleeving",       2.6,      2, tubing_color];
 PF7       = ["PTFE tubing",         46/10, 3.84, tubing_color];

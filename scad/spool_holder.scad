@@ -32,7 +32,7 @@ holes = psu_hole_list(psu);
 bearing_r = (spool_diameter(spool) + ball_bearing_diameter(bearing)) / 2;
 bearing_x = cos(angle) * bearing_r;
 bearing_z = spool_z - sin(angle) * bearing_r;
-bearing_y = spool_width(spool) / 2 + ball_bearing_width(bearing) / 2;
+bearing_y = spool_width(spool) / 2 + ball_bearing_width(bearing) / 2 - washer_thickness(M8_penny_washer);
 
 bracket_width = right - (spool_x + bearing_x);
 bracket_height =  height - bearing_z;
@@ -298,21 +298,20 @@ module spool_bracket_male_stl() {
 module spool_bracket_assembly(male)
 {
     rotate([-90, 0, 0]) {
-        translate([0, 0, exploded * 30])
+        translate([0, 0, exploded * 15]) {
             ball_bearing(bearing);
 
-        translate([0, 0, ball_bearing_width(bearing) / 2])
-            screw(M8_cap_screw, 30);
+            translate([0, 0, ball_bearing_width(bearing) / 2 + exploded * 5])
+                washer(M8_washer)
+                    translate([0, 0, exploded * 5])
+                        washer(M8_penny_washer)
+                            screw(M8_cap_screw, 30);
+        }
 
         rotate([180, 0, 0])
             translate([0, 0, ball_bearing_width(bearing) / 2]) {
                 translate([0, 0, exploded * -10])
-                    washer(M8_washer);
-
-                translate([0, 0, washer_thickness(M8_washer)]) {
-                    washer(M8_penny_washer);
-
-                    translate([0, 0, washer_thickness(M8_penny_washer)]) {
+                    washer(M8_washer) translate([0, 0, exploded * 5]) group() {
                         if(male)
                             color(plastic_part_color("lime")) render() mirror([0, 1, 0]) spool_bracket_male_stl();
                         else
@@ -320,13 +319,11 @@ module spool_bracket_assembly(male)
 
                         translate([0, 0, thickness]) {
                             translate([0, 0, exploded * 5])
-                                washer(M8_washer);
+                                washer(M8_washer)
+                                    nut(M8_nut, true);
 
-                            translate([0, 0, washer_thickness(M8_washer)])
-                                nut(M8_nut, true);
                         }
                     }
-                }
             }
         if(male)
             translate([right - (spool_x + bearing_x), height - bearing_z - tube_r, -bearing_y]) {
@@ -437,7 +434,7 @@ module spool_holder_tall_brackets_x4_stl() {
 
 }
 
-if(0)
+if(1)
     translate([0, 0, - spool_z])
         spool_assembly();
 else

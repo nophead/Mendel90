@@ -10,16 +10,18 @@
 include <conf/config.scad>
 
 wall = 2.4;
-inner_rad = (((Z_screw_dia == 6) ? M6_tap_radius : M8_tap_radius) + Z_screw_dia / 2) / 2; // half depth thread
+tap_rad = (Z_screw_dia == 6) ? M6_tap_radius : ((Z_screw_dia == 5) ? M5_tap_radius : M8_tap_radius);
+inner_rad = (tap_rad + Z_screw_dia / 2) / 2; // half depth thread
 outer_rad = inner_rad + wall;
 
 function z_screw_pointer_height() = 5;
 function z_screw_pointer_radius() = outer_rad;
+function z_screw_pointer_length() = z_bar_offset() - Z_bar_dia / 2 - 1;
 
 module z_screw_pointer_stl() {
     height = z_screw_pointer_height();
 
-    pointer = z_bar_offset() - Z_bar_dia / 2 - 1;
+    pointer =z_screw_pointer_length();
 
     stl("z_screw_pointer");
     difference() {

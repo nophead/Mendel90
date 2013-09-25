@@ -63,7 +63,7 @@ module atx_long_bracket_stl() {
         for(end = [-1, 1])
             translate([end * (length / 2 - psu_hole_x), 0, (end == -1 ? psu_hole_z : psu_hole_z2) - thickness / 2])
                 rotate([90, 0, 0])
-                    teardrop_plus(r = screw_clearance_radius(No632_pan_screw), h = 100);
+                    teardrop_plus(r = screw_clearance_radius(No632_pan_screw), h = 100, center = true);
     }
 }
 

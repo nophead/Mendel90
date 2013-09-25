@@ -16,7 +16,7 @@ use <wade.scad>
 
 bwall = 2.3;
 
-bearing_dia = Z_bearings[1] + 0.2;
+bearing_dia = Z_bearings[1];
 bearing_width = bearing_dia + 2 * bwall;
 bearing_depth = bearing_width / 2 + 1;
 bearing_length = Z_bearings[0];
@@ -32,13 +32,9 @@ shelves = [ shelf_thickness / 2,
             bearing_height - shelf_thickness / 2,
             bearing_height - (shelf_thickness + bearing_length + shelf_clearance + shelf_thickness / 2) ];
 
-actuator_width = 4;
-actuator_depth = 3;
-actuator_height = 10;
-
 module z_linear_bearings(motor_end) {
     rod_dia = Z_bearings[2];
-    opening = 2 * bearing_dia / 15.4;
+    opening = bearing_dia / 7;
     shelf_depth = bearing_depth - (rod_dia / 2 + 1);
 
     union() {
@@ -49,11 +45,6 @@ module z_linear_bearings(motor_end) {
                     cube([bearing_depth, bearing_width, bearing_height], center = true);
 
                 cylinder(h = bearing_height, r = bearing_width / 2);
-
-                if(!motor_end)
-                    *translate([-bearing_depth + eta, 0, bearing_height - eta])
-                        rotate([-90, 0, 0])
-                            right_triangle(width = -actuator_depth, height = actuator_height, h = actuator_width, center = true);
 
             }
             //hole for bearings
@@ -79,26 +70,29 @@ module z_linear_bearings(motor_end) {
 //z_linear_bearings();
 
 wall = thick_wall;                          // 4mm on Mendel and Sturdy, 3mm on Huxley
-width = x_bar_spacing();
+web = 3;
+corner_rad = 3;
+
+clamp_wall = 0.5 + washer_diameter(M3_washer) / 2 + M3_clearance_radius;
+
+width = x_bar_spacing() + X_bar_dia + 2 * clamp_wall;
 back = -ceil(z_bar_offset() + Z_nut_radius + wall);
 front = -(Z_bar_dia / 2 + 1);
 length = front - back;
 thickness = X_bar_dia + 2 * wall;
 
-clamp_wall = default_wall;                  // 4mm on Sturdy, 3mm on Mendel and Huxley
+clamp_hole_inset = clamp_wall;
+clamp_height = thickness / 2 - 0.4;
+clamp_width = X_bar_dia + 2 * clamp_wall;
+
 nut_flat_radius = nut_radius * cos(30);
-clamp_width = 2 * (nut_radius + clamp_wall);
-clamp_height = washer_diameter(washer) / 2 + nut_flat_radius + clamp_wall;
-clamp_depth = wall + nut_trap_depth;
-clamp_thickness = 5;
-slit = 1;
 bar_y = x_bar_spacing() / 2;
 
 belt_edge = -x_carriage_width() / 2 - X_carriage_clearance;
 function x_belt_offset() = belt_edge - belt_width(X_belt) / 2;
 
 idler_stack = 2 * ball_bearing_width(BB624) + 2 * (washer_thickness(M4_washer) + washer_thickness(M5_penny_washer));
-idler_front = min(belt_edge - belt_width(X_belt) / 2 + idler_stack / 2, -bar_y - thickness / 2 - 0.25);
+idler_front = min(belt_edge - belt_width(X_belt) / 2 + idler_stack / 2, -bar_y - X_bar_dia / 2 - clamp_wall);
 idler_screw_length = 45;
 idler_depth = idler_screw_length - idler_stack - 1;
 idler_back = idler_front + idler_depth;
@@ -109,13 +103,14 @@ mbracket_corner = 7;
 motor_angle = 45;
 motor_w = ceil(min(max(sin(motor_angle) + cos(motor_angle)) * NEMA_width(X_motor), NEMA_radius(X_motor) * 2) + 1);
 mbracket_width = motor_w + 2 * mbracket_thickness;
-mbracket_height = thickness / 2 + NEMA_radius(X_motor) + mbracket_thickness;
+mbracket_height = thickness / 2 + NEMA_radius(X_motor) + mbracket_thickness + 0.5;
 mbracket_front = belt_edge + 14;
-mbracket_depth = NEMA_length(X_motor) + 2 * mbracket_thickness + 1;
+mbracket_depth = NEMA_length(X_motor) + 3 * washer_thickness(M3_washer) + 2 * mbracket_thickness;
 mbracket_centre = mbracket_front + mbracket_depth / 2 - mbracket_thickness;
+nut_shelf = bearing_height -thickness / 2 - wall - nut_trap_depth(Z_nut);
 
-switch_op_x = Z_bearings[1] / 2 + 3;                            // switch operates 2mm before carriage hits the bearing
-switch_op_z = x_carriage_offset() - x_carriage_thickness() / 2; // hit the edge of the carriage
+switch_op_x = Z_bearings[1] / 2 + 3;        // switch operates 2mm before carriage hits the bearing
+switch_op_z = x_carriage_offset() - 2;      // hit the edge of the carriage
 sbracket_top = switch_op_z + 12;
 sbracket_height = sbracket_top + thickness / 2;
 sbracket_depth = switch_op_x - 3 - front;
@@ -131,30 +126,124 @@ function x_end_height() = bearing_height - thickness / 2;
 function x_end_thickness() = thickness;
 function x_motor_height() = mbracket_height - thickness / 2;
 function x_end_clearance() = switch_op_x;
+function x_end_z_nut_z() = nut_shelf;
 
 ribbon_screw = M3_cap_screw;
 ribbon_nut = screw_nut(ribbon_screw);
 ribbon_nut_trap_depth = nut_trap_depth(ribbon_nut);
-ribbon_pillar_depth = 12;
 ribbon_pillar_thickness = wall + ribbon_nut_trap_depth;
-ribbon_clamp_x = back - ribbon_pillar_depth;
-ribbon_clamp_y = mbracket_front + washer_diameter(screw_washer(ribbon_screw)) / 2 + mbracket_corner + eta;
-ribbon_clamp_z = mbracket_height + ribbon_clamp_length(extruder_ways, ribbon_screw) / 2 - thickness / 2 + 0.5;
-ribbon_pillar_width = nut_radius(ribbon_nut) * 2 + 2 * wall + 0.5;
-ribbon_pillar_top = ribbon_clamp_z + ribbon_clamp_length(extruder_ways, ribbon_screw) / 2;
-mbracket_rim_width = max(ribbon_pillar_depth + eta, 15 * NEMA_width(X_motor) / NEMA_width(NEMA17));
-mbracket_rim_inner_rad = 5;
+ribbon_pillar_depth = ribbon_pillar_thickness;
+ribbon_pillar_width = nut_radius(ribbon_nut) * 2 + 2 * web + 0.5;
+ribbon_pillar_height = ribbon_clamp_length(extruder_ways, ribbon_screw);
+ribbon_clamp_x = back - mbracket_thickness + eta;
+ribbon_clamp_y = -bearing_width / 2 - ribbon_pillar_width / 2 + web - eta;
+ribbon_clamp_z = max(mbracket_height + ribbon_pillar_height / 2 - thickness / 2,
+                     bearing_height - ribbon_clamp_length(extruder_ways, ribbon_screw) / 2 - thickness / 2);
+ribbon_pillar_top = ribbon_clamp_z + ribbon_pillar_height / 2;
 
-function anti_backlash_height() = 24 + thickness / 2;
-anti_backlash_radius = Z_nut_radius + 0.2;
-anti_backlash_wall = max(3, bearing_width / 2 - wall - cos(30) * anti_backlash_radius + 0.5);
-
-function x_end_ribbon_clamp_y() = mbracket_front + mbracket_depth - mbracket_thickness;
-function x_end_ribbon_clamp_z() = mbracket_height - thickness / 2 - mbracket_thickness - nut_radius(ribbon_nut);
+function x_end_ribbon_clamp_y() = mbracket_front + NEMA_length(X_motor) + ribbon_bracket_thickness();
+function x_end_ribbon_clamp_z() = NEMA_hole_pitch(X_motor) / sqrt(2);
 
 function x_end_extruder_ribbon_clamp_offset() = [-ribbon_clamp_x, ribbon_clamp_y + ribbon_clamp_width(ribbon_screw) / 2, ribbon_clamp_z];
 
-module x_end_bracket(motor_end, assembly = false){
+module x_end_clamp_stl() {
+    stl("x_end_clamp");
+
+    difference() {
+        hull() {
+            for(end = [-1, 1], side = [-1,1])
+                translate([end * (length / 2 - corner_rad), side * (clamp_width / 2 - corner_rad), 0])
+                    if(side < 0)
+                        translate([0, 0, clamp_height / 2])
+                            cube([2 * corner_rad, 2 * corner_rad, clamp_height], center = true);
+                        else
+                            cylinder(r = corner_rad, h = clamp_height);
+        }
+
+        translate([0, 0, thickness / 2])
+            rotate([90, 0, 90])
+                teardrop_plus(r = X_bar_dia / 2, h = length + 1, center = true);
+
+        for(end = [-1, 1]) {
+            for(side = [-1,1])
+                translate([end * (length / 2 - clamp_hole_inset), side * (X_bar_dia / 2 + M3_clearance_radius), 0])
+                    poly_cylinder(r = M3_clearance_radius, h = 100, center = true);
+
+            translate([end * (length / 2 - clamp_hole_inset), 0, thickness / 2])
+                cube([M3_clearance_radius * 2 - eta, X_bar_dia + M3_clearance_radius * 2, X_bar_dia * 0.8], center = true);
+        }
+    }
+}
+
+function ribbon_bracket_counterbore() = washer_thickness(M3_washer) + screw_head_height(M3_cap_screw) + 0.5;
+function ribbon_bracket_thickness() = ribbon_bracket_counterbore() + 2.4;
+
+module x_motor_ribbon_bracket_stl(support = true) {
+    stl("x_motor_ribbon_bracket");
+    length = ribbon_clamp_length(x_end_ways, ribbon_screw) + 2;
+    rad = ribbon_clamp_width(ribbon_screw) / 2 + 1;
+    counterbore = ribbon_bracket_counterbore();
+    height = ribbon_bracket_thickness();
+    ridge_width = 5 * filament_width + eta;                 // angled same as infill so make sure whole number of filaments
+    ridge_offset = (NEMA_width(X_motor) - NEMA_hole_pitch(X_motor)) / 2 + ridge_width / 2;
+    ridge_height = 5;
+    difference() {
+        union() {
+            hull() {
+                for(side = [-1, 1])
+                    translate([side * (length / 2 - rad), 0, 0])
+                        cylinder(h = height, r = rad);
+
+            }
+            for(side = [-1,1])
+                intersection() {
+                    rotate([0, 0, side * 45])
+                        translate([ridge_offset * side, 0, height - 1 + ridge_height / 2])
+                            cube([ridge_width, 100, ridge_height + 1], center = true);
+                    cube([length, rad * 2 - 1, 100], center = true);
+                }
+        }
+        //
+        // counterbored hole for motor screw
+        //
+        difference() {
+            union() {
+                poly_cylinder(r = M3_clearance_radius, h = 100, center = true);
+                poly_cylinder(r = washer_diameter(M3_washer) / 2 + 0.5, h = counterbore * 2, center = true);
+            }
+            if(support)
+                hole_support(M3_clearance_radius, counterbore);
+        }
+        //
+        // ribbon clamp holes
+        //
+        translate([0, 0, height])
+            ribbon_clamp_holes(x_end_ways, ribbon_screw)
+                nut_trap(screw_clearance_radius(ribbon_screw), nut_radius(ribbon_nut), ribbon_nut_trap_depth);
+    }
+}
+
+nut_trap_support_height = 10;
+
+module x_idler_support_stl() {
+    color("grey") {
+        translate([-z_bar_offset(), 0, 0])
+            hole_support(r = (Z_screw_dia + 1) / 2, h = bearing_height - wall);
+
+        translate([-z_bar_offset(), 0,  nut_shelf  + thickness / 2 - nut_trap_support_height])
+            nut_trap_support(r = Z_nut_radius, h = nut_trap_support_height + eta, r2 = (Z_screw_dia + 1) / 2);
+
+        for(side = [-1,1])
+            for(x = [front - clamp_hole_inset, back + clamp_hole_inset])
+                for(i = [-1,1])
+                    translate([x, side * bar_y + i * (X_bar_dia / 2 + M3_clearance_radius), 0])
+                        hole_support(r = M3_clearance_radius, h = M3_nut_trap_depth, max_r = nut_flat_radius(M3_nut));
+    }
+}
+
+module x_motor_support_stl() mirror([1,0,0]) x_idler_support_stl();
+
+module x_end_bracket(motor_end, integral_support = false){
 
     if(motor_end)
         stl("x_motor_bracket");
@@ -168,252 +257,183 @@ module x_end_bracket(motor_end, assembly = false){
             union(){
                 // base
                 translate([front - length / 2, 0, 0])
-                    cube([length, width, thickness], center = true);
+                    rounded_rectangle([length, width, thickness], corner_rad);
 
-                //
-                // Anti-backlash nut holder
-                //
-                translate([-z_bar_offset(), 0, thickness / 2 - eta]) union() {
-                    cylinder(r = anti_backlash_radius + anti_backlash_wall, h = anti_backlash_height() - thickness / 2 - eta, $fn = 6);
-                    translate([0, -(bearing_width - 2 * wall + 1) / 2, 0])
-                        cube([z_bar_offset() - bearing_depth + eta, bearing_width - 2 * wall + 1, anti_backlash_height() - thickness / 2]);
-                    if(motor_end)
-                        translate([back + z_bar_offset(), -(bearing_width - 2 * wall + 1) / 2, 0])
-                            cube([-back - z_bar_offset(), bearing_width - 2 * wall + 1, mbracket_height - thickness - eta]);
+                // nut holder tower
+                difference() {
+                    translate([front - length / 2, 0, bearing_height / 2 - thickness / 2])
+                        cube([length, bearing_width, bearing_height], true);
 
+                    translate([-bearing_depth - length / 2 - eta, 0, nut_shelf - bearing_height / 2])
+                        rounded_rectangle([length, bearing_width - 2 * web, bearing_height], 2);
                 }
-                //
-                // Webs from bearing holder
-                //
-                for(side = [-1, 1])
-                    if(motor_end)
-                        translate([back - eta, (bearing_width - wall - eta) / 2 * side, thickness / 2 - eta])
-                            rotate([90, 0, 0])
-                                linear_extrude(height = wall, center = true)
-                                    polygon(points = [
-                                            [0, 0],
-                                            [-back - bearing_depth + 2 * eta, 0],
-                                            [-back - bearing_depth + 2 * eta, bearing_height - thickness],
-                                            [0, mbracket_height - thickness]
-                                        ],
-                                        sides = [0, 1, 2, 3]
-                                );
-                    else
-                        translate([-bearing_depth + eta, (bearing_width - wall - eta) / 2 * side, thickness / 2 - eta])
-                            rotate([90, 0, 0])
-                                right_triangle(width = back + bearing_depth, height = bearing_height - thickness, h = wall);
-
-                for(side = [-1, 1]) {
+                if(motor_end)
                     //
-                    // Bar holders
-                    //
-                    union() {
-                        translate([front - length / 2,  bar_y * side, 0]) {
-                            rotate([90, 0, 90])
-                                teardrop(r = thickness / 2, h = length, center = true);
-                            rotate([-90, 0, 90])
-                                teardrop(r = thickness / 2, h = length, center = true);
-
-                            rotate([90, 0, 90 * side])
-                                linear_extrude(height = length - 4 * eta, center = true)
-                                    hull() {
-                                        translate([slit / 2 + eta, thickness / 2 - 1])
-                                            square([clamp_thickness - 2 * eta, 0.5]);
-                                        circle(r = thickness / 2 - eta);
-                                    }
-                        }
-                    }
-                    //
-                    // Bar clamps
+                    // limit switch bracket
                     //
                     difference() {
-                        group() {
-                            translate([front - length / 2, side * (bar_y - clamp_depth / 2 - slit / 2), thickness / 2 + clamp_height / 2 -eta])
-                                cube([clamp_width, clamp_depth, clamp_height], center = true);
-
-                            translate([front - length / 2, side * (bar_y + clamp_thickness / 2 + slit / 2)   -eta, thickness / 2])
+                        union() {
+                            translate([front - eta, sbracket_y, - thickness / 2])
                                 rotate([90, 0, 0])
-                                    linear_extrude(height = clamp_thickness, center = true)
-                                        polygon(points = [
-                                            [-length / 2 + eta, 0],
-                                            [-length / 2 + eta, -thickness / 2],
-                                            [ length / 2 - eta, -thickness / 2],
-                                            [ length / 2 - eta, 0],
-                                            [ clamp_width / 2, clamp_height],
-                                            [-clamp_width / 2, clamp_height],
-                                        ]);
+                                    linear_extrude(height = sbracket_thickness, center = true)
+                                        polygon([
+                                                    [0, 0],
+                                                    [sbracket_depth, sbracket_height - microswitch_length() + 2],
+                                                    [sbracket_depth, sbracket_height],
+                                                    [-web, sbracket_height],
+                                                    [-web, thickness - eta]
+                                                ]);
+                            translate([front - web, sbracket_y, thickness / 2 - 1])
+                                cube([web, -bearing_width / 2 - sbracket_y + 1, sbracket_height - thickness + 1]);
                         }
-                        //
-                        // Bar clamp nut traps
-                        //
-                        translate([front - length / 2, side * (bar_y - clamp_depth - slit / 2), thickness / 2 + washer_diameter(washer) / 2])
-                            rotate([90,0,0])
-                                nut_trap(screw_clearance_radius, nut_radius, nut_trap_depth, true);
+                        translate([switch_op_x, sbracket_y + sbracket_thickness / 2 + microswitch_thickness() / 2, switch_op_z])
+                            rotate([0, -90, -90])
+                                microswitch_holes(h = sbracket_thickness);
+                    }
+                else {
+                    //
+                    // idler end
+                    //
+                    difference() {
+                        union() {
+                            translate([back - idler_width / 2 + eta + corner_rad, idler_back - idler_depth / 2, 0])
+                                rounded_rectangle([idler_width + 2 * corner_rad, idler_depth, thickness], r = corner_rad, center = true);
+
+                            translate([back, idler_back, 0])
+                                rotate([0, 0, 90])
+                                    fillet(h = thickness, r = idler_width / 2);
+                        }
+
+                        translate([back - idler_width / 2, -bar_y, 0])
+                            rotate([90, 0, 90])
+                                teardrop(r = X_bar_dia / 2 + 0.5, h = 100, center = true);
+
+                        assign(screw_angle = atan2(M4_clearance_radius - 3.9 / 2, idler_depth))
+                            translate([x_idler_offset(), idler_back, 0])
+                                rotate([90, 0, -screw_angle])
+                                    nut_trap(M4_clearance_radius, M4_nut_radius, M4_nut_trap_depth);
+
                     }
                 }
             }
             //
             // Cut out for bearing holder
             //
-            cube([bearing_depth * 2 -eta, bearing_width - eta, thickness + 10], center = true);
+            translate([0, 0, bearing_height / 2 - thickness / 2])
+                cube([bearing_depth * 2 -eta, bearing_width - 1, bearing_height + 2], center = true);
             //
             // Hole for z leadscrew
             //
-            translate([-z_bar_offset(), 0, -thickness / 2])
-                nut_trap((Z_screw_dia + 1) / 2, Z_nut_radius, Z_nut_depth);
+            difference() {
+                translate([-z_bar_offset(), 0, - thickness / 2])
+                    nut_trap((Z_screw_dia + 1) / 2, Z_nut_radius, nut_shelf + thickness / 2 + nut_trap_depth(Z_nut), supported = integral_support);
 
-            translate([-z_bar_offset(), 0, thickness / 2 + eta])
-                cylinder(r = anti_backlash_radius, h = bearing_height, $fn = 6);
+                if(integral_support)
+                    translate([-z_bar_offset(), 0, nut_shelf])
+                        cylinder(r = Z_nut_radius + 1, h = layer_height);
+            }
+
+            translate([-z_bar_offset(), 0, -thickness / 2 - 1])
+                cylinder(r = Z_nut_radius + 1, h = thickness + 2, $fn = 6);
 
             for(side = [-1, 1]) {
                 //
                 // Holes for x_bars
                 //
                 translate([front - length / 2, bar_y * side, 0]) {
-                    translate([0, 0, thickness / 2])
-                        cube([length + 1, slit, thickness + 1], center = true);
                     rotate([90, 0, 90])
-                        teardrop_plus(r = X_bar_dia / 2, h = length + 1, center = true, truncate = false);
+                        teardrop_plus(r = X_bar_dia / 2, h = length + 1, center = true);
+                }
+                //
+                // Remove clamp tops
+                //
+                translate([back + (length + 1) / 2 - 0.5, side * (bar_y - X_bar_dia / 2 - clamp_wall - 0.5 + 50), bearing_height / 2])
+                    cube([length + 1, 100, bearing_height], center = true);
+                //
+                // Clamp nut traps
+                //
+                for(x = [front - clamp_hole_inset, back + clamp_hole_inset]) {
+                    for(i = [-1,1])
+                        translate([x, side * bar_y + i * (X_bar_dia / 2 + M3_clearance_radius), -thickness / 2])
+                            nut_trap(M3_clearance_radius, M3_nut_radius, M3_nut_trap_depth, supported = integral_support);
+
+                    translate([x, side * bar_y, 0])
+                        cube([M3_clearance_radius * 2 - eta, X_bar_dia + M3_clearance_radius * 2, X_bar_dia * 0.8], center = true);
                 }
             }
-            //
-            // cut out for bottom microswitch contact
-            //
-            if(motor_end)
-                translate([switch_op_x,
-                           sbracket_y - sbracket_thickness / 2 - microswitch_thickness() / 2,
-                           switch_op_z])
-                    rotate([0, -90, -90])
-                        microswitch_contact_space();
-
         }
-        //
-        // support membrane
-        //
-        translate([-z_bar_offset(), 0, Z_nut_depth + layer_height / 2 - thickness / 2 + eta])
-            cylinder(r = (Z_screw_dia + 2) /2, h = layer_height, center = true);
 
         if(motor_end) {
              difference() {
-                //
-                // Bracket
-                //
                 union() {
+                    //
+                    // Motor bracket
+                    //
                     translate([back - mbracket_width / 2 + eta, mbracket_centre, mbracket_height / 2 - thickness / 2]) {
                         difference() {
-                            rounded_rectangle([mbracket_width, mbracket_depth, mbracket_height], center = true, r = mbracket_corner);  // outside
+                            cube([mbracket_width, mbracket_depth, mbracket_height], center = true);  // outside
                             translate([0, 0, -mbracket_thickness])
-                                difference() {
-                                    cube([mbracket_width - 2 * mbracket_thickness,                                          // inside
-                                        mbracket_depth - 2 * mbracket_thickness, mbracket_height], center = true);
+                                 cube([mbracket_width - 2 * mbracket_thickness,                      // inside
+                                       mbracket_depth - 2 * mbracket_thickness, mbracket_height], center = true);
 
-                                    if(!assembly) union() {
-                                        rounded_rectangle([mbracket_width - 2 * mbracket_rim_width + 4 * filament_width,                                     // support tube
-                                                           mbracket_depth - 2 * mbracket_rim_width + 4 * filament_width, mbracket_height + 1],
-                                                           r = mbracket_rim_inner_rad + 2 * filament_width);
+                            translate([-M3_clearance_radius - wall - 100, -50, - 50])               // truncate front
+                                cube(100);
 
-                                        translate([0, 0, - mbracket_height / 2 + mbracket_thickness + layer_height])
-                                            rounded_rectangle([mbracket_width - 2 * mbracket_rim_width + 8 * filament_width,                                                     // support base
-                                                               mbracket_depth - 2 * mbracket_rim_width + 8 * filament_width,
-                                                               layer_height * 2], r = mbracket_rim_inner_rad + 4 * filament_width);
-                                    }
-                                }
-                            translate([0, 0, (mbracket_height - mbracket_thickness) / 2 + layer_height])
-                                rounded_rectangle([mbracket_width - 2 * mbracket_rim_width,
-                                                   mbracket_depth - 2 * mbracket_rim_width, 100], r = mbracket_rim_inner_rad); // open top
+                            translate([NEMA_big_hole(X_motor) * sqrt(2), 0, -mbracket_height / 2 + thickness / 2])
+                                rotate([0, 45, 180])                                                 // slope front tangential to motor boss
+                                    translate([0, 0, -50])
+                                        cube(100);
 
+                            translate([-100 - NEMA_holes(X_motor)[0] * sqrt(2) - screw_head_radius(M3_cap_screw) - wall, 0, - 50])
+                                cube(100);                                                           // truncate back
+
+                            translate([-100 + mbracket_width / 2 + 1, -mbracket_centre - bearing_width / 2 + web,
+                                       -mbracket_height / 2 + thickness - eta])
+                                cube(100);                                                           // truncate back
+
+                            translate([-M3_clearance_radius - wall - eta, -mbracket_centre - bearing_width / 2 + web + eta, mbracket_height / 2])
+                                rotate([0, 0,-90])
+                                    right_triangle(width = -mbracket_front - bearing_width / 2 + web,
+                                           height = mbracket_width / 2 -mbracket_thickness + M3_clearance_radius + wall,
+                                           h = 2 * mbracket_thickness + 1);
                         }
-                        //
-                        // Fillet to anchor the end wall to the bed while being printed
-                        //
-                        translate([-mbracket_width / 2 + mbracket_thickness - eta, 0, -mbracket_height / 2])
-                            rotate([90, 0, 0])
-                                right_triangle(width = 4, height = 4, h = mbracket_depth - mbracket_thickness, center = true);
                     }
                     //
-                    // ribbon clamp pillar
+                    // Ribbon clamp pillar
                     //
-                    translate([ribbon_clamp_x,
+                    translate([ribbon_clamp_x + ribbon_pillar_thickness / 2,
                                ribbon_clamp_y,
-                               mbracket_height + (ribbon_pillar_top - mbracket_height - thickness / 2) / 2 - eta])
-                    {
-                        translate([ribbon_pillar_thickness / 2, 0, 0])
+                               ribbon_clamp_z - eta])
+                        hull() {
                             cube([ribbon_pillar_thickness,
                                   ribbon_pillar_width,
-                                  ribbon_pillar_top - mbracket_height + thickness / 2], center = true);
-                        for(side = [-1, 1])
-                            translate([ribbon_pillar_thickness - eta, side * (ribbon_pillar_width - wall) / 2,
-                                        -(ribbon_pillar_top - mbracket_height + thickness / 2) / 2 - eta])
-                                rotate([90,0,0])
-                                    right_triangle(width = ribbon_pillar_depth - ribbon_pillar_thickness,
-                                                   height = ribbon_pillar_top - mbracket_height + thickness / 2,
-                                                   h = wall);
-                    }
-                    //
-                    // Ribbon clamp nut traps
-                    //
-                    translate([x_motor_offset(), mbracket_front + mbracket_depth - 2 * mbracket_thickness + eta, x_end_ribbon_clamp_z()])
-                        rotate([90, 180, 0])
-                            ribbon_clamp_holes(x_end_ways, ribbon_screw)
-                                difference() {
-                                    teardrop(r = nut_radius(ribbon_nut) + 2, h = ribbon_nut_trap_depth, truncate = false);
-                                    translate([0, (nut_radius(ribbon_nut) + 2) * sqrt(2), ribbon_nut_trap_depth + eta])
-                                        rotate([0, 90, 180])
-                                            right_triangle(width = ribbon_nut_trap_depth, height = ribbon_nut_trap_depth, h = 20);
-                                }
+                                  ribbon_pillar_height], center = true);
 
-
-                }
-                //
-                // Slits to leave clamp free
-                //
-                for(side = [-1,1])                  // both sides in case motor longer than bracket
-                    translate([back - slit / 2 + eta * 2, side * (-bar_y - thickness / 2 + slit / 2), 0])
-                        difference() {
-                            cube([slit, thickness, thickness + 2], center = true);
-                            translate([-1, 0, thickness / 2 + 1])
-                                rotate([0, 45, 0])
-                                    cube([2, thickness + 1, 2], center = true);
+                            translate([+ribbon_pillar_thickness / 2 + 0.5 - mbracket_thickness + eta, 0,
+                                       -(ribbon_pillar_thickness - mbracket_thickness) * 2])
+                                cube([1, ribbon_pillar_width / 2, ribbon_pillar_height], center = true);
                         }
+                }
                 //
                 // Holes
                 //
-                translate([x_motor_offset(), mbracket_front, 0]) {
-                    //
-                    // big hole for motor boss
-                    //
-                    translate([0, 0, -50/2])
-                        rotate([90,0,0])
-                            vertical_tearslot(r = NEMA_big_hole(X_motor), h = 2 * mbracket_thickness + 1, l = 50, center = true);
-                    //
-                    // small hole for second shaft
-                    //
-                    translate([0, mbracket_depth - mbracket_thickness, -50/2])
-                        rotate([90,0,0])
-                            vertical_tearslot(r = 4, h = 2 * mbracket_thickness + 1, l = 50, center = true);
+                translate([x_motor_offset(), 0, 0]) {
                     //
                     // Mounting holes
                     //
-                    for(x = NEMA_holes(X_motor))                                                         // motor screw holes
+                    assign(screw_offset = M3_clearance_radius - 2.9 / 2)
+                    for(x = NEMA_holes(X_motor))                                                        // motor screw holes
                         for(z = NEMA_holes(X_motor))
                             rotate([0, motor_angle, 0])
-                            translate([x,0,z])
-                                rotate([90,  -motor_angle, 0])
-                                    teardrop_plus(r = M3_clearance_radius, h = 2 * mbracket_thickness + 1, center = true);
+                                translate([x, 0, z])
+                                    rotate([90,  -motor_angle, 0]) {
+                                        translate([-screw_offset, 0, 0])
+                                            teardrop_plus(r = M3_clearance_radius, h = 100);            // front holes
+
+                                        translate([0, 0, -100])
+                                            teardrop_plus(r = screw_head_radius(M3_cap_screw), h = 100);// back hole
+                                    }
                 }
-                //
-                // ribbon clamp holes
-                //
-                translate([x_motor_offset(),
-                           mbracket_front + mbracket_depth - 2 * mbracket_thickness - ribbon_nut_trap_depth,
-                           mbracket_height - thickness / 2  - mbracket_thickness - nut_radius(ribbon_nut)])
-                    rotate([90, 0, 0])
-                        ribbon_clamp_holes(x_end_ways, ribbon_screw)
-                            difference() {
-                                nut_trap(screw_clearance_radius(ribbon_screw), nut_radius(ribbon_nut), ribbon_nut_trap_depth, true);
-                                translate([0,0, 5])
-                                    cylinder(r = 10, h =100);
-                            }
 
                 translate([ribbon_clamp_x + ribbon_pillar_thickness, ribbon_clamp_y, ribbon_clamp_z])
                     rotate([-90,90,90])
@@ -423,55 +443,9 @@ module x_end_bracket(motor_end, assembly = false){
                 //
                 // Hole for switch wires
                 //
-                translate([back, -bearing_width / 2 - 3, thickness / 2 + 10])
+                translate([back, -bearing_width / 2 - 4, thickness / 2 + 4])
                     rotate([90, 0, 90])
                         teardrop(r = 3, h = 2 * mbracket_thickness + 1, center = true);
-
-            }
-            //
-            // limit switch bracket
-            //
-            difference() {
-                translate([front - eta, sbracket_y, - thickness / 2])
-                    rotate([90, 0, 0])
-                        linear_extrude(height = sbracket_thickness, center = true)
-                            polygon([
-                                        [0, 0],
-                                        [sbracket_depth, sbracket_height - microswitch_length() + 2],
-                                        [sbracket_depth, sbracket_height],
-                                        [sbracket_depth - 10, sbracket_height],
-                                        //[-length / 2 + clamp_width / 2 - eta, thickness + clamp_height],
-                                        [-length / 2 + clamp_width / 2 - eta, thickness - eta]
-                                    ]);
-                translate([switch_op_x, sbracket_y + sbracket_thickness / 2 + microswitch_thickness() / 2, switch_op_z])
-                    rotate([0, -90, -90])
-                        microswitch_holes(h = sbracket_thickness);
-            }
-        }
-        else {
-            //
-            // idler end
-            //
-            difference() {
-                union() {
-                    translate([back - idler_width / 2 + eta - slit / 2, idler_back - idler_depth / 2, 0])
-                        rounded_rectangle([idler_width - slit, idler_depth, thickness], r = 2, center = true);
-
-                    translate([back - 5, idler_back - (idler_back + bar_y - slit / 2) / 2, 0])
-                        cube([10, idler_back + bar_y - slit / 2, thickness], center = true);
-
-                    translate([back, idler_back, 0])
-                        rotate([0, 0, 90])
-                            fillet(h = thickness, r = idler_width / 2);
-                }
-
-                translate([back - idler_width / 2, -bar_y, 0])
-                    rotate([90, 0, 90])
-                        teardrop(r = X_bar_dia / 2 + 0.5, h = idler_width + 1, center = true);
-
-                translate([x_idler_offset(), idler_back, 0])
-                    rotate([90, 0, 0])
-                        nut_trap(M4_clearance_radius, M4_nut_radius, M4_nut_trap_depth);
 
             }
         }
@@ -483,9 +457,14 @@ module x_end_assembly(motor_end) {
     if(!motor_end)
         assembly("x_idler_assembly");
     //
-    // RP bit
+    // RP bits
     //
-    color(x_end_bracket_color) render() x_end_bracket(motor_end, true);
+    color(x_end_bracket_color) render() x_end_bracket(motor_end);
+
+    for(side = [-1, 1])
+        translate([(front + back) / 2, side * bar_y, thickness / 2])
+            rotate([180, 0, 90 + 90 * side])
+                color("red") render() x_end_clamp_stl();
     //
     // bearings
     //
@@ -496,23 +475,40 @@ module x_end_assembly(motor_end) {
     //
     // bearing clamp fasteners
     //
-    for(side = [-1, 1]) {
-        translate([front - length / 2, side * (bar_y + clamp_thickness + slit / 2), thickness / 2 + washer_diameter(washer) / 2])
-            rotate([-90 * side,0,0])
-                screw_and_washer(hex_screw, 16);
+    for(side = [-1, 1])
+        for(x = [front - clamp_hole_inset, back + clamp_hole_inset])
+            for(i = [-1,1])
+                translate([x, side * bar_y + i * (X_bar_dia / 2 + M3_clearance_radius), 0]) {
+                    translate([0, 0, - thickness / 2 + M3_nut_trap_depth])
+                        rotate([180, 0, 0])
+                            nut(M3_nut, true);
 
-       translate([front - length / 2, side * (bar_y - clamp_depth - slit / 2 + nut_trap_depth), thickness / 2 + washer_diameter(washer) / 2])
-            rotate([90 * side,0,0])
-                nut(nut, true);
-    }
+                    translate([0, 0, thickness / 2])
+                        washer(M3_washer)
+                            screw(M3_cap_screw,
+                                screw_longer_than(thickness + washer_thickness(M3_washer) + nut_thickness(M3_nut, true) - nut_trap_depth(M3_nut)));
+                }
+
     if(motor_end) {
         translate([x_motor_offset(), mbracket_front + eta, 0]) {
-            rotate([90, motor_angle, 0]) {
+            rotate([90, motor_angle - 90, 0]) {
                 NEMA(X_motor);
                 translate([0,0, mbracket_thickness])
-                    NEMA_screws(X_motor, 3);
+                    rotate([0, 0, -90])
+                        NEMA_screws(X_motor, 2);
+
+                rotate([0, 0, -180]) translate(NEMA_holes(X_motor)) translate([0, 0, -NEMA_length(X_motor)])
+                    rotate([180, 0, 0])
+                        washer(M3_washer) washer(M3_washer) washer(M3_washer) screw(M3_cap_screw, 45);
+
                 translate([0, 0, 4])
                     pulley_assembly();
+                //
+                // Heatshrink for motor connections
+                //
+                for(i = [-1.5 : 1.5])
+                    translate([i * 5, NEMA_width(X_motor) / 2 + 2, -NEMA_length(X_motor) / 2])
+                        tubing(HSHRNK24);
             }
         }
         translate([switch_op_x, sbracket_y - sbracket_thickness / 2 - microswitch_thickness() / 2, switch_op_z])
@@ -526,20 +522,24 @@ module x_end_assembly(motor_end) {
         //
         // ribbon clamps
         //
-        translate([x_motor_offset(), x_end_ribbon_clamp_y(), x_end_ribbon_clamp_z()])
-            rotate([-90, 0, 0])
-                ribbon_clamp_assembly(x_end_ways, M3_hex_screw, 16, mbracket_thickness);
+        translate([x_motor_offset(), x_end_ribbon_clamp_y(), x_end_ribbon_clamp_z()]) {
+            rotate([90, 0, 0]) {
+                color(x_end_bracket_color) render() x_motor_ribbon_bracket_stl(false);
+
+                translate([0, 0, ribbon_bracket_counterbore() - exploded * 7])
+                    rotate([180, 0, 0])
+                        washer(M3_washer)
+                            screw(M3_cap_screw, 45);
+            }
+            explode([0, 8, 0])
+                rotate([-90, 0, 0])
+                    ribbon_clamp_assembly(x_end_ways, M3_cap_screw, 16, ribbon_bracket_thickness() - M3_nut_trap_depth);
+        }
+
 
         translate([ribbon_clamp_x, ribbon_clamp_y, ribbon_clamp_z])
             rotate([-90, 90, 90])
                 ribbon_clamp_assembly(extruder_ways, ribbon_screw, 16, wall, true);
-        //
-        // Heatshrink for motor connections
-        //
-        for(i = [-1.5 : 1.5])
-            translate([i * 5 + back - mbracket_width / 2, 0, mbracket_height - thickness / 2])
-                rotate([90, 0, 0])
-                    tubing(HSHRNK24);
     }
     else {
         translate([x_idler_offset(), idler_front - idler_stack / 2 - shift * 4, 0]) {
@@ -568,41 +568,34 @@ module x_end_assembly(motor_end) {
         end("x_idler_assembly");
 }
 
-module x_motor_bracket_stl() {
-    translate([0, 0, thickness / 2]) mirror ([1,0,0]) x_end_bracket(true);
-    for(side = [-1, 1])
-        translate([-back + mbracket_width, mbracket_centre + side * mbracket_depth / 2, 0])
-            rotate([0, 0, 135 + side * 45]) corner_shield(20, mbracket_height - 1 - 2 * eta, mbracket_corner);
-}
+module x_motor_bracket_stl(integral_support = true)
+    translate([0, 0, thickness / 2]) mirror ([1,0,0]) x_end_bracket(true, integral_support);
 
-module x_idler_bracket_stl()
+module x_idler_bracket_stl(integral_support = true)
     translate([0, 0, thickness / 2])
-        x_end_bracket(false);
+        x_end_bracket(false, integral_support);
 
 module x_ends_stl() {
     x_motor_bracket_stl();
-    translate([-5, bearing_width / 2, 0])
+    translate([-bearing_width / 4, bearing_width / 2, 0])
         x_idler_bracket_stl();
 }
 
-module x_motor_bracket_x2_stl() {
-    translate([back - mbracket_width / 2 - 1, -mbracket_centre + mbracket_depth / 2 + 1, thickness / 2]) mirror ([1,0,0]) x_end_bracket(true);
-    translate([mbracket_width / 2 - 1, mbracket_depth + 1, 0])
+module facing_pair(dir = 1) {
+    child();
+    translate([-dir * bearing_width / 4, dir * bearing_width / 2, 0])
         rotate([0, 0, 180])
-            corner_shield(20, mbracket_height - 1 - 2 * eta, mbracket_corner);
-
-    translate([mbracket_width / 2 - back,      mbracket_centre - mbracket_depth / 2 - 1, thickness / 2]) rotate([0, 0, 180]) mirror ([1,0,0]) x_end_bracket(true);
-    translate([-mbracket_width / 2, -mbracket_depth - 1, 0])
-        corner_shield(20, mbracket_height - 1 - 2 * eta, mbracket_corner);
-
+            child();
 }
 
-module x_idler_bracket_x2_stl() {
-    for(a = [0, 180])
-        rotate([0, 0, a])
-            translate([-x_idler_offset() + 1, 0, 0])
-                x_idler_bracket_stl();
-}
+
+module x_motor_bracket_x2_stl() facing_pair() x_motor_bracket_stl(false);
+
+module x_motor_support_x2_stl() facing_pair() x_motor_support_stl();
+
+module x_idler_bracket_x2_stl() facing_pair(-1) x_idler_bracket_stl(false);
+
+module x_idler_support_x2_stl() facing_pair(-1) x_idler_support_stl();
 
 
 if(0)
@@ -614,3 +607,4 @@ else
         mirror ([1,0,0]) x_end_assembly(true);
 
 //x_motor_bracket_stl();
+//x_motor_ribbon_bracket_stl();

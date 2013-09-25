@@ -23,7 +23,7 @@ module teardrop_2D(r, truncate = true) {
 }
 
 module teardrop(h, r, center, truncate = true)
-    linear_extrude(height = h, convexity = 2, center = center)
+    render(convexity = 5) linear_extrude(height = h, convexity = 2, center = center)
         teardrop_2D(r, truncate);
 
 module teardrop_plus(h, r, center, truncate = true)

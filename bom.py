@@ -92,7 +92,7 @@ def boms(machine):
     f. write("include <%s_config.scad>\n" % machine);
     f.close()
 
-    openscad.run("-o", "dummy.csg", "scad/bom.scad")
+    openscad.run("-D","$bom=2","-o", "dummy.csg", "scad/bom.scad")
     print "Generating bom ...",
 
     main = BOM()

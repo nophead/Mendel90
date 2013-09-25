@@ -27,3 +27,8 @@ module ball_bearing(type) {
             }
     }
 }
+
+module bearing_ball(dia) {
+    vitamin(str("SB",dia * 10,": Steel ball ",dia, "mm"));
+    color(bearing_color) render() sphere(r = dia / 2);
+}

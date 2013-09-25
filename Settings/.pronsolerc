@@ -1,0 +1,29 @@
+macro HOME
+  G28
+  G1X0Y0F12000
+macro BL
+  G1 X90 Y-95 F12000
+  M84
+macro BR
+  G1 X-90 Y-95 F12000
+  G84
+set xy_feedrate 50000
+set z_feedrate 240
+set e_feedrate 60
+button 0 "HOME" /c "green" HOME
+button 1 "BL" /c "blue" BL
+button 2 "BM" /c "blue" G1X0Y-95
+button 3 "BR" /c "blue" BR
+button 4 "FL" /c "blue" G1 X90 Y90 F12000
+button 5 "FM" /c "blue" G1 X0 Y90 F12000
+button 6 "FR" /c "blue" G1 X-90 Y90 F12000
+button 7 "ORIGIN" /c "green" G1X0Y0Z0
+button 8 "FOFF" /c "yellow" M107
+button 9 "FON" /c "red" M106
+set last_file_path R:\Melzi
+set build_dimensions 200x200x100-100-100+0
+set port /dev/ttyUSB0
+set baudrate 115200
+set temperature_abs 240
+set temperature_pla 220
+set bedtemp_abs 130

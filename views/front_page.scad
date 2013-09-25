@@ -7,7 +7,8 @@
 //
 // The front page picture for the instructions
 //
+// view 1644 1930 -15.4 29.1 252.25 73.2 0.00 27.8 3331
+//
 use <../scad/main.scad>
 
-view([ -11.48, 138.18, 211.14 ],[ 67.60, 0.00, 22.90 ],4112.63)
 machine_assembly(show_heatshield = false);

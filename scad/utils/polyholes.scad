@@ -8,7 +8,7 @@
 // See http://hydraraptor.blogspot.com/2011/02/polyholes.html
 //
 function sides(r) = max(round(4 *r),3);
-function corrected_radius(r,n) = 0.1 + r / cos(180 / n);
+function corrected_radius(r, n = 0) = 0.1 + r / cos(180 / (n ? n : sides(r)));
 function corrected_diameter(d) = 0.2 + d / cos(180 / sides(d / 2));
 
 module poly_circle(r, center = false) {

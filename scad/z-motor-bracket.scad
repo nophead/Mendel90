@@ -136,7 +136,7 @@ module z_motor_bracket_holes(gantry_setback)
             frame_screw_hole();
 
 
-module z_motor_assembly(gantry_setback, rhs, standalone = false) {
+module z_motor_assembly(gantry_setback, rhs, rotated = true) {
     assembly("z_motor_assembly");
 
     color(z_motor_bracket_color) render() z_motor_bracket(gantry_setback, rhs);
@@ -156,9 +156,8 @@ module z_motor_assembly(gantry_setback, rhs, standalone = false) {
     //
     // Mounting screws
     //
-    if(!standalone)
-        z_motor_bracket_hole_positions(gantry_setback)
-            frame_screw(part_base_thickness);
+    z_motor_bracket_hole_positions(gantry_setback)
+        frame_screw(part_base_thickness);
     //
     // Motor and screws
     //
@@ -170,8 +169,8 @@ module z_motor_assembly(gantry_setback, rhs, standalone = false) {
     // The coupling assembly
     //
     explode([0, 0, 30])
-        translate([0, 0, NEMA_shaft_length(Z_motor) + 1])
-            rotate([0,0,45])
+        translate([0, 0, NEMA_shaft_length(Z_motor)])
+            rotate([0, 0, rotated ? 45 : 0])
                 z_coupler_assembly();
 
    end("z_motor_assembly");

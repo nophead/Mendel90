@@ -278,7 +278,10 @@ function extruder_connector_height() = motor_y - d_motor_bracket_offset(NEMA17);
 
 module wades_big_gear_stl() {
     stl("wades_big_gear");
-    color(wades_big_gear_color) import("../imported_stls/39t17p.stl");
+    color(wades_big_gear_color) difference() {
+        import("../imported_stls/39t17p.stl", convexity = 10);
+        poly_cylinder(r = 4, h = 100, center = true);
+    }
 }
 
 module wades_small_gear_stl() {
@@ -357,7 +360,8 @@ module extruder_motor_assembly(show_connector = true, exploded = exploded) {
     // motor and gear
     translate([motor_x, motor_y, thickness + eta])
         rotate([0,180,0]) {
-            NEMA(NEMA17);
+            rotate([0, 0, 180])
+                NEMA(NEMA17);
 
             translate([0,0, 2.5 + 30 * exploded])
                 rotate([0, 0, 11])
@@ -370,6 +374,9 @@ module extruder_motor_assembly(show_connector = true, exploded = exploded) {
 }
 
 module wades_assembly(show_connector = true, show_drive = true) {
+    spring_total = 10;
+    spring_length = spring_total - 2 * washer_thickness(M4_washer);
+
     assembly("extruder_assembly");
 
     color(wades_block_color) render()
@@ -390,10 +397,10 @@ module wades_assembly(show_connector = true, show_drive = true) {
                         explode([12 - 24 * i, 0, 0])
                             nut(M4_nut);
 
-                    translate([0,0, 0]) {
-                        translate([0,0, -10 + 50 * exploded]) {
-                            comp_spring(extruder_spring, 10);
-                        }
+                    translate([0, 0, -spring_total + 53 * exploded]) {
+                        washer(M4_washer)
+                            comp_spring(extruder_spring, spring_length)
+                                washer(M4_washer);
                     }
                 }
 
@@ -404,7 +411,7 @@ module wades_assembly(show_connector = true, show_drive = true) {
                     screw(M4_hex_screw, 20);
 
         //idler
-        translate([filament_x + 22 + 40 * exploded, driven_y, filament_z])
+        translate([filament_x + 22 + 39 * exploded, driven_y, filament_z])
             rotate([90, 0, -90])
                 wade_idler_assembly();
 
@@ -446,7 +453,7 @@ module wades_assembly(show_connector = true, show_drive = true) {
                     translate([0, 0, 8])
                         nut(M8_nut);
                 }
-                else explode([0, 0, 25]) group() {
+                else explode([0, 0, 35]) group() {
                     translate([0, 0, -15 * exploded])
                         nut(M8_nut);
 
@@ -518,8 +525,22 @@ module wades_extruder_stl() {
     translate([motor_max, motor_y, 0]) wades_gear_spacer_stl();
 }
 
+module wades_big_gear_x5_stl(){
+
+    pitch = 44;
+    wades_big_gear_stl();
+    for(x = [-1,1])
+        for(y = [-1,1])
+            translate([x * pitch, y * pitch, 0])
+                wades_big_gear_stl();
+}
+
+
 if(1)
     rotate([90, 0, 0])
         wades_assembly(true);
 else
-    wades_extruder_stl();
+    if(1)
+        wades_extruder_stl();
+    else
+        wades_big_gear_x5_stl();

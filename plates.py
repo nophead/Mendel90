@@ -13,6 +13,7 @@ plate_list = [
     "d_motor_brackets.stl",
     "fixing_blocks.stl",
     "ribbon_clamps.stl",
+    "small_bits.stl",
     "spool_holder_brackets.stl",
     "wades_extruder.stl",
     "x_carriage_parts.stl",
@@ -32,7 +33,7 @@ def plates(machine):
     #
     # Make the stls in the list
     #
-    if machine == "dibond":
+    if machine == "dibond" or machine == "huxley":
         plate_list.remove("cable_clips.stl");
     used = stls(machine, plate_list)
     #

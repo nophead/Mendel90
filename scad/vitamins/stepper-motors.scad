@@ -10,7 +10,7 @@
 
 //                       corner  body    boss    boss          shaft
 //         side, length, radius, radius, radius, depth, shaft, length, holes
-NEMA17  = [42.3, 47.5,   53.6/2, 25,     11,     2,     5,     24,     31 ];
+NEMA17  = [42.3, 47,     53.6/2, 25,     11,     2,     5,     24,     31 ];
 NEMA17S = [42.3, 34,     53.6/2, 25,     11,     2,     5,     24,     31 ];
 NEMA14  = [35.2, 36,     46.4/2, 21,     11,     2,     5,     21,     26 ];
 
@@ -19,7 +19,9 @@ function NEMA_length(motor)   = motor[1];
 function NEMA_radius(motor)   = motor[2];
 function NEMA_holes(motor)    = [-motor[8]/2, motor[8]/2];
 function NEMA_big_hole(motor) = motor[4] + 0.2;
+function NEMA_shaft_dia(motor) = motor[6];
 function NEMA_shaft_length(motor) = motor[7];
+function NEMA_hole_pitch(motor) = motor[8];
 
 module NEMA(motor) {
     side = NEMA_width(motor);
@@ -27,7 +29,7 @@ module NEMA(motor) {
     body_rad = motor[3];
     boss_rad = motor[4];
     boss_height = motor[5];
-    shaft_rad = motor[6] / 2;
+    shaft_rad = NEMA_shaft_dia(motor) / 2;
     cap = 8;
     vitamin(str("NEMA", round(motor[0] / 2.54), length * 10, ": NEMA", round(motor[0] / 2.54), " x ", length, "mm stepper motor"));
     union() {
@@ -61,6 +63,16 @@ module NEMA(motor) {
                             cylinder(r = 3/2, h = 9, center = true);
             }
         }
+
+        translate([0, side / 2, -length + cap / 2])
+            rotate([90, 0, 0])
+                for(i = [0:3])
+                    rotate([0, 0, 225 + i * 90])
+                        color(["red", "blue","green","black"][i]) render()
+                            translate([1, 0, 0])
+                                cylinder(r = 1.5 / 2, h = 12, center = true);
+
+
     }
 }
 

@@ -22,8 +22,32 @@ module slot(h, r, l, center = true)
                 circle(r = r, center = true);
         }
 
+module hole_support(r, h, max_r = 999) {
+    n = sides(r);
+    cr = corrected_radius(r, n);
+    ir = min(cr, max_r - 2.25 * filament_width);
+    or = ir + 2 * filament_width;
+    difference() {
+        cylinder(r = or, h = h, $fn = n);
+        translate([0, 0, -1])
+            cylinder(r = ir, h = h + 2, $fn = n);
+    }
+}
+
+module nut_trap_support(h, r, r2 = 0) {
+    ir = r;
+    ir2 = r2 ? r2 : r;
+    or = ir + 2 * filament_width;
+    or2 = ir2 + 2 * filament_width;
+    difference() {
+        cylinder(r2 = or, r1 = or2, h = h, $fn = 6);
+        translate([0, 0, -1])
+            cylinder(r2 = ir, r1 = or2, h = h + 2, $fn = 6);
+    }
+}
+
 module nut_trap(screw_r, nut_r, depth, horizontal = false, supported = false) {
-    union() {
+    render(convexity = 5) union() {
         if(horizontal) {
             if(screw_r)
                 teardrop_plus(r = screw_r, h = 200, center = true);
@@ -128,22 +152,6 @@ module tube(or, ir, h, center = true) {
 // Exploded view helper
 //
 module explode(v, offset = [0,0,0]) {
-    if(exploded) {
-        translate(v)
-            child();
-        render() hull() {
-            sphere(0.2);
-            translate(v + offset)
-                sphere(0.2);
-        }
-    }
-    else
-        child();
-}
-//
-// Same again as cant appear twice in the tree
-//
-module explode2(v, offset = [0,0,0]) {
     if(exploded) {
         translate(v)
             child();

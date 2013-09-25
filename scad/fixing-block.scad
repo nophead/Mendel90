@@ -44,10 +44,10 @@ module fixing_block_h_holes(h)
                 child();
 
 
-module fixing_block(front) {
+module fixing_block(upper, rear) {
     same = screw_clearance_radius(base_screw) == screw_clearance_radius(frame_screw) && (!cnc_sheets || (base_nuts == frame_nuts));
-    stl((front && !same) ? "front_fixing_block" : "fixing_block");
-    v_screw = front ? frame_screw : base_screw;
+    stl((upper && !same) ? "upper_fixing_block" : (base_nuts && rear) ? "rear_fixing_block" : "fixing_block");
+    v_screw = upper ? frame_screw : base_screw;
 
     difference() {
         translate([-(width - 2 * corner_rad) / 2, 0, 0])
@@ -66,14 +66,14 @@ module fixing_block(front) {
 
 
         fixing_block_v_hole(height - counter_bore_depth)
-            if(cnc_sheets && (front? frame_nuts  : base_nuts))
+            if((cnc_sheets && (upper? frame_nuts  : base_nuts)) && !rear)
                 translate([0, 0, counter_bore_depth])
                     nut_trap(screw_clearance_radius(v_screw), nut_radius(screw_nut(v_screw)), height - thickness);
             else
                 rotate([0,0,90])
                     union() {
                         slot(h = 100, r = screw_clearance_radius(base_screw), l = slot, center = true);
-                        multmatrix(m = [ [1, 0, shear / counter_bore_depth, 0],
+                        multmatrix(m = [ [1, 0, (cnc_sheets ? 0 : shear) / counter_bore_depth, 0],
                                          [0, 1, 0, 0],
                                          [0, 0, 1, 0],
                                          [0, 0, 0, 1] ])
@@ -97,17 +97,28 @@ module fixing_block(front) {
     }
 }
 
-module fixing_block_stl() fixing_block(false);
+module fixing_block_stl() fixing_block(false, false);
 
-module front_fixing_block_stl() fixing_block(true);
+module upper_fixing_block_stl() fixing_block(true, false);
 
-module fixing_block_assembly(front = false) {
-    color(fixing_block_color) render() fixing_block(front);
+module rear_fixing_block_stl() fixing_block(false, true);
+
+module fixing_block_assembly(upper = false, rear = false) {
+    t = tube_thickness(AL_square_tube);
+
+    color(fixing_block_color) render() fixing_block(upper, rear);
+
     fixing_block_v_hole(height - counter_bore_depth)
-        if(front)
+        if(upper)
                 frame_screw(thickness);
         else
-            base_screw(thickness);
+            if(base_nuts && rear)
+                translate([0, 0, -sheet_thickness(base) - thickness - t])
+                    rotate([180, 0, 0])
+                        base_screw(thickness + t);
+            else
+                base_screw(thickness);
+
     fixing_block_h_holes(depth - counter_bore_depth)
         frame_screw(thickness);
 }
@@ -118,9 +129,9 @@ module fixing_blocks_stl()
             translate([(width + 2) * row, (depth + 2) * col, 0])
                 rotate([0, 0, col ? col * 180 : 180])
                     translate([0, -depth / 2, 0])
-                        fixing_block(col > 2);
+                        fixing_block(col > 2, col == 0);
 
-if(1)
+if(0)
     fixing_blocks_stl();
 else
     fixing_block_assembly();

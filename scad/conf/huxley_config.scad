@@ -17,18 +17,18 @@ X_motor = NEMA14;
 Y_motor = NEMA14;
 Z_motor = NEMA14;
 
-hot_end = JHeadMk4;
+hot_end = JHeadMk5;
 
 X_travel = 150;
 Y_travel = 150;
 Z_travel = 150;
 
-bed_depth = 150 + 14;
-bed_width = 150 + 14;
+bed_depth = 164;
+bed_width = 114;
 bed_pillars = M3x20_pillar;
 bed_glass = glass2;
 bed_thickness = pcb_thickness + sheet_thickness(bed_glass);    // PCB heater plus glass sheet
-bed_holes = bed_width - 5;
+bed_holes = [bed_width - 2 * 2.54, bed_depth - 2 * 2.54];
 
 base = DiBond;                  // Sheet material used for the base. Needs to be thick enough to screw into.
 base_corners = 25;
@@ -39,26 +39,31 @@ frame_corners = 25;
 frame_nuts = true;
 
 case_fan = fan80x38;
+part_fan = fan40x11;
+
 psu = External;
 controller = Melzi;
 
 spool = spool_200x55;
 bottom_limit_switch = false;
 top_limit_switch = true;
+include_fan = true;
 
+clip_handles = false;
 single_piece_frame = true;
 stays_from_window = false;
 cnc_sheets = true;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
+pulley_type = T2p5x16_metal_pulley;
 
 Y_carriage = DiBond;
 
 X_belt = T2p5x6;
 Y_belt = T2p5x6;
 motor_shaft = 5;
-Z_screw_dia = 6;            // Studding for Z axis
+Z_screw_dia = 5;            // Studding for Z axis
 
-Y_carriage_depth = bed_holes + 7;
-Y_carriage_width = bed_holes + 7;
+Y_carriage_depth = bed_holes[1] + 7;
+Y_carriage_width = bed_holes[1] + 7;
 
 Z_nut_radius = M6_nut_radius;
 Z_nut_depth = M6_nut_depth;

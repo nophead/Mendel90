@@ -63,6 +63,9 @@ module comp_spring(type, l = 0) {
     color(spring_color) render()
         coil(r1 = (spring_od(type) - spring_gauge(type)) / 2, r2 = spring_gauge(type) / 2, h = l, twists = spring_coils(type));
 
+    if($children)
+        translate([0, 0, l])
+            child();
 }
 
 //comp_spring(extruder_spring);

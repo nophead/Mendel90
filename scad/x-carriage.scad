@@ -58,6 +58,10 @@ dowel_height = 2;
 tension_screw_pos = 8;
 tension_screw_length = 25;
 
+function x_carriage_lug_width() = lug_width;
+function x_carriage_lug_depth() = lug_depth;
+function x_carriage_dowel() = dowel;
+
 module belt_lug(motor_end) {
     height = motor_end ? x_carriage_offset() - pulley_inner_radius:
                          x_carriage_offset() - ball_bearing_diameter(X_idler_bearing) / 2;
@@ -194,14 +198,17 @@ module x_belt_grip_stl()
     }
 }
 belt_tensioner_rim = X_carriage_clearance;
+belt_tensioner_rim_r = 2;
 belt_tensioner_height = belt_tensioner_rim + belt_width(X_belt) + belt_clearance + belt_tensioner_rim;
+
+function x_belt_tensioner_radius() = (x_carriage_offset() - pulley_inner_radius - belt_thickness(X_belt)) / 2;
 
 module x_belt_tensioner_stl()
 {
     stl("x_belt_tensioner");
 
     flat = 1;
-    d = x_carriage_offset() - pulley_inner_radius - belt_thickness(X_belt);
+    d = 2 * x_belt_tensioner_radius();
 
     module d(r, w) {
         difference() {
@@ -221,7 +228,7 @@ module x_belt_tensioner_stl()
                 d(d / 2, flat);
 
             linear_extrude(height = belt_tensioner_rim)
-                d(d / 2 + 2, flat);
+                d(d / 2 + belt_tensioner_rim_r, flat);
         }
         translate([wall, 0, belt_tensioner_height / 2])
             rotate([90, 0, 90])
@@ -229,7 +236,6 @@ module x_belt_tensioner_stl()
     }
 }
 
-part_fan = fan60x15;
 duct_wall = 2 * 0.35 * 1.5;
 top_thickness = 2;
 fan_nut_trap_thickness = 4;
@@ -245,7 +251,7 @@ fan_screw_boss_r = fan_width / 2 - fan_hole_pitch(part_fan);
 front_nut_width = 2 * nut_radius(M3_nut) + wall;
 front_nut_height = 2 * nut_radius(M3_nut) * cos(30) + wall;
 front_nut_depth = wall + nut_trap_depth(M3_nut);
-front_nut_pitch = (bar_x - bearing_holder_length(X_bearings) / 2 - nut_radius(M3_nut) - 0.3);
+front_nut_pitch = min((bar_x - bearing_holder_length(X_bearings) / 2 - nut_radius(M3_nut) - 0.3), fan_hole_pitch(part_fan) - 5);
 front_nut_z = 3;
 front_nut_y = - width / 2 + wall;
 
@@ -374,39 +380,70 @@ module x_carriage_fan_duct_stl() {
                 nut_trap(screw_clearance_radius(fan_screw), nut_radius(screw_nut(fan_screw)), duct_height - fan_nut_trap_thickness, supported = true);
                 nut_trap(0, nut_radius(screw_nut(fan_screw)) + 0.15, duct_height - fan_nut_trap_thickness - nut_trap_depth(fan_nut));
             }
+        //
+        // Cold end cooling vent
+        //
+        rotate([0, 0, atan2(-fan_x, -fan_y)])
+            translate([0, ir + skew, duct_height - top_thickness - 3])
+                rotate([90, 0, 0])
+                    teardrop(r = 4.5 / 2, h = 10, center = true);
     }
 }
 
 module x_carriage_fan_bracket_stl() {
     stl("x_carriage_fan_bracket");
 
+    t = fan_bracket_thickness;
     h = fan_z - fan_depth(part_fan) / 2;
     pitch = fan_hole_pitch(part_fan);
     boss_r = washer_diameter(fan_washer) / 2 + 1;
-    w = front_nut_pitch * 2 + washer_diameter(M3_washer) + 5;
+    w = front_nut_pitch * 2 + washer_diameter(M3_washer) + 2 * t;
+    rad = sqrt(2) * pitch - boss_r;
+    bodge = 54 - 51.2;                                              // error in length of MK5 J-head
+    dx = pitch - w / 2;
+    dy = -(fan_y + width / 2) - pitch;
+    hyp = sqrt(dx * dx + dy * dy);
+    angle = atan2(dy, dx) - asin(boss_r / hyp);
+    tangent = sqrt(hyp * hyp - boss_r * boss_r);
+    gusset = tangent - sqrt(boss_r * boss_r - (boss_r - t) * (boss_r - t));
+    gusset_pitch = front_nut_pitch - t / 2 - washer_diameter(M3_washer) / 2 - 1;
+    gusset_spacing = gusset_pitch - t / 2;
     difference() {
         union() {
             hull() {
                 translate([- w / 2, fan_y + width / 2, 0])
-                    cube([w, 1, fan_bracket_thickness]);
+                    cube([w, 1, t]);
 
                 for(side = [-1, 1])
                     translate([side * pitch, -pitch, 0])
-                        cylinder(r = boss_r, h = fan_bracket_thickness);
+                        cylinder(r = boss_r, h = t);
             }
             translate([- w / 2, fan_y + width / 2, eta])
-                cube([w, fan_bracket_thickness, h]);
+                cube([w, t, h]);
+
+            // gussets
+            for(side = [-1, 1]) {
+                translate([side * gusset_pitch, fan_y + width / 2 + t - eta, t - eta])
+                    rotate([90, 0, 90])
+                        right_triangle(width = -(fan_y + width / 2 + t) - sqrt(rad * rad - gusset_spacing * gusset_spacing) - eta, height = h - t, h = t);
+
+                translate([side * (w / 2), fan_y + width / 2 + eta, t - eta])
+                    rotate([90, 0, (90 + angle) * side - 90])
+                        translate([0, 0, -side * t / 2])
+                            linear_extrude(height = t, center = true)
+                                polygon([[0, 0], [0, h - t], [t * sin(angle), h - t], [gusset, 0]]);
+            }
         }
         //
         // clear the fan
         //
-        cylinder(r = sqrt(2) * pitch - boss_r, h = 100, center = true);
+        cylinder(r = rad, h = 100, center = true);
 
         for(side = [-1, 1]) {
             //
             // mounting screw holes
             //
-            translate([side * front_nut_pitch, 0, h - top_thickness - front_nut_z + h / 2])
+            translate([side * front_nut_pitch, 0, max(h - top_thickness - front_nut_z - bodge, fan_bracket_thickness + washer_diameter(M3_washer) / 2) + h / 2])
                 rotate([90, 0, 0])
                     vertical_tearslot(h = 100, l = h, r = M3_clearance_radius, center = true);
             //
@@ -417,7 +454,6 @@ module x_carriage_fan_bracket_stl() {
         }
     }
 }
-
 
 bearing_gap = 5;
 bearing_slit = 1;
@@ -692,11 +728,11 @@ module x_carriage_assembly(show_extruder = true, show_fan = true) {
 }
 
 module x_carriage_parts_stl() {
-    x_belt_clamp_stl();
-    translate([-(lug_width + 2),0,0]) x_belt_grip_stl();
     x_carriage_stl();
-    translate([6, 8, 0]) rotate([0, 0, -90]) x_belt_tensioner_stl();
     translate([fan_x, fan_y - 2, 0]) rotate([0, 0, 180]) x_carriage_fan_bracket_stl();
+    //x_belt_clamp_stl();
+    //translate([-(lug_width + 2),0,0]) x_belt_grip_stl();
+    //translate([6, 8, 0]) rotate([0, 0, -90]) x_belt_tensioner_stl();
 }
 
 
@@ -707,7 +743,6 @@ module x_carriage_fan_ducts_stl() {
             x_carriage_fan_duct_stl();
 }
 
-
 if(0)
     if(0)  {
         intersection() {
@@ -717,7 +752,7 @@ if(0)
         }
     }
     else
-        if(1)
+        if(0)
             x_carriage_fan_ducts_stl();
         else
             x_carriage_parts_stl();

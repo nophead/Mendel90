@@ -142,6 +142,7 @@ module ribbon_clamp_14_33_stl()    ribbon_clamp_stl(14, M3_cap_screw);
 module ribbon_clamp_14_33NB_stl()  ribbon_clamp_stl(14, M3_cap_screw, nutty = true, slotted = false);
 
 module ribbon_clamp_20_33_stl()    ribbon_clamp_stl(20, M3_cap_screw);
+module ribbon_clamp_20_33N_stl()   ribbon_clamp_stl(20, M3_cap_screw, nutty = true);
 module ribbon_clamp_20_40_stl()    ribbon_clamp_stl(20, No6_screw);
 module ribbon_clamp_20_44_stl()    ribbon_clamp_stl(20, M4_cap_screw);
 module ribbon_clamp_20_44N_stl()   ribbon_clamp_stl(20, M4_cap_screw, nutty = true);

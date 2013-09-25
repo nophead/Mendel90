@@ -74,7 +74,7 @@ def stls(machine, parts = None):
                         # Run openscad on the created file
                         #
                         stl_name = target_dir + "/" + module[:-4] + ".stl"
-                        openscad.run("-o", stl_name, stl_maker_name)
+                        openscad.run("-D$bom=1","-o", stl_name, stl_maker_name)
                         c14n_stl.canonicalise(stl_name)
                         targets.remove(stl)
                         #
