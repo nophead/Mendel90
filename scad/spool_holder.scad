@@ -390,7 +390,7 @@ module spool_assembly(show_spool = true) {
     }
 
 
-    vitamin("PLA3020: PLA sample 3mm ~20m");
+    vitamin("PLA3040: PLA sample 3mm ~50m");
 
     end("spool_holder_assembly");
 }

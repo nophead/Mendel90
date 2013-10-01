@@ -473,21 +473,13 @@ module wades_assembly(show_connector = true, show_drive = true) {
     //
     assembly("hot_end_assembly");
     translate([filament_x, -extension, filament_z])
-        rotate([-90, 0, 0]) difference() {
-            union() {
-                if(hot_end_style(hot_end) == m90)
-                    m90_hot_end(hot_end);
-                if(hot_end_style(hot_end) == Stoffel)
-                    stoffel_hot_end(hot_end);
-                if(hot_end_style(hot_end) == jhead)
-                    jhead_hot_end(hot_end, exploded = 0, show_wires = false);
-            }
-            rotate([180, 0, 180])
-                translate([0, 0, hot_end_length(hot_end)] + hot_end_duct_offset(hot_end))    // trim the wires
-                    tube(or = 100, ir = hot_end_duct_radius(hot_end) - 1, h = 30, center = true);
-
-            translate([0, 0, 60])
-                cube(100, center = true);
+        rotate([-90, 0, 0]) {
+            if(hot_end_style(hot_end) == m90)
+                m90_hot_end(hot_end);
+            if(hot_end_style(hot_end) == Stoffel)
+                stoffel_hot_end(hot_end);
+            if(hot_end_style(hot_end) == jhead)
+                jhead_hot_end(hot_end, exploded = 0);
        }
     end("hot_end_assembly");
 

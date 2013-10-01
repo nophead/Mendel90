@@ -769,12 +769,12 @@ module frame_stay(left, bodge = 0) {
     }
 }
 
-module bed_fan_assembly() {
+module bed_fan_assembly(show_fan = false) {
     assembly("bed_fan_assembly");
     translate([left_stay_x, fan_y, fan_z])
         rotate([0, -90, 0]) {
             translate([0, 0, -(sheet_thickness(frame) + fan_depth(case_fan)) / 2])
-                fan_assembly(case_fan, sheet_thickness(frame) + fan_guard_thickness(), include_fan);
+                fan_assembly(case_fan, sheet_thickness(frame) + fan_guard_thickness(), include_fan || show_fan);
 
             translate([0, 0, sheet_thickness(frame) / 2])
                 color(fan_guard_color) render() fan_guard(case_fan);

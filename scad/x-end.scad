@@ -330,7 +330,7 @@ module x_end_bracket(motor_end, integral_support = false){
 
                 if(integral_support)
                     translate([-z_bar_offset(), 0, nut_shelf])
-                        cylinder(r = Z_nut_radius + 1, h = layer_height);
+                        cylinder(r = Z_nut_radius + 1, h = 2 * layer_height, center = true);
             }
 
             translate([-z_bar_offset(), 0, -thickness / 2 - 1])
