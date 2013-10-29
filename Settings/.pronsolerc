@@ -6,7 +6,7 @@ macro BL
   M84
 macro BR
   G1 X-90 Y-95 F12000
-  G84
+  M84
 set xy_feedrate 50000
 set z_feedrate 240
 set e_feedrate 60
