@@ -15,21 +15,17 @@ module bed_assembly(y = 0) {
     //
     // Screws pillars and washers
     //
-    for(x = [-bed_holes[0] / 2, bed_holes[0] / 2]) {
-        translate([x, bed_holes[1] / 2, 0])
-            washer(M3_washer);
-
-        translate([x, -bed_holes[1] / 2 - washer_diameter(M3_washer) / 2 - 3 / 2, 0])
-            washer(M3_washer);
-
+    for(x = [-bed_holes[0] / 2, bed_holes[0] / 2])
         for(y = [-bed_holes[1] / 2, bed_holes[1] /2])
-            translate([x, y, washer_thickness(M3_washer)]) {
-                hex_pillar(bed_pillars);
+            translate([x, y, 0]) {
+                washer(M3_washer);
 
-                translate([0,0, pillar_height(bed_pillars) + pcb_thickness])
+                translate([0, 0, washer_thickness(M3_washer)])
+                    hex_pillar(bed_pillars);
+
+                translate([0, 0, pillar_height(bed_pillars) + pcb_thickness])
                     screw(M3_cap_screw, 10);
             }
-    }
 
     //
     // Mark the origin
