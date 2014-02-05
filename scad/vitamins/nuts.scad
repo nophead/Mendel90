@@ -89,7 +89,6 @@ module wingnut(type) {
                             [bottom_rad * cos(top_angle) - eta, 0],
                             [wing_span / 2  - wing_width / 2, wing_height - wing_width / 2],
                             [top_rad * cos(top_angle) - eta, thickness],
-                            [bottom_rad * cos(top_angle) - eta, 0],
                         ]);
                     }
         }

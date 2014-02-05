@@ -75,7 +75,6 @@ module pie_slice(r, start_angle, end_angle) {
             [R * cos(a2), R * sin(a2)],
             [R * cos(a3), R * sin(a3)],
             [R * cos(a4), R * sin(a4)],
-            [0,0]
        ]);
     }
 }
@@ -438,4 +437,7 @@ if(1)
     translate([0, 0, - spool_z])
         spool_assembly();
 else
-    spool_holder_brackets_stl();
+    if(1)
+        spool_holder_brackets_stl();
+    else
+        dust_filter_stl();
