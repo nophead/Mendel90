@@ -11,5 +11,4 @@ install:
  - sudo apt-get install -qq inkscape openscad
 script:
   - python make_machine.py dibond
-  - python make_machine.py mendel
   - python make_machine.py sturdy
