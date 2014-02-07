@@ -70,5 +70,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         sheets(sys.argv[1])
     else:
-        print "usage: sheets [mendel|sturdy|your_machine]"
+        print("usage: sheets [mendel|sturdy|your_machine]")
         sys.exit(1)

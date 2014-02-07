@@ -16,5 +16,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         make_machine(sys.argv[1])
     else:
-        print "usage: make_machine [mendel|sturdy|your_machine]"
+        print("usage: make_machine [mendel|sturdy|your_machine]")
         sys.exit(1)

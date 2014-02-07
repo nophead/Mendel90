@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+
 import os
 import sys
 import shutil
 import openscad
+
 
 class BOM:
     def __init__(self):
@@ -34,7 +37,7 @@ class BOM:
         return ass.replace("assembly", "assemblies")
 
     def print_bom(self, breakdown, file = None):
-        print >> file, "Vitamins:"
+        print("Vitamins:", file=file)
         if breakdown:
             longest = 0
             for ass in self.assemblies:
@@ -45,10 +48,10 @@ class BOM:
                     name = ass.replace("_assembly","").replace("_"," ").capitalize()
                     index = i - (longest - len(name))
                     if index < 0:
-                        print >> file, "  ",
+                        print("  ", end=" ", file=file)
                     else:
-                        print >> file, " %s" % name[index],
-                print >> file
+                        print(" %s" % name[index], end=" ", file=file)
+                print(file=file)
 
         for part in sorted(self.vitamins):
             if ': ' in part:
@@ -62,10 +65,10 @@ class BOM:
                         file.write("%2d|" % bom.vitamins[part])
                     else:
                         file.write("  |")
-            print >> file, "%3d" % self.vitamins[part], description
+            print("%3d" % self.vitamins[part], description, file=file)
 
-        print >> file
-        print >> file, "Printed:"
+        print(file=file)
+        print("Printed:", file=file)
         for part in sorted(self.printed):
             if breakdown:
                 for ass in sorted(self.assemblies):
@@ -74,13 +77,13 @@ class BOM:
                         file.write("%2d|" % bom.printed[part])
                     else:
                         file.write("  |")
-            print >> file, "%3d" % self.printed[part], part
+            print("%3d" % self.printed[part], part, file=file)
 
-        print >> file
+        print(file=file)
         if self.assemblies:
-            print >> file, "Sub-assemblies:"
+            print("Sub-assemblies:", file=file)
         for ass in sorted(self.assemblies):
-            print  >> file, "%3d %s" % (self.assemblies[ass].count, self.assemblies[ass].make_name(ass))
+            print("%3d %s" % (self.assemblies[ass].count, self.assemblies[ass].make_name(ass)), file=file)
 
 def boms(machine):
     bom_dir = machine + "/bom"
@@ -93,7 +96,7 @@ def boms(machine):
     f.close()
 
     openscad.run("-D","$bom=2","-o", "dummy.csg", "scad/bom.scad")
-    print "Generating bom ...",
+    print("Generating bom ...", end=" ")
 
     main = BOM()
     stack = []
@@ -110,7 +113,7 @@ def boms(machine):
             else:
                 if s[0] == '/':
                     if s[1:] != stack[-1]:
-                        raise Exception, "Mismatched assembly " + s[1:] + str(stack)
+                        raise Exception("Mismatched assembly " + s[1:] + str(stack))
                     stack.pop()
                 else:
                     main.add_part(s)
@@ -122,15 +125,15 @@ def boms(machine):
     for ass in sorted(main.assemblies):
         f = open(bom_dir + "/" + ass + ".txt", "wt");
         bom = main.assemblies[ass]
-        print >> f, bom.make_name(ass) + ":"
+        print(bom.make_name(ass) + ":", file=f)
         bom.print_bom(False, f)
         f.close()
 
-    print " done"
+    print(" done")
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         boms(sys.argv[1])
     else:
-        print "usage: bom [mendel|sturdy|your_machine]"
+        print("usage: bom [mendel|sturdy|your_machine]")
         sys.exit(1)

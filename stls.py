@@ -87,12 +87,12 @@ def stls(machine, parts = None):
     # List the ones we didn't find
     #
     for module in targets:
-        print "Could not find", module
+        print("Could not find", module)
     return used
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         stls(sys.argv[1], sys.argv[2:])
     else:
-        print "usage: stls [mendel|sturdy|your_machine] [part.stl ...]"
+        print("usage: stls [mendel|sturdy|your_machine] [part.stl ...]")
     sys.exit(1)

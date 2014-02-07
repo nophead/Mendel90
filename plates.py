@@ -50,11 +50,11 @@ def plates(machine):
             if os.path.isfile(path):
                 shutil.copy(path, target_dir + "/" + file)
             else:
-                print "can't find %s to copy" % path
+                print("can't find %s to copy" % path)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         plates(sys.argv[1])
     else:
-        print "usage: plates [mendel|sturdy|your_machine]"
+        print("usage: plates [mendel|sturdy|your_machine]")
         sys.exit(1)

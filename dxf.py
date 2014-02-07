@@ -7,9 +7,9 @@ def parse_dxf(fn):
     f = open(fn)
 
     # skip to entities section
-    s = f.next()
+    s = next(f)
     while s.strip() != 'ENTITIES':
-        s = f.next()
+        s = next(f)
 
     in_line = False
     in_circle = False
@@ -27,8 +27,8 @@ def parse_dxf(fn):
             keys = dict.fromkeys(['8','10','20','30','11','21','31'], 0.0)
             while line != '0':
                 if line in keys:
-                    keys[line] = float(f.next().strip())
-                line = f.next().strip()
+                    keys[line] = float(next(f).strip())
+                line = next(f).strip()
             pt_list.append( ((keys['10'], keys['20']), (keys['11'], keys['21'])) )
             in_line = False
 
@@ -36,8 +36,8 @@ def parse_dxf(fn):
             keys = dict.fromkeys(['8','10','20','30','40'], 0.0)
             while line != '0':
                 if line in keys:
-                    keys[line] = float(f.next().strip())
-                line = f.next().strip()
+                    keys[line] = float(next(f).strip())
+                line = next(f).strip()
             cir_list.append([[keys['10'], keys['20'], keys['30']], keys['40']])
             in_circle = False
 
@@ -102,7 +102,7 @@ def dxf_to_svg(fn):
     xmin = ymin = 99999999
     for loop in loops:
         if len(loop) < 4 or loop[0] != loop[-1]:
-            raise Exception, "loop not closed " + str(loop)
+            raise Exception("loop not closed " + str(loop))
         for point in loop:
             if point[0] > xmax: xmax = point[0]
             if point[0] < xmin: xmin = point[0]
@@ -111,7 +111,7 @@ def dxf_to_svg(fn):
 
     def p(x, y): return (x - xmin, ymax - y)
 
-    print xmin, ymin, xmax, ymax
+    print(xmin, ymin, xmax, ymax)
     scene = Scene(fn[:-4], ceil(ymax - ymin + 10), ceil(xmax - xmin + 10))
     for loop in loops:
         circle = is_circle(loop)
