@@ -20,7 +20,7 @@ To view the model of the whole machine, open scad\main.scad. It will take severa
 
 To view a sub-assembly, open the individual scad files. Set the exploded flag in config.scad to make exploded views.
 
-To get blender renders of all the parts put blender in your search path and run render.py machine_name.
+To get blender renders of all the parts put blender in your search path and run `render.py machine_name`.
 
 Credits
 =======
