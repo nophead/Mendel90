@@ -1,9 +1,9 @@
 Limitations
-===========
+-----------
 Currently only supports mendel and sturdy machine variants, the huxley version needs more work.
 
 Use
-===
+---
 Add the directory of the OpenScad executable to your search path. OpenSCAD-2013.06 or later is required.
 To get PDF versions of the sheet drawings add InkScape to your search path.
 
@@ -23,7 +23,7 @@ To view a sub-assembly, open the individual scad files. Set the exploded flag in
 To get blender renders of all the parts put blender in your search path and run `render.py machine_name`.
 
 Credits
-=======
+-------
 Fan model based on [this model](http://www.thingiverse.com/thing:8063) by MiseryBot, CC license.
 
 [Sanguinololu model](http://www.thingiverse.com/thing:18606) by ax\_the\_b, CC license.
