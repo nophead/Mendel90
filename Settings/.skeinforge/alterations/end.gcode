@@ -9,4 +9,3 @@ G1 Z200 X-100 F9000 ; go to top
 ;M42 P28 S0 ;bed fan off
 G1 Y-100  ;bed to front
 M84     ; disable motors
-M0 ; end
