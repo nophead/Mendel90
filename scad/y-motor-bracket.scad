@@ -95,7 +95,7 @@ module y_motor_assembly() {
     //
     // Motor and screws
     //
-    rotate([0, 0, 180])
+    rotate([0, 0, base_nuts ? 180 : 90])
         NEMA(Y_motor);
     translate([0,0, thickness])
         NEMA_screws(Y_motor);
