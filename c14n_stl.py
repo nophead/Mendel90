@@ -5,7 +5,11 @@
 # It then sorts the triangles to start with the one with the lowest vertices first (comparing first vertex, second, then third)
 # This has no effect on the model but makes the STL consistent. I.e. it makes a canonical form.
 #
+
+from __future__ import print_function
+
 import sys
+
 
 class Vertex:
     def __init__(self, x, y, z):
@@ -55,20 +59,20 @@ class STL:
 
             self.facets.sort(key = Facet.key)
         else:
-            print "Not an OpenSCAD ascii STL file"
+            print("Not an OpenSCAD ascii STL file")
             sys.exit(1)
 
     def write(self, fname):
         f = open(fname,"wt")
-        print >> f,'solid OpenSCAD_Model'
+        print('solid OpenSCAD_Model', file=f)
         for facet in self.facets:
-            print >> f, '  facet normal %s %s %s' % (facet.normal.dx, facet.normal.dy, facet.normal.dz)
-            print >> f, '    outer loop'
+            print('  facet normal %s %s %s' % (facet.normal.dx, facet.normal.dy, facet.normal.dz), file=f)
+            print('    outer loop', file=f)
             for vertex in facet.vertices:
-                print >> f, '      vertex %s %s %s' % (vertex.x, vertex.y, vertex.z)
-            print  >> f, '    endloop'
-            print  >> f, '  endfacet'
-        print >> f, 'endsolid OpenSCAD_Model'
+                print('      vertex %s %s %s' % (vertex.x, vertex.y, vertex.z), file=f)
+            print('    endloop', file=f)
+            print('  endfacet', file=f)
+        print('endsolid OpenSCAD_Model', file=f)
         f.close()
 
 def canonicalise(fname):
@@ -79,5 +83,5 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         canonicalise(sys.argv[1])
     else:
-        print "usage: c14n_stl file"
+        print("usage: c14n_stl file")
         sys.exit(1)
