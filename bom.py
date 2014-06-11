@@ -44,14 +44,15 @@ class BOM:
                 name = ass.replace("_assembly","")
                 longest = max(longest, len(name))
             for i in range(longest):
+                line = ""
                 for ass in sorted(self.assemblies):
                     name = ass.replace("_assembly","").replace("_"," ").capitalize()
                     index = i - (longest - len(name))
                     if index < 0:
-                        print("  ", end=" ", file=file)
+                        line += "   "
                     else:
-                        print(" %s" % name[index], end=" ", file=file)
-                print(file=file)
+                        line += (" %s " % name[index])
+                print(line[:-1], file=file)
 
         for part in sorted(self.vitamins):
             if ': ' in part:
@@ -102,8 +103,9 @@ def boms(machine):
     stack = []
 
     for line in open("openscad.log"):
-        if line[:7] == 'ECHO: "':
-            s = line[7:-2]
+        pos = line.find('ECHO: "')
+        if pos > -1:
+            s = line[pos + 7 : line.rfind('"')]
             if s[-1] == '/':
                 ass = s[:-1]
                 if stack:
