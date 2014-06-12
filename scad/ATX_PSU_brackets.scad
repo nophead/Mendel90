@@ -158,6 +158,8 @@ sleeving = [
     [HSHRNK100, 1],         // 12 * 0V
 ];
 
+function sleeve_pos(i) = i > 0 ? sleeve_pos(i - 1) + tubing_od(sleeving[i][0]) /2 + 1 + tubing_od(sleeving[i - 1][0]) / 2 : 0;
+
 module atx_bracket_assembly(show_psu = false) {
     rotate([0, 0, 180]) {
         translate([0, psu_width(psu) / 2, 0]) {
@@ -183,7 +185,8 @@ module atx_bracket_assembly(show_psu = false) {
 
     for(j = [0 : len(sleeving) - 1])
         for(i = [0 : sleeving[j][1] - 1])
-            translate([psu_length(psu) / 2 + 8,  - 10 * j, psu_height(psu) / 2 + 10 * i])
+            assign(od = tubing_od(sleeving[j][0]))
+            translate([psu_length(psu) / 2 + 8,  psu_width(psu) / 2 - 15 - sleeve_pos(j), 12 + i * (od + 1) + od / 2])
                 rotate([0, 90, 0])
                     tubing(sleeving[j][0]);
 

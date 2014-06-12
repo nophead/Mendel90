@@ -49,6 +49,9 @@ single_piece_frame = true;
 stays_from_window = false;
 cnc_sheets = true;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
 pulley_type = T2p5x16_metal_pulley;
+//raspberry_pi = true;
+//raspberry_pi_camera = true;
+//light_strip = SPS125;
 
 Y_carriage = DiBond;
 

@@ -26,7 +26,11 @@ use <ATX_PSU_brackets.scad>
 use <spool_holder.scad>
 use <tube_cap.scad>
 use <d-motor_bracket.scad>
+use <raspberry_pi.scad>
+use <raspberry_pi_camera.scad>
+use <light_strip.scad>
 include <positions.scad>
+
 
 X = 0 * X_travel / 2; // - limit_switch_offset;
 Y = 0 * Y_travel / 2; // - limit_switch_offset;
@@ -363,14 +367,6 @@ module print_bed_assembly(show_bed = true, show_heatshield = true) {
     //
     translate([X_origin, Y + Y0, 0]) {
 
-        translate([0, 0, Y_carriage_height + sheet_thickness(Y_carriage) / 2]) {
-            if(show_bed) {
-                bed_assembly(Y);
-                if(show_heatshield)
-                    translate([0, 0, sheet_thickness(Cardboard) / 2])
-                        y_heatshield();
-            }
-        }
 
         translate([0, -(Y + Y0) + ribbon_clamp_y + ribbon_clamp_width(base_screw) / 2, ribbon_clamp_slot_depth() - cable_strip_thickness])
             rotate([90, 0, 90])
@@ -383,6 +379,14 @@ module print_bed_assembly(show_bed = true, show_heatshield = true) {
 
         y_carriage_assembly(show_bed);
 
+        translate([0, 0, Y_carriage_height + sheet_thickness(Y_carriage) / 2]) {
+            if(show_bed) {
+                if(show_heatshield)
+                    translate([0, 0, sheet_thickness(Cardboard) / 2])
+                        y_heatshield();
+                bed_assembly(Y);
+            }
+        }
     }
     end("print_bed_assembly");
 }
@@ -787,9 +791,9 @@ module electronics_assembly() {
     translate([right_stay_x + sheet_thickness(frame) / 2, controller_y, controller_z])
         rotate([90, 0, 90]) {
             controller_screw_positions(controller)
-                pcb_spacer_assembly();
+                pcb_spacer_assembly(raspberry_pi ? 2 : 1, raspberry_pi ? $i >= 2 : true);
 
-            translate([0, 0, pcb_spacer_height()])
+            translate([0, 0, pcb_spacer_height() * (raspberry_pi ? 2 : 1)])
                 controller(controller);
         }
 
@@ -804,7 +808,7 @@ module psu_assembly() {
 
     assembly("psu_assembly");
 
-    translate([right_stay_x + sheet_thickness(frame) / 2, psu_y, psu_z])
+    translate([psu_x, psu_y, psu_z])
         rotate([0, 90, 0]) {
             psu_screw_positions(psu) group() {
                 if(psu_screw_from_back(psu))
@@ -882,8 +886,17 @@ module machine_assembly(show_bed = true, show_heatshield = true, show_spool = tr
         electronics_assembly();
         psu_assembly();
 
-        if(show_spool)
+        if(raspberry_pi)
+            raspberry_pi_assembly();
+
+        if(raspberry_pi_camera)
+            raspberry_pi_camera_assembly(light_strip);
+
+        if(show_spool) {
             spool_assembly(left_stay_x, right_stay_x);
+            if(light_strip && !raspberry_pi_camera)
+                light_strip_assembly();
+        }
 
         translate([0, Y0, 0]) {
             x_axis_assembly(true);

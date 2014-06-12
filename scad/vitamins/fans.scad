@@ -61,7 +61,7 @@ module fan(type) {
     //Seven Blades
     linear_extrude(height = depth - 1, center = true, convexity = 4, twist = -30, slices = depth / 2)
         for(i= [0 : 6])
-            rotate((360 * i) / 7)
+            rotate([0, 0, (360 * i) / 7])
                 translate([0, -1.5 / 2])
                     square([fan_bore(type) / 2 - 0.75, 1.5]);
 }

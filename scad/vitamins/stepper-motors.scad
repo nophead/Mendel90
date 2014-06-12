@@ -14,14 +14,15 @@ NEMA17  = [42.3, 47,     53.6/2, 25,     11,     2,     5,     24,     31 ];
 NEMA17S = [42.3, 34,     53.6/2, 25,     11,     2,     5,     24,     31 ];
 NEMA14  = [35.2, 36,     46.4/2, 21,     11,     2,     5,     21,     26 ];
 
-function NEMA_width(motor)    = motor[0];
-function NEMA_length(motor)   = motor[1];
-function NEMA_radius(motor)   = motor[2];
-function NEMA_holes(motor)    = [-motor[8]/2, motor[8]/2];
-function NEMA_big_hole(motor) = motor[4] + 0.2;
-function NEMA_shaft_dia(motor) = motor[6];
-function NEMA_shaft_length(motor) = motor[7];
-function NEMA_hole_pitch(motor) = motor[8];
+function NEMA_width(motor)    =    motor[0];
+function NEMA_length(motor)      = motor[1];
+function NEMA_radius(motor)      = motor[2];
+function NEMA_big_hole(motor)    = motor[4] + 0.2;
+function NEMA_boss_height(motor) = motor[5];
+function NEMA_shaft_dia(motor)   = motor[6];
+function NEMA_shaft_length(motor)= motor[7];
+function NEMA_hole_pitch(motor)  = motor[8];
+function NEMA_holes(motor)       = [-motor[8]/2, motor[8]/2];
 
 module NEMA(motor) {
     side = NEMA_width(motor);

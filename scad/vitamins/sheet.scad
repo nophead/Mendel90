@@ -28,6 +28,7 @@ PMMA8    = [ "AC", "Acrylic sheet",        8, [1,   1,   1,   0.5  ], false];   
 PMMA10   = [ "AC", "Acrylic sheet",       10, [1,   1,   1,   0.5  ], false];   // ~3/8"
 glass2   = [ "GL", "Glass sheet",          2, [1,   1,   1,   0.25 ], false];
 DiBond   = [ "DB", "Dibond sheet",         3, "RoyalBlue",            false];
+DiBond6  = [ "DB", "Dibond sheet",         6, "RoyalBlue",            false];
 Cardboard= [ "CB", "Corrugated cardboard", 5, [0.8, 0.6, 0.3, 1    ], false];
 FoilTape = [ "AF", "Aluminium foil tape",0.05,[0.9, 0.9, 0.9, 1    ], false];
 Foam20   = [ "FM", "Foam sponge",          20,[0.3, 0.3, 0.3, 1    ], true];

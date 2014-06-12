@@ -27,8 +27,9 @@ function controller_accessories(type) = type[4];
 module controller_screw_positions(type) {
     inset = controller_hole_inset(type);
 
-    for(x = [inset, controller_width(type) - inset])
-        for(y = [inset, controller_length(type) - inset])
+    for($i = [0:3])
+        assign(x = [inset, controller_width(type) - inset][$i % 2])
+        assign(y = [inset, controller_length(type) - inset][$i / 2])
             translate([x, y, 0])
                 child();
 }

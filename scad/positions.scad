@@ -14,7 +14,7 @@ use <fixing-block.scad>
 use <mains_inlet.scad>
 use <ribbon_clamp.scad>
 
-base_depth = Y_travel + limit_switch_offset + Y_carriage_depth + 2 * base_clearance;
+base_depth = ceil(Y_travel + limit_switch_offset + Y_carriage_depth + 2 * base_clearance);
 AL_tube_inset = 9.5;
 
 Y0 = limit_switch_offset / 2;
@@ -25,7 +25,7 @@ bed_height =  Y_carriage_height + sheet_thickness(Y_carriage) / 2 + pillar_heigh
 
 Z0 = floor(bed_height + nozzle_length - x_carriage_offset());
 
-height = Z0 + Z_travel + limit_switch_offset + x_end_height() + bar_clamp_depth + axis_end_clearance + base_clearance;
+height = ceil(Z0 + Z_travel + limit_switch_offset + x_end_height() + bar_clamp_depth + axis_end_clearance + base_clearance);
 
 gantry_thickness = height - max(bed_height + Z_travel + Z_clearance, Y_carriage_depth + 1);
 
@@ -77,6 +77,7 @@ fan_z = Y_carriage_height + fan_width(case_fan) / 2;
 atx_bracket_width = (frame_nuts && cnc_sheets) ? 2 * (nut_radius(frame_nut) + 3 * filament_width)
                                                : washer_diameter(frame_washer) + 1;
 
+psu_x = right_stay_x + sheet_thickness(frame) / 2;
 psu_z = fixing_block_height() + psu_length(psu) / 2;
 psu_y = base_depth / 2 - base_clearance - psu_width(psu) / 2 - (atx_psu(psu) ? atx_bracket_width : mains_inlet_inset());
 

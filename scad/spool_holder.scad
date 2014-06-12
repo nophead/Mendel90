@@ -48,6 +48,8 @@ tube_spacing = sqrt(dx * dx + dy * dy);
 
 width = spool_width(spool) - 2 * (thickness + washer_thickness(M8_washer) + washer_thickness(M8_penny_washer));
 
+function spool_holder_gap() = spool_y - width / 2 - thickness - (gantry_Y + sheet_thickness(frame));
+
 sponge_length = 15;
 sponge_depth  = 15;
 sponge_height = 15;
@@ -175,15 +177,15 @@ module tube(height) {
 //
 // The outline of the bracket, triangle with rounded corners
 //
-module shape(width, height) {
+module shape(width, height, offset = 0) {
     hull() {
-        circle(washer_diameter(M8_washer) / 2 + 1);
+        circle(washer_diameter(M8_washer) / 2 + 1 + offset);
 
         translate([width - tube_r, height + hook - tube_r])
-            circle(tube_r);
+            circle(tube_r + offset);
 
         translate([width - tube_r, -height + tube_r])
-            circle(tube_r);
+            circle(tube_r + offset);
     }
 }
 //
@@ -196,15 +198,12 @@ module inner_shape(width, height) {
     inset = frame_bar_width + rad;
 
     minkowski() {
-        render() difference() {
+        difference() {
             shape(width, height);
             union() {
-               minkowski() {
+                minkowski() {
                     difference() {
-                        minkowski() {
-                            shape(width, height);
-                            circle(r = 1, center = true);
-                        }
+                        shape(width, height, 1);
                         shape(width, height);
                         translate([width -1, -inset])
                             square([3, 2 * inset + 1]);

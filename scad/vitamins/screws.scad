@@ -13,8 +13,9 @@ hs_cs  = 2;     // counter sunk
 hs_hex = 3;
 hs_grub= 4;     // pulley set screw
 
-M2p5_pan_screw = ["PS025", "M2.5 pan screw",     hs_pan, 2.5, 4.7, 1.7, M2p5_washer, false,  M2p5_tap_radius,  M2p5_clearance_radius];
+M2_cap_screw   = ["CS020", "M2 cap screw",       hs_cap,   2, 3.8, 1.5,   M2_washer, false,  M2_tap_radius,    M2_clearance_radius];
 
+M2p5_pan_screw = ["PS025", "M2.5 pan screw",     hs_pan, 2.5, 4.7, 1.7, M2p5_washer, false,  M2p5_tap_radius,  M2p5_clearance_radius];
 M2p5_cap_screw = ["CS025", "M2.5 cap screw",     hs_cap, 2.5, 4.7, 2.0, M2p5_washer, false,  M2p5_tap_radius,  M2p5_clearance_radius];
 
 M3_cap_screw   = ["CS030", "M3 cap screw",       hs_cap,   3, 5.5, 2.5,   M3_washer, M3_nut, M3_tap_radius,    M3_clearance_radius];
@@ -69,8 +70,8 @@ module screw(type, length, hob_point = 0) {
     rad = screw_radius(type) - eta;
     head_rad = screw_head_radius(type);
     if(exploded)
-        cylinder(r = 0.2, h = 16);
-    translate([0, 0, exploded ? length + 10 : 0]) {
+        cylinder(r = 0.2, h = 10 * exploded);
+    translate([0, 0, exploded ? (length + 10) * exploded : 0]) {
         if(head_type == hs_cap) {
             assign(head_height = rad * 2,
                    socket_rad = type[5] / cos(30) / 2,

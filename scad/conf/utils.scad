@@ -22,14 +22,14 @@ module slot(h, r, l, center = true)
                 circle(r = r, center = true);
         }
 
-module hole_support(r, h, max_r = 999) {
+module hole_support(r, h, max_r = 999, closed = false) {
     n = sides(r);
     cr = corrected_radius(r, n);
     ir = min(cr, max_r - 2.25 * filament_width);
     or = ir + 2 * filament_width;
     difference() {
         cylinder(r = or, h = h, $fn = n);
-        translate([0, 0, -1])
+        translate([0, 0, closed ? layer_height : -1])
             cylinder(r = ir, h = h + 2, $fn = n);
     }
 }
@@ -45,6 +45,9 @@ module nut_trap_support(h, r, r2 = 0) {
             cylinder(r2 = ir, r1 = or2, h = h + 2, $fn = 6);
     }
 }
+
+function nut_trap_radius(nut) = nut_radius(nut) + layer_height / 4;
+function nut_trap_flat_radius(nut) = nut_trap_radius(nut) * cos(30);
 
 module nut_trap(screw_r, nut_r, depth, horizontal = false, supported = false) {
     render(convexity = 5) union() {
@@ -153,11 +156,11 @@ module tube(or, ir, h, center = true) {
 //
 module explode(v, offset = [0,0,0]) {
     if(exploded) {
-        translate(v)
+        translate(v * exploded)
             child();
         render() hull() {
             sphere(0.2);
-            translate(v + offset)
+            translate(v * exploded + offset)
                 sphere(0.2);
         }
     }

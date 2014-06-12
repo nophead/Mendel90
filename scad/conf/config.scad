@@ -7,6 +7,9 @@
 //
 // Configuration file
 //
+
+function sqr(x) = x * x;            // shortcut
+
 bom = $bom == undef ? 0: $bom;                 // 0 no bom, 1 assemblies and stls, 2 vitamins as well
 exploded = $exploded == undef ? 0 : $exploded; // 1 for exploded view
 
@@ -34,6 +37,10 @@ No6_pilot_radius = 2.0 / 2;       // wood screw into soft wood
 No2_clearance_radius = 2.5 / 2;
 No4_clearance_radius = 3.5 / 2;
 No6_clearance_radius = 4.0 / 2;
+
+M2_tap_radius = 1.6 / 2;
+M2_clearance_radius = 2.4 / 2;
+M2_nut_trap_depth = 2.5;
 
 M2p5_tap_radius = 2.05 / 2;
 M2p5_clearance_radius= 2.8 / 2;   // M2.5
@@ -100,7 +107,11 @@ base_nuts = false;                  // Need something under the base if using nu
 pulley_type = T5x8_plastic_pulley;
 clip_handles = true;
 include_fan = false;
+squeeze = false;                    // Bodge to make Huxley as small as possible without affecting dibond kits
 part_fan = fan60x15;
+raspberry_pi = false;               // Raspberry pi mounted on PSU
+raspberry_pi_camera = false;        // RPI camera on bar across the back
+light_strip = false;
 include <machine.scad>              // this file is generated from the command line parameter to include one of the machine configs
 
 screw_clearance_radius = screw_clearance_radius(cap_screw);
