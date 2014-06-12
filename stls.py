@@ -6,14 +6,18 @@ import shutil
 import sys
 import c14n_stl
 
-source_dir = "scad"
+from bom import source_dir
 
-def bom_to_stls(machine):
+def bom_to_stls(machine, assembly = None):
     #
     # Make a list of all the stls in the BOM
     #
     stl_files = []
-    for line in open(machine + "/bom/bom.txt", "rt").readlines():
+    if assembly:
+        bom = "accessories/%s.txt" % assembly
+    else:
+        bom = "bom.txt"
+    for line in open(machine + "/bom/" + bom, "rt").readlines():
         words = line.split()
         if words:
             last_word = words[-1]
@@ -36,7 +40,7 @@ def stls(machine, parts = None):
     #
     # Set the target machine
     #
-    f = open("scad/conf/machine.scad","wt")
+    f = open(source_dir + "/conf/machine.scad","wt")
     f. write("include <%s_config.scad>\n" % machine);
     f.close()
 

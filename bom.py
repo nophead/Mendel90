@@ -7,6 +7,23 @@ import sys
 import shutil
 import openscad
 
+source_dir = "scad"
+
+def find_scad_file(assembly):
+    for filename in os.listdir(source_dir):
+        if filename[-5:] == ".scad":
+            #
+            # look for module which makes the assembly
+            #
+            for line in open(source_dir + "/" + filename, "r").readlines():
+                words = line.split()
+                if len(words) and words[0] == "module":
+                    module = words[1].split('(')[0]
+                    if module == assembly:
+                        return filename
+
+
+    return None
 
 class BOM:
     def __init__(self):
@@ -86,17 +103,40 @@ class BOM:
         for ass in sorted(self.assemblies):
             print("%3d %s" % (self.assemblies[ass].count, self.assemblies[ass].make_name(ass)), file=file)
 
-def boms(machine):
+def boms(machine, assembly = None):
+
     bom_dir = machine + "/bom"
-    if os.path.isdir(bom_dir):
-        shutil.rmtree(bom_dir)
-    os.makedirs(bom_dir)
+    if assembly:
+        bom_dir += "/accessories"
+        if not os.path.isdir(bom_dir):
+            os.makedirs(bom_dir)
+    else:
+        assembly = "machine_assembly"
+        if os.path.isdir(bom_dir):
+            shutil.rmtree(bom_dir)
+        os.makedirs(bom_dir)
 
     f = open("scad/conf/machine.scad","wt")
     f. write("include <%s_config.scad>\n" % machine);
     f.close()
-
-    openscad.run("-D","$bom=2","-o", "dummy.csg", "scad/bom.scad")
+    #
+    # Find the scad file that makes the module
+    #
+    scad_file = find_scad_file(assembly)
+    if not scad_file:
+        raise Exception("can't find source for " + assembly)
+    #
+    # make a file to use the module
+    #
+    bom_maker_name = source_dir + "/bom.scad"
+    f = open(bom_maker_name, "w")
+    f.write("use <%s>\n" % scad_file)
+    f.write("%s();\n" % assembly);
+    f.close()
+    #
+    # Run openscad
+    #
+    openscad.run("-D","$bom=2","-o", "dummy.csg", bom_maker_name)
     print("Generating bom ...", end=" ")
 
     main = BOM()
@@ -122,7 +162,8 @@ def boms(machine):
                     if stack:
                         main.assemblies[stack[-1]].add_part(s)
 
-    main.print_bom(True, open(bom_dir + "/bom.txt","wt"))
+    if assembly == "machine_assembly":
+        main.print_bom(True, open(bom_dir + "/bom.txt","wt"))
 
     for ass in sorted(main.assemblies):
         f = open(bom_dir + "/" + ass + ".txt", "wt");
@@ -134,8 +175,12 @@ def boms(machine):
     print(" done")
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        boms(sys.argv[1])
+    args = len(sys.argv)
+    if args > 1:
+        if args > 2:
+            boms(sys.argv[1], sys.argv[2])
+        else:
+            boms(sys.argv[1])
     else:
-        print("usage: bom [mendel|sturdy|your_machine]")
+        print("usage: bom mendel|sturdy|your_machine [assembly_name]")
         sys.exit(1)
