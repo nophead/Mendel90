@@ -9,8 +9,12 @@ import shutil
 import os
 
 def accessories(machine, assembly = None):
-    assemblies = ["raspberry_pi_assembly", "raspberry_pi_camera_assembly", "light_strip_assembly" ]
-
+    assemblies = [
+        "raspberry_pi_assembly",
+        "raspberry_pi_camera_assembly",
+        "light_strip_assembly",
+        "z_limit_switch_assembly"
+    ]
     #
     # Make the target directory
     #
@@ -25,6 +29,7 @@ def accessories(machine, assembly = None):
 
     if assembly:
         assemblies = [ assembly ]
+
     for assembly in assemblies:
         print(assembly)
         bom.boms(machine, assembly)
