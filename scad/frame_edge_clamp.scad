@@ -34,21 +34,22 @@ module frame_edge_clamp_front_stl(length = 20) {
 
     w = total_width;
 
-    union() {
-        difference() {
+    difference() {
+        union() {
             translate([0, 0, clamp_thickness / 2])
                 cube([length, w, clamp_thickness], center = true);
 
-            for(side = [-1, 1])
-                translate([side * frame_edge_clamp_pitch(length) / 2, w / 2 - width - screw_d / 2, clamp_thickness])
-                    rotate([0, 0, 90])
-                        nut_trap(M3_clearance_radius, nut_radius(M3_nut), M3_nut_trap_depth);
-
-            translate([0, - w / 2 + hinge / 2, 0])
-                cube([pivot_l(length) + 2 * clearance, pivot_w + 2 * clearance, pivot_h * 2], center = true);
+            if($children)
+                child();
         }
-        if($children)
-            child();
+
+        for(side = [-1, 1])
+            translate([side * frame_edge_clamp_pitch(length) / 2, w / 2 - width - screw_d / 2, clamp_thickness])
+                rotate([0, 0, 90])
+                    nut_trap(M3_clearance_radius, nut_radius(M3_nut), M3_nut_trap_depth);
+
+        translate([0, - w / 2 + hinge / 2, 0])
+            cube([pivot_l(length) + 2 * clearance, pivot_w + 2 * clearance, pivot_h * 2], center = true);
     }
 }
 
