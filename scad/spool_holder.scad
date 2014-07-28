@@ -27,8 +27,6 @@ right =  right_stay_x - sheet_thickness(frame) / 2;
 spool_x = (left + right) / 2;
 spool_y = gantry_Y + sheet_thickness(frame) + 10 + spool_height(spool) / 2;
 
-holes = psu_hole_list(psu);
-
 bearing_r = (spool_diameter(spool) + ball_bearing_diameter(bearing)) / 2;
 bearing_x = cos(angle) * bearing_r;
 bearing_z = spool_z - sin(angle) * bearing_r;
@@ -167,7 +165,10 @@ module tube(height) {
     difference() {
         union() {
             cylinder(r = tube_r, h = height);
-            cylinder(r = tube_r - min_wall, h = height + thickness - wall - layer_height);        // dowel
+            hull() {
+                cylinder(r = tube_r - min_wall, h = height + thickness - wall - 2 * layer_height);              // dowel
+                cylinder(r = tube_r - min_wall - layer_height, h = height + thickness - wall - layer_height);   // chamferred end
+            }
         }
         translate([0, 0, wall])
             cylinder(r = tube_r - wall, h = height - 2 * wall);
