@@ -45,7 +45,7 @@ extension_clearance = 1;
 jhead_screw = M3_cap_screw;
 jhead_washer = M4_washer;
 jhead_nut_slot = nut_thickness(screw_nut(jhead_screw)) + 0.3;
-jhead_screw_length = 16;
+jhead_screw_length = screw_longer_than(base_thickness + extension + jhead_nut_slot + washer_thickness(jhead_washer) + washer_thickness(screw_washer(jhead_screw)));
 jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
                           jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
 
