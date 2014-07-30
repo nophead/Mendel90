@@ -42,7 +42,7 @@ extension = max(0, nozzle_length - hot_end_length(hot_end));
 extension_width = 30;
 
 jhead_screw = M3_cap_screw;
-jhead_screw_length = 16;
+jhead_screw_length = 16 + extension;
 jhead_washer = M4_washer;
 jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
                           jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
