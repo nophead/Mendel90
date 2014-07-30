@@ -40,15 +40,16 @@ filament_z = 13;
 
 extension = max(0, nozzle_length - hot_end_length(hot_end));
 extension_width = 30;
+extension_clearance = 1;
 
 jhead_screw = M3_cap_screw;
-jhead_screw_length = 16;
 jhead_washer = M4_washer;
+jhead_nut_slot = nut_thickness(screw_nut(jhead_screw)) + 0.3;
+jhead_screw_length = 16;
 jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
                           jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
 
 extension_rad = jhead_screw_pitch + 5;
-extension_clearance = 1;
 
 pscrew_y = [17.5, 45.5];
 pscrew_z = [filament_z - 6.5, filament_z + 6.5];
@@ -84,7 +85,6 @@ module keyhole(r, h, l) {
 nut_inset = min_wall;
 
 jhead_screw_angle = 5;
-jhead_nut_slot = nut_thickness(screw_nut(jhead_screw)) + 0.3;
 
 module wades_block_stl() {
     stl("wades_block");
