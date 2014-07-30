@@ -226,7 +226,7 @@ module wades_block_stl() {
                          rotate([0, 0, i * 120 + jhead_screw_angle])
                             translate([jhead_screw_pitch, 0, 0])
                                 rotate([0, 0, -i * 120 - jhead_screw_angle]) {
-                                    teardrop_plus(r = screw_clearance_radius(jhead_screw), h = jhead_screw_length * 2, center = true);
+                                    teardrop_plus(r = screw_clearance_radius(jhead_screw), h = (base_thickness + extension + jhead_nut_slot + 6) * 2, center = true);
                                     translate([0, 0, -base_thickness - extension - jhead_nut_slot / 2]) {
                                         rotate([0, 0, [0, 30, 30][i]])
                                             nut_trap(0, nut_radius(screw_nut(jhead_screw)), jhead_nut_slot / 2, horizontal = true);
