@@ -246,9 +246,14 @@ module rpi_camera_front_stl() {
             //
             // bar clamp
             //
-            translate([0, band_y, band_or])
-                rotate([-90, 0, 90])
-                    teardrop(r = band_or, h = band_width, center = true);                           // clamp band to go round bar
+            hull() {
+                translate([0, band_y, band_or])
+                    rotate([-90, 0, 90])
+                        teardrop(r = band_or, h = band_width, center = true);                       // clamp band to go round bar
+
+                translate([-band_width / 2, pi_cam_front_length / 2 - rad, 0])
+                    cube([band_width, 1, 1]);
+            }
 
             translate([0, band_y, band_or + band_tab_height / 2])
                 cube([band_width, band_tab_d, band_tab_height], center = true);                     // tab for screw
