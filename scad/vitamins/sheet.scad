@@ -23,6 +23,7 @@
 MDF6     = [ "MD", "MDF sheet",            6, [0.4, 0.4, 0.2, 1    ], true];    // ~1/4"
 MDF10    = [ "MD", "MDF sheet",           10, [0.4, 0.4, 0.2, 1    ], true];    // ~3/8"
 MDF12    = [ "MD", "MDF sheet",           12, [0.4, 0.4, 0.2, 1    ], true];    // ~1/2"
+MDF18    = [ "MD", "MDF sheet",           18, [0.4, 0.4, 0.2, 1    ], true];    // ~3/4"
 PMMA6    = [ "AC", "Acrylic sheet",        6, [1,   1,   1,   0.5  ], false];   // ~1/4"
 PMMA8    = [ "AC", "Acrylic sheet",        8, [1,   1,   1,   0.5  ], false];   // ~5/16"
 PMMA10   = [ "AC", "Acrylic sheet",       10, [1,   1,   1,   0.5  ], false];   // ~3/8"
