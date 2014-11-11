@@ -7,7 +7,7 @@
 //
 // Configuration file
 //
-echo("Stuphi:");
+echo("Mendel:");
 
 Z_bearings = LM8UU;
 Y_bearings = LM8UU;
@@ -31,10 +31,10 @@ bed_thickness = pcb_thickness + sheet_thickness(bed_glass);    // PCB heater plu
 bed_holes = [209, 209];
 
 base = MDF18;               // Sheet material used for the base. Needs to be thick enough to screw into.
-base_corners = 0;
+base_corners = 25;
 
 frame = MDF18;
-frame_corners = 0;
+frame_corners = 25;
 frame_nuts = false;
 
 case_fan = fan80x38;
