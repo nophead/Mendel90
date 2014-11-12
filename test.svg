@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="400mm" width="400mm" >
+ <g style="fill-opacity:1.0; stroke:black; stroke-width:1;">
+  <rect x="50mm" y="50mm" height="100mm"
+    width="100mm" style="fill:#0ff;" />
+  <line x1="100.000000mm" y1="100.000000mm" x2="150.000000mm" y2="100.000000mm" />
+  <line x1="100.000000mm" y1="100.000000mm" x2="50.000000mm" y2="100.000000mm" />
+  <line x1="100.000000mm" y1="100.000000mm" x2="100.000000mm" y2="150.000000mm" />
+  <line x1="100.000000mm" y1="100.000000mm" x2="100.000000mm" y2="50.000000mm" />
+  <circle cx="100.000000mm" cy="100.000000mm" r="15.000000mm" fill="none"/>
+  <circle cx="100.000000mm" cy="150.000000mm" r="15.000000mm" fill="none"/>
+  <circle cx="150.000000mm" cy="100.000000mm" r="15.000000mm" fill="none"/>
+  <circle cx="50.000000mm" cy="100.000000mm" r="15.000000mm" fill="none"/>
+  <circle cx="100.000000mm" cy="50.000000mm" r="15.000000mm" fill="none"/>
+  <text x="25mm" y="25mm" font-size="24">
+   Testing SVG
+  </text>
+ </g>
+ <g style="fill-opacity:1.0; stroke:black; stroke-width:0.5;">
+  <line x1="0.000000mm" y1="0.000000mm" x2="400.000000mm" y2="400.000000mm" />
+  <line x1="0.000000mm" y1="400.000000mm" x2="400.000000mm" y2="0.000000mm" />
+ </g>
+</svg>
