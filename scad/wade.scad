@@ -12,6 +12,7 @@ use <d-motor_bracket.scad>
 use <vitamins/m90_hot_end.scad>
 use <vitamins/stoffel_hot_end.scad>
 use <vitamins/jhead_hot_end.scad>
+use <vitamins/e3d_hot_end.scad>
 
 spring = false;             // use two nuts or one nut and a spring
 
@@ -480,6 +481,8 @@ module wades_assembly(show_connector = true, show_drive = true) {
                 stoffel_hot_end(hot_end);
             if(hot_end_style(hot_end) == jhead)
                 jhead_hot_end(hot_end, exploded = 0);
+            if(hot_end_style(hot_end) == e3d)
+                e3d_hot_end(hot_end, exploded = 0);
        }
     end("hot_end_assembly");
 
