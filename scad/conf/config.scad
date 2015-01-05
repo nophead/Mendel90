@@ -81,7 +81,7 @@ pcb_thickness = 1.6;
 feed_tube_rad = 5 / 2;              // Filament feed tube
 feed_tube_tape_rad = 6.2 / 2;
 feed_tube_tape = 12;
-nozzle_length = 54;                 // how far nozzle is below top of carriage
+function nozzle_length(hot_end) = max(54, hot_end_length(hot_end));      // how far nozzle is below top of carriage. Can be more than that if the hot end is bigger
 
 
 include <colors.scad>
