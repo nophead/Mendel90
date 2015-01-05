@@ -22,8 +22,6 @@ barrel_tap_dia = 5;
 barrel_dia = 6;
 insulator_dia = 12;
 
-function jhead_groove_dia() = 12;
-
 module heater_block(type, resistor, thermistor) {
     color("gold") render(convexity = 10) difference() {
         cube([heater_length(type), heater_width(type), heater_height(type)], center = true);
@@ -82,8 +80,8 @@ module jhead_hot_end(type, exploded = exploded) {
             difference() {
                 cylinder(r = hot_end_insulator_diameter(type) / 2, h = insulator_length);
                 cylinder(r = 3.2 / 2, h = insulator_length * 2 + 1, center = true);
-                translate([0, 0, insulator_length - jhead_groove_offset() - jhead_groove() / 2])
-                    tube(ir = jhead_groove_dia() / 2, or = 17 / 2, h = jhead_groove());
+                translate([0, 0, insulator_length - hot_end_inset(type) - hot_end_groove_heigh(type) / 2])
+                    tube(ir = hot_end_screw_pitch(type) / 2, or = 17 / 2, h = hot_end_groove_heigh(type));
             }
 
         color("gold")  render(convexity = 10) union() {
