@@ -122,12 +122,17 @@ module rounded_rectangle(size, r, center = true)
 //
 module rounded_cylinder(r, h, r2)
 {
+    r2=min(h, r2, r);
     rotate_extrude()
         union() {
             square([r - r2, h]);
             square([r, h - r2]);
             translate([r - r2, h - r2])
-                circle(r = r2);
+                difference() {
+                    circle(r = r2);
+                    translate([-r2, -r2]) square([2*r2, r2]);
+                    translate([-r2, -r2]) square([r2, 2*r2]);
+                }
         }
 }
 
