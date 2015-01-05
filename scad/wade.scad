@@ -39,7 +39,7 @@ mount_pitch = 25;
 filament_x = 75;
 filament_z = 13;
 
-extension = max(0, nozzle_length - hot_end_length(hot_end));
+extension = max(0, nozzle_length(hot_end) - hot_end_length(hot_end));
 extension_width = 30;
 
 jhead_screw = M3_cap_screw;
