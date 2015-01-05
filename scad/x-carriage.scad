@@ -289,13 +289,15 @@ module throat(inner) {
 }
 
 module neck(inner) {
-    iw = 2 * (fan_hole_pitch(part_fan) - fan_screw_boss_r) - 3;
+    iw = 2 * (fan_hole_pitch(part_fan));
+    ow = iw + 2*duct_wall;
+
     if(inner)
         translate([fan_x_duct - iw / 2, fan_y_duct - fan_bore(part_fan) / 2, duct_bottom_thickness])
             cube([iw, 2 * eta, duct_height_fan - duct_bottom_thickness - duct_top_thickness]);
     else
-        translate([fan_x_duct - fan_width / 2, fan_y_duct - fan_bore(part_fan) / 2, 0])
-            cube([fan_width, 2 * eta, duct_height_fan]);
+        translate([fan_x_duct - ow / 2, fan_y_duct - fan_bore(part_fan) / 2, 0])
+            cube([ow, 2 * eta, duct_height_fan]);
 }
 
 module x_carriage_fan_duct_stl() {
