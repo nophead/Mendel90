@@ -279,7 +279,7 @@ module throat(inner) {
         translate([-throat_width / 2 + duct_wall, y, nozzle_height])
             cube([throat_width - 2 * duct_wall, 2 * eta, (duct_height_nozzle - nozzle_height) - duct_top_thickness]);
     else
-        translate([-throat_width / 2, y - duct_wall, 0])
+        translate([-throat_width / 2, y, 0])
             cube([throat_width, 2 * eta, duct_height_nozzle]);
 }
 
@@ -289,7 +289,7 @@ module neck(inner) {
         translate([fan_x_duct - iw / 2, fan_y_duct - fan_bore(part_fan) / 2, duct_wall])
             cube([iw, 2 * eta, duct_height_fan - duct_wall - duct_top_thickness]);
     else
-        translate([fan_x_duct - fan_width / 2, fan_y_duct - fan_width / 2, 0])
+        translate([fan_x_duct - fan_width / 2, fan_y_duct - fan_bore(part_fan) / 2, 0])
             cube([fan_width, 2 * eta, duct_height_fan]);
 }
 
