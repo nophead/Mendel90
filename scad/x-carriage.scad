@@ -301,6 +301,8 @@ module neck(inner) {
 module x_carriage_fan_duct_stl() {
     stl("x_carriage_fan_duct");
 
+    fan_bore_r = max(fan_bore(part_fan) / 2, fan_width/2-duct_wall);
+
     difference() {
         union() {
             difference() {
@@ -338,14 +340,18 @@ module x_carriage_fan_duct_stl() {
                 hull() {
                     translate([fan_x_duct, fan_y_duct, duct_wall + duct_height_fan - duct_wall - duct_top_thickness])
                         rotate([180, 0, 0])
-                            rounded_cylinder(r = fan_bore(part_fan) / 2, h = duct_height_fan - duct_bottom_thickness - duct_top_thickness, r2 = duct_height_fan / 2);
+                            rounded_cylinder(r = fan_bore_r, h = duct_height_fan - duct_bottom_thickness - duct_top_thickness, r2 = duct_height_fan / 2);
 
                     neck(true);
                 }
                 translate([0, 0, duct_height_fan - duct_wall - duct_top_thickness - 1])
                     hull() {
                         translate([fan_x_duct, fan_y_duct, duct_wall])
-                            cylinder(r = fan_bore(part_fan) / 2, h = duct_height_fan - duct_wall - duct_top_thickness);
+                            difference() {
+                                cylinder(r = fan_bore_r, h = duct_height_fan - duct_wall - duct_top_thickness);
+                                // Cut half of the cylinder so that there is no conflict with the neck
+                                translate([0, -fan_bore_r, 0]) cube([2*fan_bore_r, 2*fan_bore_r, 2*duct_height_fan], center=true);
+                            }
 
                         neck(true);
                     }
