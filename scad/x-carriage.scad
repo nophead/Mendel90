@@ -259,7 +259,7 @@ front_nut_y = - width / 2 + wall;
 gap = 6;
 taper_angle = 30;
 nozzle_height = 6;
-duct_height_nozzle = 20;   // Thickness on the exit side
+duct_height_nozzle = hot_end_duct_height(hot_end);   // Thickness on the exit side
 duct_height_fan = 20;      // Thickness on the fan side
 
 ir = hot_end_duct_radius(hot_end);
