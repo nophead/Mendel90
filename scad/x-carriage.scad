@@ -237,6 +237,7 @@ module x_belt_tensioner_stl()
 }
 
 duct_wall = 2 * 0.35 * 1.5;
+duct_bottom_thickness = 3*layer_height;
 duct_top_thickness = 4*layer_height;
 fan_nut_trap_thickness = 4;
 fan_bracket_thickness = 3;
@@ -286,8 +287,8 @@ module throat(inner) {
 module neck(inner) {
     iw = 2 * (fan_hole_pitch(part_fan) - fan_screw_boss_r) - 3;
     if(inner)
-        translate([fan_x_duct - iw / 2, fan_y_duct - fan_bore(part_fan) / 2, duct_wall])
-            cube([iw, 2 * eta, duct_height_fan - duct_wall - duct_top_thickness]);
+        translate([fan_x_duct - iw / 2, fan_y_duct - fan_bore(part_fan) / 2, duct_bottom_thickness])
+            cube([iw, 2 * eta, duct_height_fan - duct_bottom_thickness - duct_top_thickness]);
     else
         translate([fan_x_duct - fan_width / 2, fan_y_duct - fan_bore(part_fan) / 2, 0])
             cube([fan_width, 2 * eta, duct_height_fan]);
@@ -333,7 +334,7 @@ module x_carriage_fan_duct_stl() {
                 hull() {
                     translate([fan_x_duct, fan_y_duct, duct_wall + duct_height_fan - duct_wall - duct_top_thickness])
                         rotate([180, 0, 0])
-                            rounded_cylinder(r = fan_bore(part_fan) / 2, h = duct_height_fan - duct_wall - duct_top_thickness, r2 = duct_height_fan / 2);
+                            rounded_cylinder(r = fan_bore(part_fan) / 2, h = duct_height_fan - duct_bottom_thickness - duct_top_thickness, r2 = duct_height_fan / 2);
 
                     neck(true);
                 }
