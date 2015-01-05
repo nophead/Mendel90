@@ -127,7 +127,10 @@ module rounded_cylinder(r, h, r2)
             square([r - r2, h]);
             square([r, h - r2]);
             translate([r - r2, h - r2])
-                circle(r = r2);
+                difference() {
+                    circle(r = r2);
+                    translate([-r2, -r2]) square([2*r2, r2]);
+                }
         }
 }
 
