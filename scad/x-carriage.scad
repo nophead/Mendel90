@@ -383,6 +383,7 @@ module x_carriage_fan_duct_stl() {
         //
         // Cold end cooling vent
         //
+        if (hot_end_style(hot_end) != e3d)
         rotate([0, 0, atan2(-fan_x, -fan_y)])
             translate([0, ir + skew, duct_height - top_thickness - 3])
                 rotate([90, 0, 0])
