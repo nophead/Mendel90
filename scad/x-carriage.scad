@@ -273,12 +273,16 @@ fan_z = nozzle_length + hot_end_duct_offset(hot_end)[2] - duct_height_fan - fan_
 fan_x_duct = fan_x - hot_end_duct_offset(hot_end)[0];
 fan_y_duct = -fan_y + hot_end_duct_offset(hot_end)[1];
 
+duct_throat_rotate = -atan(fan_x_duct / (fan_y_duct - fan_width / 2));
+
 module throat(inner) {
     y = or + skew - duct_wall;
     if(inner)
+    rotate([0, 0, duct_throat_rotate])
         translate([-throat_width / 2 + duct_wall, y, nozzle_height])
             cube([throat_width - 2 * duct_wall, 2 * eta, (duct_height_nozzle - nozzle_height) - duct_top_thickness]);
     else
+    rotate([0, 0, duct_throat_rotate])
         translate([-throat_width / 2, y - duct_wall, 0])
             cube([throat_width, 2 * eta, duct_height_nozzle]);
 }
