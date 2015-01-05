@@ -269,7 +269,7 @@ throat_width = (or + skew) * 2;
 
 fan_x = base_offset;
 fan_y = -(width / 2 + fan_width(part_fan) / 2) - (2*X_carriage_clearance + belt_width(X_belt) + belt_clearance);
-fan_z = nozzle_length + hot_end_duct_offset(hot_end)[2] - duct_height_fan - fan_depth(part_fan) / 2;
+fan_z = nozzle_length(hot_end) + hot_end_duct_offset(hot_end)[2] - duct_height_fan - fan_depth(part_fan) / 2;
 
 fan_x_duct = fan_x - hot_end_duct_offset(hot_end)[0];
 fan_y_duct = -fan_y + hot_end_duct_offset(hot_end)[1];
@@ -399,6 +399,7 @@ module x_carriage_fan_duct_stl() {
         //
         // Cold end cooling vent
         //
+        if (hot_end_style(hot_end) != e3d)
         rotate([0, 0, atan2(-fan_x, -fan_y)])
             translate([0, ir + skew, duct_height_nozzle - duct_top_thickness - 3])
                 rotate([90, 0, 0])
@@ -628,7 +629,7 @@ module x_carriage_stl(){
 module x_carriage_fan_assembly() {
     assembly("x_carriage_fan_assembly");
 
-    translate([0, 0, nozzle_length + exploded * 15] + hot_end_duct_offset(hot_end))
+    translate([0, 0, nozzle_length(hot_end) + exploded * 15] + hot_end_duct_offset(hot_end))
         rotate([180, 0, 0])
             color(plastic_part_color("lime")) render() x_carriage_fan_duct_stl();
 
