@@ -12,6 +12,7 @@ use <d-motor_bracket.scad>
 use <vitamins/m90_hot_end.scad>
 use <vitamins/stoffel_hot_end.scad>
 use <vitamins/jhead_hot_end.scad>
+use <vitamins/e3d_hot_end.scad>
 
 spring = false;             // use two nuts or one nut and a spring
 
@@ -38,14 +39,14 @@ mount_pitch = 25;
 filament_x = 75;
 filament_z = 13;
 
-extension = max(0, nozzle_length - hot_end_length(hot_end));
+extension = max(0, nozzle_length(hot_end) - hot_end_length(hot_end));
 extension_width = 30;
 
 jhead_screw = M3_cap_screw;
 jhead_screw_length = 16;
 jhead_washer = M4_washer;
 jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
-                          jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
+                          hot_end_screw_pitch(hot_end) / 2 + washer_diameter(jhead_washer) / 2);
 
 extension_rad = jhead_screw_pitch + 5;
 extension_clearance = 1;
@@ -214,8 +215,8 @@ module wades_block_stl() {
             rotate([90,0,0]) {
                 if(hot_end_groove_mount(hot_end)) assign(relief = 0.5) {
 
-                    translate([0, 0, -insulator_depth + jhead_groove_offset() / 2 + eta])         // slot for the flange
-                        keyhole(insulator / 2, jhead_groove_offset(), width - filament_z);
+                    translate([0, 0, -insulator_depth + hot_end_inset(hot_end) / 2 + eta])         // slot for the flange
+                        keyhole(insulator / 2, hot_end_inset(hot_end), width - filament_z);
 
                     translate([0, 0, -insulator_depth + relief / 2])
                         keyhole(insulator / 2 + 0.5, relief, width - filament_z);           // relief to avoid corner radius
@@ -480,6 +481,8 @@ module wades_assembly(show_connector = true, show_drive = true) {
                 stoffel_hot_end(hot_end);
             if(hot_end_style(hot_end) == jhead)
                 jhead_hot_end(hot_end, exploded = 0);
+            if(hot_end_style(hot_end) == e3d)
+                e3d_hot_end(hot_end, exploded = 0);
        }
     end("hot_end_assembly");
 
