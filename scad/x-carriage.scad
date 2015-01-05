@@ -308,9 +308,9 @@ module x_carriage_fan_duct_stl() {
                     // fan input
                     hull() {
                         for(side = [-1, 1])
-                            translate([fan_x_duct + side * fan_hole_pitch(part_fan), fan_y_duct + fan_hole_pitch(part_fan), 0])
+                          for (front = [-1,1])
+                            translate([fan_x_duct + side * fan_hole_pitch(part_fan), fan_y_duct + front*fan_hole_pitch(part_fan), 0])
                                 cylinder(r = fan_screw_boss_r, h = duct_height_fan);
-                        neck(false);
                     }
                     // neck
                     hull() {
