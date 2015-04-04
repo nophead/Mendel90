@@ -216,7 +216,7 @@ module wades_block_stl() {
                 if(hot_end_groove_mount(hot_end)) assign(relief = 0.5) {
 
                     translate([0, 0, -insulator_depth + hot_end_inset(hot_end) / 2 + eta])         // slot for the flange
-                        keyhole(insulator / 2, hot_end_inset(hot_end), width - filament_z);
+                        keyhole(insulator / 2, hot_end_inset(hot_end) + eta, width - filament_z);
 
                     translate([0, 0, -insulator_depth + relief / 2])
                         keyhole(insulator / 2 + 0.5, relief, width - filament_z);           // relief to avoid corner radius

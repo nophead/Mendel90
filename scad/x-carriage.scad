@@ -249,11 +249,11 @@ fan_screw_length = screw_longer_than(fan_depth(part_fan) + fan_bracket_thickness
 fan_width = max(2 * fan_hole_pitch(part_fan) + screw_boss_diameter(fan_screw), fan_bore(part_fan) + 2 * wall);
 fan_screw_boss_r = fan_width / 2 - fan_hole_pitch(part_fan);
 
+front_nut_z = 3;
 front_nut_width = 2 * nut_radius(M3_nut) + wall;
-front_nut_height = 2 * nut_radius(M3_nut) * cos(30) + wall;
+front_nut_height = front_nut_z + nut_flat_radius(M3_nut) + wall;
 front_nut_depth = wall + nut_trap_depth(M3_nut);
 front_nut_pitch = min((bar_x - bearing_holder_length(X_bearings) / 2 - nut_radius(M3_nut) - 0.3), fan_hole_pitch(part_fan) - 5);
-front_nut_z = 3;
 front_nut_y = - width / 2 + wall;
 
 gap = 6;
@@ -530,7 +530,6 @@ module x_carriage_stl(){
                                             inner_base_shape();
                                             translate([-base_offset, -hole_offset])
                                                 rounded_square(hole + 2 * wall, hole_width + 2 * wall, corner_radius + wall);
-
                                         }
                             }
                             // ribs between bearing holders
@@ -542,7 +541,7 @@ module x_carriage_stl(){
                             // Front nut traps for large fan mount
                             for(end = [-1, 1])
                                 translate([end * (bar_x - bearing_holder_length(X_bearings) / 2 - front_nut_width / 2 + eta) - front_nut_width / 2,
-                                            -width / 2 + wall, -top_thickness - eta])
+                                            -width / 2 + wall, top_thickness - rim_thickness / 2 - eta])
                                      cube([front_nut_width, front_nut_depth, front_nut_height]);
 
                          }
@@ -663,7 +662,7 @@ module x_carriage_assembly(show_extruder = true, show_fan = true) {
     // Fan bracket screws
     //
     for(side = [-1, 1])
-        translate([fan_x + side * front_nut_pitch, -width / 2 - fan_bracket_thickness, front_nut_z + duct_top_thickness]) {
+        translate([fan_x + side * front_nut_pitch, -width / 2 - fan_bracket_thickness, front_nut_z + top_thickness]) {
             rotate([90, 0, 0])
                 screw_and_washer(M3_cap_screw, 10);
 

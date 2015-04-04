@@ -18,9 +18,9 @@ m90_hot_end_12p75mm = [m90,      "HEM90340: Mendel 90 hot end", 57, 10,         
 JHeadMk4 =            [jhead,   "HEJH16340: JHead MK4 hot end", 64, 5.1,         16,    50, "black", 12,            true, 4.64, 10.19 + 4, [0, 2.94, -5],  20, 20];
 JHeadMk5 =            [jhead,   "HEJH16340: JHead MK5 hot end", 54, 5.1,         16,    40, "black", 12,            true, 4.64, 9     + 4, [0, 2.38, -5],  20, 20];
 
-e3dv6 =               [e3d,     "e3d V6 3mm direct",            62, 3.7,         16,  42.7, "lightgrey",  12,       true,    6,        15, [1, 5, -5], 15, 25];
-e3dv5 =               [e3d,     "e3d V5 3mm direct",            70, 3.7,         16,  50.1, "lightgrey",  12,       true,    6,        15, [1, 5, -5], 15, 31];
-e3d_clone =           [e3d,     "e3d clone aliexpress",         66, 6.8,         16,    46, "lightgrey",  12,       true,  5.6,        15, [1, 5, -5], 15, 25];
+e3dv6 =               [e3d,     "E3D V6 3mm direct",            62, 3.7,         16,  42.7, "lightgrey",  12,       true,    6,        15, [1, 5, -4], 15, 25];
+e3dv5 =               [e3d,     "E3D V5 3mm direct",            70, 3.7,         16,  50.1, "lightgrey",  12,       true,    6,        15, [1, 5, -5], 15, 31];
+e3d_clone =           [e3d,     "E3D clone aliexpress",         66, 6.8,         16,    46, "lightgrey",  12,       true,  5.6,        15, [1, 5, -5], 15, 25];
 
 function hot_end_style(type)              = type[0];
 function hot_end_part(type)               = type[1];

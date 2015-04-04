@@ -17,7 +17,7 @@ X_motor = NEMA17;
 Y_motor = NEMA17;
 Z_motor = NEMA17;
 
-hot_end = JHeadMk5;
+hot_end = e3dv6;
 
 X_travel = 214;
 Y_travel = 214;

@@ -20,7 +20,7 @@ module e3d_nozzle(type) {
             cylinder(r1=1.3/2, r2=3/2, h=2);
             translate([0, 0, 2]) cylinder(r = 8/2, h=nozzle_h-2, $fn=6);
         }
-        translate([0, 0, -eta]) cylinder(d=0.5, h=nozzle_h+ 2*eta);
+        translate([0, 0, -eta]) cylinder(r =0.5 / 2, h=nozzle_h+ 2*eta);
     }
 }
 
@@ -38,10 +38,10 @@ fan_x_offset = rad_dia/2 + 4;
 
 module e3d_resistor(type) {
     translate([11-heater_x, -3-heater_y, heater_height/2+nozzle_h]) {
-        color("grey") rotate([-90, 0, 0]) cylinder(d=resistor_dia, h=resistor_len);
+        color("grey") rotate([-90, 0, 0]) cylinder(r=resistor_dia / 2, h=resistor_len);
         color("red") translate([-3.5/2, resistor_len  + 3.5/2  +1, 0]) {
-            cylinder(d=3.5, h=36);
-            translate([3.5, 0, 0]) cylinder(d=3.5, h=36);
+            cylinder(r=3.5 / 2, h=36);
+            translate([3.5, 0, 0]) cylinder(r=3.5 / 2, h=36);
         }
 
 
@@ -53,12 +53,12 @@ module heater_block(type) {
         translate([0, 0, nozzle_h]) difference() {
             color("lightgrey") union() {
                 // Heat break
-                cylinder(d=4, h=heater_height + 10);
+                cylinder(r=2, h=heater_height + 10);
                 translate([-heater_x, -heater_y, 0])  {
                     cube([heater_length, heater_width, heater_height]);
                 }
             }
-            cylinder(d=3, h=heater_height + 10 + eta); // Filament hole
+            cylinder(r=3/ 2, h=heater_height + 10 + eta); // Filament hole
         }
 
         e3d_resistor(type);
@@ -85,13 +85,13 @@ module e3d_rad(type) {
 
 module e3d_fan_duct(type) {
     color("DeepSkyBlue")
-    difference() {
+    render(convexity = 3) difference() {
         hull() {
             translate([-8, -23/2, 0]) cube([eta, 23, 26]);
             translate([fan_x_offset, -30/2, 0]) cube([eta, 30, 30]);
         }
-        cylinder(h=70, d=rad_dia+0.1, center=true); // For rad
-        translate([0, 0, 15])  rotate([0, 90, 0]) cylinder(d=rad_dia, h=50);
+        cylinder(h=70, r = (rad_dia+0.1) / 2, center=true); // For rad
+        translate([0, 0, 15])  rotate([0, 90, 0]) cylinder(r = rad_dia / 2, h=50);
     }
 }
 
@@ -117,7 +117,7 @@ module e3d_hot_end(type) {
                 translate([0, 0, insulator_length - hot_end_inset(type) - groove_h / 2])
                     tube(ir = groove_dia / 2, or = hot_end_insulator_diameter(type) / 2 + eta, h = groove_h);
             }
-            e3d_rad(e3d_china);
+            e3d_rad(type);
         }
     }
 
@@ -145,4 +145,4 @@ module e3d_hot_end(type) {
 
 }
 
-e3d_hot_end(e3d_china);
+e3d_hot_end(e3d_clone);
