@@ -57,8 +57,10 @@ pulley_type = T2p5x16_metal_pulley;
 
 Y_carriage = DiBond;
 
-X_belt = T2p5x6;
-Y_belt = T2p5x6;
+pulley_type = GT2x20_metal_pulley;
+X_belt = GT2x6;
+Y_belt = GT2x6;
+
 motor_shaft = 5;
 Z_screw_dia = 5;            // Studding for Z axis
 

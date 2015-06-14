@@ -104,7 +104,6 @@ thermistor_wires_hole_radius = wire_hole_radius(thermistor_wires);
 
 cnc_sheets = false;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
 base_nuts = false;                  // Need something under the base if using nuts
-pulley_type = T5x8_plastic_pulley;
 clip_handles = true;
 include_fan = false;
 squeeze = false;                    // Bodge to make Huxley as small as possible without affecting dibond kits

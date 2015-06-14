@@ -21,9 +21,11 @@ module pulley_assembly() {
         else
             color(pulley_color) render() pulley_stl();
 
-    translate([0, pulley_bore(type) / 2 + pulley_screw_length(type), pulley_screw_z(type) + pulley_offset(type)[2]])
-        rotate([-90, 0, 0])
-            screw(pulley_screw(type), pulley_screw_length(type));
+	translate([0, 0, pulley_screw_z(type) + pulley_offset(type)[2]])
+		for(i = [0 : pulley_screws(type) - 1])
+			rotate([-90, 0, i * -90])
+				translate([0, 0, pulley_bore(type) / 2 + pulley_screw_length(type)])
+					screw(pulley_screw(type), pulley_screw_length(type));
 
     if(pulley_nut_y(type))
         translate([0, pulley_nut_y(type), pulley_screw_z(type) + pulley_offset(type)[2]])

@@ -501,7 +501,7 @@ module x_end_assembly(motor_end) {
                     rotate([180, 0, 0])
                         washer(M3_washer) washer(M3_washer) washer(M3_washer) screw(M3_cap_screw, 45);
 
-                translate([0, 0, 4])
+                translate([0, 0, 5])
                     pulley_assembly();
                 //
                 // Heatshrink for motor connections
