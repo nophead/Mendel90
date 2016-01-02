@@ -47,11 +47,11 @@ def accessories(machine, assembly = None):
 
 if __name__ == '__main__':
     args = len(sys.argv)
-    if args > 1:
-        if args > 2:
+    if args in [2,3]:
+        if args == 3:
             accessories(sys.argv[1], sys.argv[2])
         else:
             accessories(sys.argv[1])
     else:
-        print("usage: accessories mendel|sturdy|your_machine [assembly_name]")
+        print("usage: accessories dibond|mendel|sturdy|your_machine [assembly_name]")
         sys.exit(1)

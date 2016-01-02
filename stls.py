@@ -5,6 +5,7 @@ import openscad
 import shutil
 import sys
 import c14n_stl
+from set_machine import *
 
 from bom import source_dir
 
@@ -40,9 +41,7 @@ def stls(machine, parts = None):
     #
     # Set the target machine
     #
-    f = open(source_dir + "/conf/machine.scad","wt")
-    f. write("include <%s_config.scad>\n" % machine);
-    f.close()
+    set_machine(machine)
 
     #
     # Decide which files to make
@@ -98,5 +97,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         stls(sys.argv[1], sys.argv[2:])
     else:
-        print("usage: stls [mendel|sturdy|your_machine] [part.stl ...]")
+        print("usage: stls dibond|mendel|sturdy|your_machine [part.stl ...]")
     sys.exit(1)

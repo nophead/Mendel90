@@ -4,6 +4,7 @@ import os
 import sys
 import shutil
 import openscad
+from set_machine import *
 
 
 
@@ -16,9 +17,8 @@ def views(machine):
     #
     # Set the target machine
     #
-    f = open("scad/conf/machine.scad","wt")
-    f.write("include <%s_config.scad>\n" % machine);
-    f.close()
+    set_machine(machine)
+
     #
     # List of individual part files
     #
@@ -66,5 +66,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         views(sys.argv[1])
     else:
-        print "usage: views [mendel|sturdy|your_machine]"
+        print "usage: views dibond|mendel|sturdy|your_machine"
         sys.exit(1)
