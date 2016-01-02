@@ -11,6 +11,7 @@
 include <conf/config.scad>
 use <bearing-holder.scad>
 use <wade.scad>
+use <fan-guard.scad>
 
 hole = 36;
 width = hole + 2 * bearing_holder_width(X_bearings);
@@ -257,8 +258,9 @@ front_nut_y = - width / 2 + wall;
 
 gap = 6;
 taper_angle = 30;
+duct_height = 12;
 nozzle_height = 6;
-duct_height = 20;
+throat_nozzle_height = max(duct_height - 14, duct_wall);
 ir = hot_end_duct_radius(hot_end);
 or = ir + duct_wall + gap + duct_wall;
 skew = nozzle_height * tan(taper_angle);
@@ -273,8 +275,8 @@ fan_y_duct = -fan_y + hot_end_duct_offset(hot_end)[1];
 module throat(inner) {
     y = or + skew - duct_wall;
     if(inner)
-        translate([-throat_width / 2 + duct_wall, y, nozzle_height])
-            cube([throat_width - 2 * duct_wall, 2 * eta, (duct_height - nozzle_height) - top_thickness]);
+        translate([-throat_width / 2 + duct_wall, y, throat_nozzle_height])
+            cube([throat_width - 2 * duct_wall, 2 * eta, (duct_height - throat_nozzle_height) - top_thickness]);
     else
         translate([-throat_width / 2, y - duct_wall, 0])
             cube([throat_width, 2 * eta, duct_height]);
@@ -453,6 +455,7 @@ module x_carriage_fan_bracket_stl() {
                 poly_cylinder(r = screw_clearance_radius(fan_screw), h = 100, center = true);
         }
     }
+	fan_guard(part_fan);
 }
 
 bearing_gap = 5;
@@ -621,7 +624,7 @@ module x_carriage_fan_assembly() {
         rotate([180, 0, 0]) {
             for(x = [-1, 1])
                 for(y = [-1,1])
-                    translate([x * fan_hole_pitch(part_fan), y * fan_hole_pitch(part_fan), fan_depth(part_fan) / 2 + (y < 0 ? fan_bracket_thickness : 0)])
+                    translate([x * fan_hole_pitch(part_fan), y * fan_hole_pitch(part_fan), fan_depth(part_fan) / 2 + (y < 0 ? fan_bracket_thickness : /*fan_guard_thickness*/ 2)])
                         screw_and_washer(fan_screw, fan_screw_length);
             fan_hole_positions(part_fan) group() {
                 rotate([180, 0, 0])
@@ -757,4 +760,7 @@ if(0)
         else
             x_carriage_parts_stl();
 else
-    x_carriage_assembly(true);
+x_carriage_fan_bracket_stl();
+//    x_carriage_assembly(true);
+
+

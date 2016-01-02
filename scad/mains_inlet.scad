@@ -29,67 +29,176 @@ function mains_inlet_top_width() = mains_inlet_width() - 2 * tab;
 function mains_inlet_inset() = tab + thickness;
 function mains_inlet_depth() = depth - terminal_depth;
 
-module mains_inlet_stl() {
-    height = mains_inlet_height();
-    width = mains_inlet_width();
+$fn=360;
+length=115-6;
+width=50;
+height=50-9.5;
+hole_d=8.25;
+hole_spacing=10;
+access_hole_d=6.5;
+mount_hole_d=3;
 
-    stl("mains_inlet");
 
-    difference() {
-        translate([0, 0, depth / 2])                    // main body
-            cube([width, height, depth], center = true);
+module block()
+//big block chevy
+{
+    difference()
+    {
+        cube([length,width,height]);
+        translate([length*.04, width*.1, height]) cube([length-length*.08,width,height]);
+    }
+}
+module wire_holes()
+//holes for wires and perhaps terminal clips/sockets/adapters
+//depending on what you have at the end of your wires, i use prongs
+{
+//    #translate([length*.08, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+//    #translate([length*.17, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+//    #translate([length*.26, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+    #translate([length*.35, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+    #translate([length*.44, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+    #translate([length*.53, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+    #translate([length*.62, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+//    #translate([length*.71, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+//    #translate([length*.80, width+1, height*.8]) rotate([90,0,0]) cylinder(h=width+2, r=hole_d/2);
+}
+module access_holes()
+//holes at the top allow you to access the terminals
+//with a screwdriver without removing the cover
+{
+//    #translate([length*.08, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
 
-        difference() {
-            translate([0, -thickness, depth / 2])
-                cube([width - 2 * tab - 2 * thickness, height, depth - 2 * thickness], center = true);        // hollow inside
-            for(side = [-1, 1])
-                translate([side * hole_pitch / 2, height / 2 - thickness - cut_out_width / 2, 0])
-                    cylinder(r = washer_diameter(M3_washer) / 2, h = 10);
-        }
+ translate([50, 3, -1]) cube([49, 26, 22.5]);
 
-        translate([-thickness - tab, - height / 2 + eta, depth])
-            cube([width, terminal_height * 2, terminal_depth * 2], true);           // cut out for terminal strip
+// translate([52.5, 4.5, -1]) cube([49, 26, 22.5]);
+//    {
+//        cube([27.5, 20, 4]);
+//        rotate([90,0,0]) cylinder(h=55,r=1.2);
+//    }
+//    #translate([length*.17, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+//    #translate([length*.26, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+//    #translate([length*.35, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+//    #translate([length*.44, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+//    #translate([length*.53, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+//    #translate([length*.62, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+//    #translate([length*.71, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+//    #translate([length*.80, width*.5, -1]) cylinder(h=width+2, r=access_hole_d/2);
+}
 
-        translate([0, height / 2 - cut_out_width / 2 - thickness, 0])
-            cube([cut_out_length, cut_out_width, 2 * thickness + 1], center = true);    // connector apperture
+module mount_holes()
+//optional, could just use wood screws and make your own holes for mounting
+{
+    
+    translate([-1,width*.2,29.3]) rotate([0,90,0]) cylinder(h=length+2, r=mount_hole_d/2);
+    translate([-1,width*.6,29.3]) rotate([0,90,0]) cylinder(h=length+2, r=mount_hole_d/2);
+    
+}
 
-        for(side = [-1, 1]) {
-            //
-            // mounting screw holes
-            //
-            for(z = side > 0 ? [depth - holes, holes] : [depth - terminal_depth - holes])
-                translate([side * (width / 2 - tab / 2), - height / 2, z])
-                    rotate([90, 0, 0]) teardrop_plus(r = screw_clearance_radius(base_screw), h = foot * 2 + 1, center = true);
+module circles()
+//curved lip along the bottom makes for easy install and it's pretty too...
+{
+    translate([-1,width*1.2,height+width*.5]) rotate([0,90,0]) cylinder(h=length+2, r=width*.8);
+}
 
-            translate([side * width / 2, foot, 1])
-                cube([tab * 2,  height, depth * 2], center = true);     // cut outs for lugs
+module extras()
+//leaves some extra material along the edges for strength
+{
+    translate([length*.018,height*.055,height*.1]) cube([length-length*0.036,width,height]);
+    translate([length*.04,width*.4, height*.05]) cube([length-length*0.08,width,height*.1]);
+}
 
-            translate([side * hole_pitch / 2, height / 2 - thickness - cut_out_width / 2, 0])
-                poly_cylinder(r = M3_tap_radius, h = depth, center = true);
-        }
+module beef()
+//thicken up some areas
+{
+	difference()
+	{
+		translate([length*.97, width*.1, height*.33]) cube([length*.030, width*.65, height*.43]);
+		translate([length*.94, width*.2, height*.2]) rotate([0,0,65]) cube([length*.1, width*.5, height*.6]);
+	}
+}
 
+module cover()
+//the basic cover with wire/access holes
+{
+    difference()
+    {
+        block();
+        wire_holes();
+        access_holes();
+        led_hole();
+        extras();
+        circles();
     }
 }
 
-module mains_inlet_holes()
-    for(side = [-1, 1])
-        for(z = side > 0 ? [depth - holes, holes] : [depth - terminal_depth - holes])
-            translate([side * (mains_inlet_width() / 2 - tab / 2), -mains_inlet_height() / 2 + foot, z])
-                rotate([-90, 0, 0])
-                        child();
+module cover_beefy()
+//add material to minimize warping and for mounting screw holes
+{
+	cover();
+    beef();
+    	
+	//translate([length*.4,0,0-height*.2236]) scale([.5,1,1]) beef();
+
+	#scale([1,1,1]) translate([length, 0, 0]) mirror([1,0,0]) beef();
+	//#scale([.6,1,1]) translate([length, 0, 0-height*.25]) mirror([1,0,0]) beef();
+}
+
+module grill()
+{
+	union()
+	{
+		//horizontal bars
+		translate([4.848, 0, height*.76]) cube([hole_d*1.925, 1.75, .8]);
+		translate([4.848, 0, height*.835]) cube([hole_d*1.925, 1.75, .8]);
+		translate([4.848, 0, height*.91]) cube([hole_d*1.925, 1.75, .8]);
+
+		//vertical bars
+		//translate([length*.875, 0, height*.7]) cube([.8, 1.75, hole_d*1.7]);
+		//translate([length*.9125, 0, height*.7]) cube([.8, 1.75, hole_d*1.7]);
+		//translate([length*.95, 0, height*.7]) cube([.8, 1.75, hole_d*1.7]);
+	}
+}
+
+module led_hole()
+//big rounded square for easy viewing of the power led from wide angles
+{
+    translate([6.937, width+1, height*.78]) minkowski()
+    {
+        cube([hole_d*.438, width+1, hole_d*.63]);
+        rotate([90,0,0]) cylinder(h=55,r=1.2);
+    }
+}
+module printable()
+//make mounting holes go all the way through
+{
+	grill();
+	difference()
+	{
+		cover_beefy();
+		mount_holes();
+	}
+}
+
+
+
+module mains_inlet_stl() {
+    //rotated and centered
+translate([(-50+9.5+18),-3,50])  rotate([270,0,270])printable();
+}
+
+
 
 
 
 module mains_inlet_assembly() {
     assembly("mains_inlet_assembly");
-    translate([-mains_inlet_depth(), -mains_inlet_width() / 2 + mains_inlet_inset(),  mains_inlet_height() / 2]) rotate([90, 0, 90]) {
+     {
 
         color(plastic_part_color("lime")) render() mains_inlet_stl();
         //
         // Mounting screws and washers
         //
-        mains_inlet_holes()
-            frame_screw(foot);
+     
     }
     end("mains_inlet_assembly");
 }
