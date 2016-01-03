@@ -7,7 +7,7 @@
 //
 // Bed fan assembly view
 //
-// assembly 958 958 -175 101 85 62 0 214 620
+// assembly 958 958 -175 101 85 62 0 214 326
 //
 use <../scad/main.scad>
 

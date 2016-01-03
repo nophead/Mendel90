@@ -7,7 +7,7 @@
 //
 // Wade's assembly view
 //
-// assembly 929 904 66 39 -6 241 0 38 900
+// assembly 929 904 66 39 -6 241 0 38 450
 //
 use <../scad/wade.scad>
 

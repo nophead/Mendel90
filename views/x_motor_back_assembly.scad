@@ -7,11 +7,10 @@
 //
 // The x motor assembly view
 //
-// assembly  1141 965 46 11 10.4 46 0 234 760
+// assembly  1141 965 46 11 10.4 46 0 234 380
 //
 use <../scad/main.scad>
 
-//view([ -27.61, -56.21, 34.43 ], [ 57.80, 0.00, 304.50 ], 1161.53)
 x_motor_assembly();
 
 $exploded = 1;

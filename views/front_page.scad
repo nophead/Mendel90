@@ -7,7 +7,7 @@
 //
 // The front page picture for the instructions
 //
-// view 1644 1930 -15.4 29.1 252.25 73.2 0.00 27.8 3331
+// view 1644 1930 -15.4 29.1 252.25 73.2 0.00 27.8 1960
 //
 use <../scad/main.scad>
 

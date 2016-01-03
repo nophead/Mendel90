@@ -7,8 +7,8 @@
 //
 // The Z motor assembly view
 //
-// assembly  1057 965 -2.5 10.5 15 55 0 25 556
-// assembled 1057 965 10  -6.3 0   59 0 42 556
+// assembly  1057 965 -2.5 10.5 15 55 0 25 278
+// assembled 1057 965 10  -6.3 0   59 0 42 278
 //
 use <../scad/z-motor-bracket.scad>
 

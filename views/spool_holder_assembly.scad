@@ -7,11 +7,10 @@
 //
 // The spool holder assembly view
 //
-// assembly 1300 965 -240.32 127.70 350.89 65.50 0.00 74.00 1300
+// assembly 1300 965 -240.32 127.70 350.89 65.50 0.00 74.00 650
 //
 use <../scad/spool_holder.scad>
 
-//view([-240.32, 127.70, 350.89 ],[ 65.50, 0.00, 74.00 ], 1161.53)
 spool_assembly(show_spool = false);
 
 $exploded = 1;

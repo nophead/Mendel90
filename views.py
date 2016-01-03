@@ -36,13 +36,13 @@ def views(machine):
                     w = int(words[2]) * 2
                     h = int(words[3]) * 2
 
-                    dx = -float(words[4])
-                    dy = -float(words[5])
-                    dz = -float(words[6])
+                    dx = float(words[4])
+                    dy = float(words[5])
+                    dz = float(words[6])
 
-                    rx = 360.0 - float(words[7]) + 90
-                    ry = 360.0 - float(words[8])
-                    rz = 360.0 - float(words[9])
+                    rx = float(words[7])
+                    ry = float(words[8])
+                    rz = float(words[9])
 
                     d = float(words[10])
                     camera = "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f" % (dx, dy, dz, rx, ry, rz, d)

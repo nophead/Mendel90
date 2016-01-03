@@ -7,7 +7,7 @@
 //
 // Hotend assembly view
 //
-// assembly 872 881 14.22 -15.83 -29.08 56.40 0.00 25.00 762.08
+// assembly 872 881 14.22 -15.83 -29.08 56.40 0.00 25.00 520
 //
 use <../scad/vitamins/jhead_hot_end.scad>
 

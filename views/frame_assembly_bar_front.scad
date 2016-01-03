@@ -7,7 +7,7 @@
 //
 // Frame front bar detail
 //
-// assembly 958 842 171 -154 -26 65.5 0 314 556
+// assembly 958 842 171 -154 -26 65.5 0 314 290
 //
 use <../scad/main.scad>
 
