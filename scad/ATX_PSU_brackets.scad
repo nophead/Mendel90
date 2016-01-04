@@ -28,40 +28,48 @@ nut_depth = frame_nut_traps ? nut_trap_depth(frame_nut) : 0;
 module atx_long_bracket_stl() {
     stl("atx_long_bracket");
 
-    translate([offset, width / 2, thickness / 2]) difference() {
+  rotate([0, 0, 180])
+    translate([-offset, 0, 0]) difference() {
         union() {
-            hull() {
-                translate([0, -width / 4, 0])
-                    cube([length - 2 * tab_length, width / 2, thickness], center = true);
+            // base
+            linear_extrude(height = thickness)
+                hull() {
+                    translate([0, -width / 4, 0])
+                        square([length - 2 * tab_length, width / 2], center = true);
 
-                for(end = [-1, 1])
-                    translate([end * (length  / 2 - tab_length - width / 2), 0, 0])
-                        cylinder(r = width / 2, h = thickness, center = true);
-            }
-            for(end = [-1, 1]) assign(height =  end == -1 ? tab_height : tab_height2)
-                translate([end * (length / 2 - tab_length / 2 - eta), -(width - tab_thickness) / 2, (height - thickness) / 2])
+                    for(end = [-1, 1])
+                        translate([end * (length  / 2 - tab_length - width / 2), -width / 2])
+                            circle(width / 2);
+                }
+            // tabs
+            for(end = [-1, 1]) {
+                height =  end == 1 ? tab_height : tab_height2;
+                translate([end * (length / 2 - tab_length / 2 - eta), -tab_thickness / 2, height / 2])
                     cube([tab_length, tab_thickness, height], center = true);
-
+            }
+            // nut traps
             if(frame_nut_traps)
                 for(end = [-1, 1])
-                    translate([end * (length  / 2 - tab_length - width / 2), 0, eta])
-                        linear_extrude(height = thickness / 2 + nut_depth, convexity = 5)
+                    translate([end * (length  / 2 - tab_length - width / 2), 0, 0])
+                        linear_extrude(height = thickness + nut_depth, convexity = 5)
                             union() {
-                                translate([end * width / 2, (tab_thickness - width) / 2])
-                                    square([tab_length, tab_thickness], center = true);
-                                circle(r = width / 2 - eta);
+                                translate([end * width / 4, -tab_thickness / 2])
+                                    square([width / 2 + eta, tab_thickness], center = true);
+
+                                translate([2 * end * eta, -width / 2 -eta])
+                                    circle(r = width / 2 + eta);
                             }
         }
         rotate([0, 0, 180])
             for(end = [-1, 1])
-                translate([end * (length / 2 - tab_length - width / 2), 0, thickness / 2 + nut_depth + eta])
+                translate([end * (length / 2 - tab_length - width / 2), width / 2, thickness + nut_depth + eta])
                     if(frame_nut_traps)
                         nut_trap(screw_clearance_radius(frame_screw), nut_radius(frame_nut), nut_depth);
                     else
                         poly_cylinder(r = screw_clearance_radius(frame_screw), h = 100, center = true);
 
         for(end = [-1, 1])
-            translate([end * (length / 2 - psu_hole_x), 0, (end == -1 ? psu_hole_z : psu_hole_z2) - thickness / 2])
+            translate([end * (length / 2 - psu_hole_x), 0, end == 1 ? psu_hole_z : psu_hole_z2])
                 rotate([90, 0, 0])
                     teardrop_plus(r = screw_clearance_radius(No632_pan_screw), h = 100, center = true);
     }
