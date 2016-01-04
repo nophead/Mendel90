@@ -28,12 +28,11 @@ module z_screw_pointer_stl() {
         union() {
             linear_extrude(height = wall)
                 hull() {
-                    circle(r = outer_rad, center = true);
+                    circle(outer_rad);
                     translate([pointer - filament_width, 0, 0])
                         square(filament_width * 2, center = true);
                 }
-            translate([0,0, eta])
-                cylinder(r = outer_rad, h = height);
+            cylinder(r = outer_rad + 0.001, h = height);
         }
         poly_cylinder(r = inner_rad, h = 2 * height + 1, center = true);
     }
