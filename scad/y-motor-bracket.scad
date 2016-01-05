@@ -29,7 +29,7 @@ module y_motor_bracket_holes()
         for(z = [thickness - depth + holes, thickness - holes])
             translate([side * (y_motor_bracket_width() / 2 - tab / 2 + nut_offset), -y_motor_bracket_height() / 2 + part_base_thickness, z])
                 rotate([-90, 0, 0])
-                    child();
+                    children();
 
 module y_motor_bracket() {
     height = y_motor_bracket_height();

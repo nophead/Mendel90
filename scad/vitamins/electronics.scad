@@ -27,11 +27,12 @@ function controller_accessories(type) = type[4];
 module controller_screw_positions(type) {
     inset = controller_hole_inset(type);
 
-    for($i = [0:3])
-        assign(x = [inset, controller_width(type) - inset][$i % 2])
-        assign(y = [inset, controller_length(type) - inset][$i / 2])
-            translate([x, y, 0])
-                child();
+    for($i = [0:3]) {
+        x = [inset, controller_width(type) - inset][$i % 2];
+        y = [inset, controller_length(type) - inset][$i / 2];
+        translate([x, y, 0])
+            children();
+   }
 }
 
 module controller(type) {
@@ -133,5 +134,5 @@ module psu(type) {
 module psu_screw_positions(type) {
     for(point = psu_hole_list(type))
         translate(point)
-            child();
+            children();
 }

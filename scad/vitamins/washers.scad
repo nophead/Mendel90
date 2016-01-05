@@ -41,7 +41,7 @@ module washer(type) {
     }
     if($children)
         translate([0, 0, thickness])
-            child();
+            children();
 }
 
 module star_washer(type) {
@@ -63,5 +63,5 @@ module star_washer(type) {
     }
     if($children)
         translate([0, 0, thickness])
-            child();
+            children();
 }

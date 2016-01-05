@@ -138,19 +138,19 @@ module atx_screw_positions(psu, base = false) {
                     psu_width(psu) / 2 - sb_corner_offset - sb_base_width / 2,
                     psu_height(psu) + sb_wall - sb_height / 2 + layer_height + sb_clearance])
             rotate([90, 0, 90])
-                child();
+                children();
 
     else {
         for(end = [-1, 1])
             translate([end * (length  / 2 - tab_length - width / 2) - offset, -psu_width(psu) / 2 - width / 2, thickness])
-                child();
+                children();
 
         if(sb_frame_screw)
             translate([-psu_length(psu) / 2 + sb_corner_offset + sb_frame_width / 2,
                         psu_width(psu) / 2 + sb_frame_offset - sb_frame_thickness + (frame_nut_traps ? nut_trap_depth(frame_nut) : 0),
                         psu_height(psu) + sb_wall - sb_height / 2 + sb_clearance])
                 rotate([90, 0, 0])
-                    child();
+                    children();
     }
 }
 
@@ -192,11 +192,12 @@ module atx_bracket_assembly(show_psu = false) {
         psu(psu);
 
     for(j = [0 : len(sleeving) - 1])
-        for(i = [0 : sleeving[j][1] - 1])
-            assign(od = tubing_od(sleeving[j][0]))
+        for(i = [0 : sleeving[j][1] - 1]) {
+            od = tubing_od(sleeving[j][0]);
             translate([psu_length(psu) / 2 + 8,  psu_width(psu) / 2 - 15 - sleeve_pos(j), 12 + i * (od + 1) + od / 2])
                 rotate([0, 90, 0])
                     tubing(sleeving[j][0]);
+        }
 
     translate([psu_length(psu) / 2 + 10, -psu_width(psu) / 2 + 20, 20])
         rotate([90, 0, 0])

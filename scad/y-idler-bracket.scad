@@ -83,7 +83,7 @@ nut_offset = base_nut_traps ? -tab_length / 2 + nut_radius(base_nut) + 0.5 : 0;
 
 module y_idler_screw_hole_position()
     translate([0, dia / 2 + wall + tab_length / 2 + nut_offset,0])
-        child();
+        children();
 
 module y_idler_screw_hole()
     y_idler_screw_hole_position()

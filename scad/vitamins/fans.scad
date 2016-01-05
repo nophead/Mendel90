@@ -7,6 +7,7 @@
 // based on http://www.thingiverse.com/thing:8063 by MiseryBot, CC license
 
 fan80x38 = [80, 38, 75, 35.75, M4_cap_screw, 40,   4.3, 84];
+fan80x25 = [80, 25, 75, 35.75, M4_cap_screw, 40,   4.3, 84];
 fan70x15 = [70, 15, 66, 30.75, M4_cap_screw, 29,   3.8, 70];
 fan60x25 = [60, 25, 57, 25,    M4_cap_screw, 31.5, 3.6, 64];
 fan60x15 = [60, 15, 57, 25,    M4_cap_screw, 29,   2.4, 60];
@@ -72,7 +73,7 @@ module fan_hole_positions(type) {
     for(x = [-hole_pitch, hole_pitch])
         for(y = [-hole_pitch, hole_pitch])
             translate([x, y, fan_depth(type) / 2])
-                child();
+                children();
 }
 
 module fan_holes(type, poly = false) {

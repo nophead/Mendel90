@@ -49,6 +49,9 @@ module nut(type, nyloc = false, brass = false) {
         translate([0, 0, -1])
             cylinder(r = hole_rad, h = nyloc_thickness + 2);
     }
+    if($children)
+        translate([0, 0, thickness])
+            children();
 }
 
 module nut_and_washer(type, nyloc) {

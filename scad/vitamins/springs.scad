@@ -65,7 +65,7 @@ module comp_spring(type, l = 0) {
 
     if($children)
         translate([0, 0, l])
-            child();
+            children();
 }
 
 //comp_spring(extruder_spring);

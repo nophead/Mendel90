@@ -26,25 +26,13 @@ module bulldog_shape(depth, height, radius, open) {
 }
 
 module shell(length, width, height, wall) {
-    difference() {
-        linear_extrude(height = height, center = true, convexity = 5)
-            child();
-        linear_extrude(height = height + 1, center = true, convexity = 5)
-            difference() {
-                square([length - 2 * wall, width - 2 * wall], center = true);
-                minkowski() {
-                    difference() {
-                        square([length + 1, width + 1], center = true);
-                        translate([10,0])
-                            square([length + 1, 2 * wall + eta], center = true);
-                        child();
-                     }
-                     circle(r = wall, center = true);
-                }
-            }
-    }
+    linear_extrude(height = height, center = true, convexity = 5)
+        difference() {
+            children();
+            offset(-wall)
+                children();
+        }
 }
-
 
 module bulldog(type, open = 4) {
     tube = bulldog_tube(type);
@@ -61,6 +49,7 @@ module bulldog(type, open = 4) {
                 rotate([90, 0, 0])
                     shell(depth, bulldog_height(type), bulldog_length(type), thickness)
                         bulldog_shape(depth, bulldog_height(type), bulldog_radius(type), gap);
+
                 translate([depth - tube - eta, 0, 0])
                     cube([depth, bulldog_length(type) + 1, 100], center = true);
             }

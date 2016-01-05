@@ -26,6 +26,9 @@ module ball_bearing(type) {
                 cylinder(r = (type[0] + rim) / 2, h = 3, center = true);
             }
     }
+    if($children)
+        translate([0, 0, ball_bearing_width(type) / 2])
+            children();
 }
 
 module bearing_ball(dia) {

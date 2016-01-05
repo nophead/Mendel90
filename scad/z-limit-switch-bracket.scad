@@ -48,7 +48,7 @@ module z_limit_screw_positions() {
     for(z = [0, screw_spacing])
         translate([slot_x, -thickness, bottom_z  + hinge_post + leg_width / 2 + adjustment - down_adjustment + z])
             rotate([90, 0, 0])
-                child();
+                children();
 }
 
 
