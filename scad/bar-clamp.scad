@@ -54,7 +54,7 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
 
     cavity_l = stem - 2 * wall;
     cavity_h = h - nut_trap_meat - nut_trap_depth;
-    cavity_w = w - 2 * wall;
+    cavity_w = max(w - 2 * wall, nut_radius * 2);
 
     sbracket_length = -y_switch_x(w) + 4;
     sbracket_thickness = 7;
