@@ -35,8 +35,10 @@ module bar_clamp_holes(d, yaxis) {
     for(y = [bar_rail_offset(d) - bar_clamp_length(d) + 0.5 * bar_clamp_tab - nut_offset,
              bar_rail_offset(d)                       - 0.5 * bar_clamp_tab + nut_offset])
         translate([0, y, 0])
-            child();
+            children();
 }
+
+zswitch_tweak = squeeze ? bar_clamp_band - min_wall - No2_pilot_radius - layer_height / 4 : 0;
 
 module bar_clamp(d, h, w, switch = false, yaxis = false) {
     stl(str(yaxis ? "y_bar_clamp" : "z_bar_clamp", (switch && yaxis) ? "_switch" : ""));
@@ -111,7 +113,7 @@ module bar_clamp(d, h, w, switch = false, yaxis = false) {
                     if(!yaxis)
                         translate([-w / 2 - axis_end_clearance,
                                    outer_rad + microswitch_thickness() / 2 - rail_offset,
-                                   h - outer_rad + microswitch_first_hole_x_offset()])
+                                   h - outer_rad + microswitch_first_hole_x_offset() + zswitch_tweak])
                             rotate([0, 90, 90])
                                 microswitch_holes();
 
@@ -190,7 +192,7 @@ module bar_clamp_assembly(d, h, w, switch = false, yaxis = true) {
             if(top_limit_switch)
                 translate([-w / 2 - limit_switch_offset,
                            outer_rad + microswitch_thickness() / 2,
-                           h - outer_rad + microswitch_first_hole_x_offset()])
+                           h - outer_rad + microswitch_first_hole_x_offset() + zswitch_tweak])
                     rotate([0, 90, 90]) {
                         microswitch();
                         microswitch_hole_positions()
@@ -216,16 +218,19 @@ module z_bar_clamp_stl()        translate([0,0,bar_clamp_depth/2]) rotate([0,90,
 module z_bar_clamp_switch_stl() translate([0,0,bar_clamp_depth/2]) rotate([0,90,0]) bar_clamp(Z_bar_dia, gantry_setback, bar_clamp_depth, true, false);
 
 module bar_clamps_stl() {
-    y2 = bar_clamp_length(Z_bar_dia) - bar_clamp_tab + 2;
-    y3 = y2 + bar_clamp_length(Y_bar_dia) - bar_clamp_tab + 2;
-                                                                                         rotate([0, 0, 180]) z_bar_clamp_switch_stl();
-    translate([2, -2 * bar_rail_offset(Z_bar_dia) + bar_clamp_length(Z_bar_dia), 0])                         z_bar_clamp_stl();
+    gap = 3;
+    y2 = bar_clamp_length(Z_bar_dia) - bar_clamp_tab + gap;
+    y3 = y2 + bar_clamp_length(Y_bar_dia) - bar_clamp_tab + gap;
 
-    translate([-10, y2, 0])                                                              rotate([0, 0, 180]) y_bar_clamp_switch_stl();
-    translate([12, y2 -2 * bar_rail_offset(Y_bar_dia) + bar_clamp_length(Y_bar_dia), 0])                     y_bar_clamp_stl();
+    rotate([0, 0, 90]) {                                                                                       rotate([0, 0, 180]) z_bar_clamp_switch_stl();
+        translate([gap, -2 * bar_rail_offset(Z_bar_dia) + bar_clamp_length(Z_bar_dia), 0])                       z_bar_clamp_stl();
 
-    translate([0, y3, 0])                                                                rotate([0, 0, 180]) y_bar_clamp_stl();
-    translate([2, y3 -2 * bar_rail_offset(Y_bar_dia) + bar_clamp_length(Y_bar_dia), 0])                      y_bar_clamp_stl();
+        translate([-9 - gap, y2, 0])                                                         rotate([0, 0, 180]) y_bar_clamp_switch_stl();
+        translate([9 + gap * 2, y2 -2 * bar_rail_offset(Y_bar_dia) + bar_clamp_length(Y_bar_dia), 0])            y_bar_clamp_stl();
+
+        translate([0, y3, 0])                                                                rotate([0, 0, 180]) y_bar_clamp_stl();
+        translate([gap, y3 -2 * bar_rail_offset(Y_bar_dia) + bar_clamp_length(Y_bar_dia), 0])                    y_bar_clamp_stl();
+    }
 }
 
 if(0)
