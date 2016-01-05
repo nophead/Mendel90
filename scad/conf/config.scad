@@ -108,6 +108,7 @@ clip_handles = true;
 include_fan = false;
 squeeze = false;                    // Bodge to make Huxley as small as possible without affecting dibond kits
 part_fan = fan60x15;
+extruder = Wades;                   // Default extruder
 raspberry_pi = false;               // Raspberry pi mounted on PSU
 raspberry_pi_camera = false;        // RPI camera on bar across the back
 light_strip = false;

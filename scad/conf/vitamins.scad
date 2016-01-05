@@ -32,6 +32,7 @@ include <../vitamins/components.scad>
 include <../vitamins/hot_ends.scad>
 include <../vitamins/bars.scad>
 include <../vitamins/pullies.scad>
+include <../vitamins/extruders.scad>
 include <../vitamins/light_strips.scad>
 
 module rod(d , l) {
