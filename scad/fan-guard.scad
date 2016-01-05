@@ -10,7 +10,11 @@
 include <conf/config.scad>
 
 thickness = 2;
-wall = 2 * filament_width + eta;
+nozzle = 0.45;
+
+//wall = 2 * filament_width - layer_height * (PI / 4 - 0.5);
+wall = filament_width - layer_height / 2 + nozzle / 2 + filament_width / 2;
+
 finger_width = 7;
 spokes = 4;
 
