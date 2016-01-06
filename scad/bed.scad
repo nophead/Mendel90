@@ -11,6 +11,8 @@ include <conf/config.scad>
 include <positions.scad>
 
 module bed_assembly(y = 0) {
+    glass_width = vero_bed ? bed_width - 6 * 2.54 : bed_width;
+    glass_depth = vero_bed ? bed_depth : bed_depth - 12;
 
     //
     // Screws pillars and washers
@@ -32,15 +34,6 @@ module bed_assembly(y = 0) {
     }
 
     //
-    // Mark the origin
-    //
-    *translate([0, 0, pillar_height(bed_pillars) + pcb_thickness + sheet_thickness(bed_glass)])
-        color("green")
-            render()
-                sphere();
-
-
-    //
     // PCB, glass and clips
     //
     translate([0, 0, washer_thickness(M3_washer)]) {
@@ -49,15 +42,33 @@ module bed_assembly(y = 0) {
             color(bed_color) cube([bed_width, bed_depth, pcb_thickness], center = true);
 
         translate([0,0, pillar_height(bed_pillars) + pcb_thickness + sheet_thickness(bed_glass) / 2 + eta * 3])
-            sheet(bed_glass, bed_width, bed_depth - 12);
+            sheet(bed_glass, glass_width, glass_depth);
 
         for(x = [-1, 1])
             for(y = [-1,1])
-                translate([bed_width / 2 * x,
-                           ((bed_depth - bulldog_length(small_bulldog)) / 2 - washer_diameter(M3_washer)) * y,
-                           pillar_height(bed_pillars) + (pcb_thickness + sheet_thickness(bed_glass))/ 2])
-                    rotate([0, 0, 90 + x * 90])
-                        bulldog(small_bulldog, pcb_thickness + sheet_thickness(bed_glass));
+                if(glass_width == bed_width)
+                    translate([glass_width / 2 * x,
+                              (glass_depth / 2 - bulldog_length(small_bulldog) / 2) * y,
+                               pillar_height(bed_pillars) + (pcb_thickness + sheet_thickness(bed_glass))/ 2])
+                        rotate([0, 0, 90 + x * 90])
+                            bulldog(small_bulldog, pcb_thickness + sheet_thickness(bed_glass));
+                else
+                    translate([(glass_width / 2 - bulldog_length(small_bulldog) / 2) * x,
+                                glass_depth  / 2 * y,
+                               pillar_height(bed_pillars) + (pcb_thickness + sheet_thickness(bed_glass))/ 2])
+                        rotate([0, 0, -y * 90])
+                            bulldog(small_bulldog, pcb_thickness + sheet_thickness(bed_glass));
+
+        //
+        // Mark the origin
+        //
+        if(show_rays)
+            translate([0, 0, pillar_height(bed_pillars) + pcb_thickness + sheet_thickness(bed_glass)])
+                color("green")
+                    render()
+                        sphere();
+
+
     }
 
 
