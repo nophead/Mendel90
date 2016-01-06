@@ -74,7 +74,7 @@ module tube_cap_stl() {
                             cube([w_inner - 1, h_inner - 1, height + 1]);
                     }
 
-                translate([0, h_inner / 2 - nut_thickness(base_nut, true) - 1.5, base_screw_offset + tube_end_clearance + wall])
+                translate([0, h_inner / 2 - nut_thickness(base_nut, true) - (squeeze ? 0.5 : 1.5), base_screw_offset + tube_end_clearance + wall])
                     rotate([-90, 90, 0]) {
                         hull()
                             for(z = [-1, 1])
@@ -82,7 +82,8 @@ module tube_cap_stl() {
                                     cylinder(r = nut_radius(base_nut), $fn = 6, h = 100);
 
                         rotate([0,0,90])
-                            teardrop_plus(r = screw_clearance_radius(base_screw), h = 100, center = true);
+                            translate([0, 0, squeeze ? -1 : -50])
+                                teardrop_plus(r = screw_clearance_radius(base_screw), h = 100);
                     }
             }
         }
@@ -93,14 +94,17 @@ module tube_cap_stl() {
 
 module tube_assembly() {
 
-    color("silver") render() base_tube();
+    color("silver") render(convexity = 3) base_tube();
 
     translate([0, -(base_depth / 2 - fixing_block_width() / 2 - base_clearance), sheet_thickness(base)]) {
         translate([0, 0, exploded * 20])
-            washer(screw_washer(base_screw))
-                translate([0, 0, exploded * 6])
-                    washer(screw_washer(base_screw))
-                        screw_and_washer(base_screw, base_screw_length);
+            if(base_screw == M3_cap_screw)
+                screw_and_washer(base_screw, 10);
+            else
+                washer(screw_washer(base_screw))
+                    translate([0, 0, exploded * 6])
+                        washer(screw_washer(base_screw))
+                            screw_and_washer(base_screw, base_screw_length);
 
         translate([0, 0, -sheet_thickness(base) - tube_thickness(AL_square_tube)])
             rotate([180, 0, 90])
