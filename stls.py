@@ -100,4 +100,4 @@ if __name__ == '__main__':
         stls(sys.argv[1], sys.argv[2:])
     else:
         print("usage: stls dibond|mendel|sturdy|your_machine [part.stl ...]")
-    sys.exit(1)
+        sys.exit(1)

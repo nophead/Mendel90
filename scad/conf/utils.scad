@@ -13,24 +13,32 @@ include <../utils/teardrops.scad>
 include <../utils/cables.scad>
 include <../utils/shields.scad>
 
+function round_to_layer(z) = ceil(z / layer_height) * layer_height;
+
 module slot(h, r, l, center = true)
     linear_extrude(height = h, convexity = 6, center = center)
         hull() {
             translate([l/2,0,0])
-                circle(r = r, center = true);
+                circle(r);
             translate([-l/2,0,0])
-                circle(r = r, center = true);
+                circle(r);
         }
 
-module hole_support(r, h, max_r = 999, closed = false) {
+module hole_support(r, h, max_r = 999, closed = false, capped = false) {
     n = sides(r);
     cr = corrected_radius(r, n);
     ir = min(cr, max_r - 2.25 * filament_width);
     or = ir + 2 * filament_width;
     difference() {
         cylinder(r = or, h = h, $fn = n);
-        translate([0, 0, closed ? layer_height : -1])
-            cylinder(r = ir, h = h + 2, $fn = n);
+        difference() {
+            translate([0, 0, closed ? layer_height : -1])
+                cylinder(r = ir, h = h + 2, $fn = n);
+
+            if(capped)
+                translate([0, 0, h - 4 * layer_height])
+                    cylinder(r = or, h = 3 * layer_height + eta);
+        }
     }
 }
 
@@ -105,7 +113,7 @@ module rounded_square(w, h, r)
         for(x = [-w/2 + r, w/2 - r])
             for(y = [-h/2 + r, h/2 - r])
                 translate([x, y])
-                    circle(r = r);
+                    circle(r);
     }
 }
 
@@ -123,11 +131,14 @@ module rounded_rectangle(size, r, center = true)
 module rounded_cylinder(r, h, r2)
 {
     rotate_extrude()
-        union() {
-            square([r - r2, h]);
-            square([r, h - r2]);
+        hull() {
+            square([1, h]);
+            square([r, 1]);
             translate([r - r2, h - r2])
-                circle(r = r2);
+                intersection() {
+                    circle(r2);
+                    square(r2);
+                }
         }
 }
 
@@ -157,7 +168,7 @@ module tube(or, ir, h, center = true) {
 module explode(v, offset = [0,0,0]) {
     if(exploded) {
         translate(v * exploded)
-            child();
+            children();
         render() hull() {
             sphere(0.2);
             translate(v * exploded + offset)
@@ -165,16 +176,5 @@ module explode(v, offset = [0,0,0]) {
         }
     }
     else
-        child();
+        children();
 }
-//
-// Restore the view point
-//
-module view(t,r,d = 1000)
-    rotate([55, 0, 25])
-        translate([0, 0, -d + 500])
-            rotate([-r[0], 0, 0])
-                rotate([0, -r[1], 0])
-                    rotate([0, 0, -r[2]])
-                        translate(-t)
-                            child();
