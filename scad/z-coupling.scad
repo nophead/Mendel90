@@ -14,13 +14,12 @@ actual_dia = [ undef, undef, undef, undef, undef, 4.82, 5.65, undef, 7.8];  // m
 studding_dia = actual_dia[Z_screw_dia];
 
 shaft_dia = 7.75;               // includes tubing
-squeeze = 0.5;                  // how much holes undersized
+squeeze_shaft = 0.5;            // how much holes undersized
 holeR = M3_clearance_radius;
 nutR = M3_nut_radius;
 nutH = M3_nut_trap_depth;
-corner_cut = 26;
 wall = 2;
-gap = wall;
+gap = 2;
 
 holeX = 7.5;
 holeY2 = studding_dia / 2 + M3_clearance_radius;
@@ -28,13 +27,14 @@ holeY1 = shaft_dia    / 2 + M3_clearance_radius;
 
 nut_flat_radius = M3_nut_radius * cos(30);
 width = 2 * (max(holeY2, holeY1) + nut_flat_radius + wall);
-length = 30;
+length = 22 + 2 * thick_wall;
 tubing_length = (length - gap) / 2 + 2;
 
 function z_coupling_length() = length;
 function z_coupling_gap() = gap;
 
-depth = 8;
+depth = squeeze ? 7 : 8;
+echo(squeeze,depth);
 centre_line = depth / 2;
 
 rad = M3_nut_radius + wall;
@@ -67,8 +67,8 @@ module z_coupling_stl(){
             translate([-holeX,  holeY2, - depth / 2]) rotate([0,0,-30]) cylinder(h = nutH * 2, r=nutR, $fn=6, center=true);
 
             //shaft groves
-            translate([-gap / 2, 0, centre_line]) rotate([0,-90,0])  cylinder(h = length, r = (studding_dia - squeeze) / 2);
-            translate([ gap / 2, 0, centre_line]) rotate([0, 90,0])  cylinder(h = length, r = (shaft_dia - squeeze) / 2);
+            translate([-gap / 2, 0, centre_line]) rotate([0,-90,0])  cylinder(h = length, r = (studding_dia - squeeze_shaft) / 2);
+            translate([ gap / 2, 0, centre_line]) rotate([0, 90,0])  cylinder(h = length, r = (shaft_dia - squeeze_shaft) / 2);
 
             //screw holes
             for(y = [-1, 1]) {
@@ -91,6 +91,7 @@ module z_coupling_stl(){
 
 module z_coupler_assembly() {
     //assembly("z_coupler_assembly");
+    screw_length = screw_longer_than(depth * 2 + washer_thickness(M3_washer) - nutH + nut_thickness(M3_nut, true));
 
     for(side = [-1, 1])
         explode([10 * side, 0, 0])
@@ -100,7 +101,7 @@ module z_coupler_assembly() {
                     for(pos = [[holeX, holeY1], [-holeX, -holeY2]])
                         translate([pos[0], pos[1], -depth/2])
                             rotate([180, 0, 0])
-                                screw_and_washer(M3_cap_screw, 20);
+                                screw_and_washer(M3_cap_screw, screw_length);
 
                     for(pos = [[holeX, -holeY1], [-holeX, holeY2]])
                         translate([pos[0], pos[1], -depth/2 + nutH])
