@@ -27,6 +27,22 @@ $fs = 0.5;
 
 function sqr(x) = x * x;            // shortcut
 
+module rotate(a)
+{
+ cx = cos(a[0]);
+ cy = cos(a[1]);
+ cz = cos(a[2]);
+ sx = sin(a[0]);
+ sy = sin(a[1]);
+ sz = sin(a[2]);
+ multmatrix([
+  [ cy * cz, cz * sx * sy - cx * sz, cx * cz * sy + sx * sz, 0],
+  [ cy * sz, cx * cz + sx * sy * sz,-cz * sx + cx * sy * sz, 0],
+  [-sy,      cy * sx,                cx * cy,                0],
+  [ 0,       0,                      0,                      1]
+ ]) children();
+}
+
 cnc_tool_dia = 2.4;
 layer_height = 0.4;
 filament_width = layer_height * 1.5;
