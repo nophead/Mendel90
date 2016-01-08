@@ -82,7 +82,7 @@ module right_triangle(width, height, h, center = true) {
 
 module rounded_square(w, h, r)
 {
-    union() {
+    hull() {
         square([w - 2 * r, h], center = true);
         square([w, h - 2 * r], center = true);
         for(x = [-w/2 + r, w/2 - r])
