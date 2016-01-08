@@ -54,31 +54,6 @@ module nut_trap_support(h, r, r2 = 0) {
     }
 }
 
-function nut_trap_radius(nut) = nut_radius(nut) + layer_height / 4;
-function nut_trap_flat_radius(nut) = nut_trap_radius(nut) * cos(30);
-
-module nut_trap(screw_r, nut_r, depth, horizontal = false, supported = false) {
-    render(convexity = 5) union() {
-        if(horizontal) {
-            if(screw_r)
-                teardrop_plus(r = screw_r, h = 200, center = true);
-            cylinder(r = nut_r + layer_height / 4, h = depth * 2, center = true, $fn = 6);
-        }
-        else {
-            difference() {
-                union() {
-                    if(screw_r)
-                        poly_cylinder(r = screw_r, h = 200, center = true);
-                    cylinder(r = nut_r, h = depth * 2, center = true, $fn = 6);
-                }
-                if(supported)
-                    translate([0, 0, depth - eta])
-                        cylinder(r = nut_r, h = layer_height, center = false);
-            }
-        }
-    }
-}
-
 module part_screw_hole(screw, nut, horizontal = false, supported = false) {
     screw_r = screw_clearance_radius(screw);
     if(nut)
@@ -107,7 +82,7 @@ module right_triangle(width, height, h, center = true) {
 
 module rounded_square(w, h, r)
 {
-    union() {
+    hull() {
         square([w - 2 * r, h], center = true);
         square([w, h - 2 * r], center = true);
         for(x = [-w/2 + r, w/2 - r])
