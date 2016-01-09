@@ -15,11 +15,6 @@ use <vitamins/jhead_hot_end.scad>
 
 spring = false;             // use two nuts or one nut and a spring
 
-module b608(h = 7) {
-    cylinder(r = 11.01, h = h);
-}
-
-
 screw_depth = 5;
 
 motor_y = 28;
@@ -37,6 +32,7 @@ mount_pitch = 25;
 
 filament_x = 75;
 filament_z = 13;
+feed_tube_socket = 4;
 
 extension = max(0, nozzle_length - hot_end_length(hot_end));
 extension_width = 30;
@@ -56,16 +52,21 @@ pscrew_z = [filament_z - 6.5, filament_z + 6.5];
 driven_x = 70;
 driven_y = 31.5;
 
-bearing_housing_depth = 24 + 2 * filament_width;
+bearing = BB608;
+
+bearing_rad = ball_bearing_diameter(bearing) / 2;
+socket_rad = bearing_rad;                           // make it a tight fit
+socket_cr = corrected_radius(socket_rad);           // actual radius
+echo(socket_cr=socket_cr*2);
+
 bearing_housing_x = 57;
+bearing_housing_x2 = driven_x + socket_cr + 2 * filament_width;
+bearing_housing_depth = bearing_housing_x2 - bearing_housing_x;
+bearing_housing_bulge = driven_x - bearing_housing_x + 1;
 pscrew_length = 50;
 pscrew_x = bearing_housing_x + pscrew_length;
 
-clamp_depth = hot_end_inset(hot_end) - 1;
-clamp_width = 2 * (hot_end_screw_pitch(hot_end) + max(screw_clearance_radius(M3_cap_screw) + min_wall, clamp_depth / 2));
-clamp_height = width - filament_z - 0.5;
-
-function extruder_connector_offset() = [-filament_x + motor_x, filament_z - thickness, motor_y] + d_motor_connector_offset(NEMA17);
+function extruder_connector_offset() = [-filament_x + motor_x, filament_z - thickness, motor_y] + d_motor_connector_offset();
 
 module keyhole(r, h, l) {
     R = r + layer_height / 4;
@@ -113,6 +114,13 @@ module wades_block_stl() {
             translate([bearing_housing_x, 0, 0])
                 cube([bearing_housing_depth, height, width]);               // bearing housing
 
+            translate([driven_x + 6, driven_y, 0])
+                difference() {
+                    cylinder(r = bearing_housing_bulge + 6, h = width);     // bulge to make it stronger
+                    translate([0, -25, -1])
+                        cube([50, 50, width + 2]);
+                }
+
             translate([80,1.5,0])                                           // fillet
                 cube([11,11, width]);
 
@@ -131,7 +139,11 @@ module wades_block_stl() {
 
         translate([filament_x, 20, filament_z])
             rotate([90,0,0])
-                teardrop(h = 70, r=4/2, center=true);                       // filament
+                teardrop_plus(h = 70, r=3.5/2, center=true);                       // filament
+
+        translate([filament_x, height,  filament_z])
+            rotate([90,0,0])
+                teardrop_plus(h = feed_tube_socket * 2, r = tubing_od(PF7) / 2, center = true);   // feed tube socket
 
         // mounting holes
         for(side = [-1, 1])
@@ -197,22 +209,23 @@ module wades_block_stl() {
             translate([driven_x,     driven_y, 7 + layer_height + eta])
                 poly_cylinder(r = M8_clearance_radius + 0.25, h = 30);
 
-            translate([driven_x + 2, driven_y - 5, filament_z + 4 - eta])
-                cube([10, 10, layer_height + eta]); // support bridge
+            translate([driven_x + 1.9, driven_y - 5, filament_z + 4 ])
+                cube([10, 10, layer_height]); // support bridge
         }
         //
         // Sockets for bearings
         //
-        translate([driven_x,       driven_y, width - 7])       b608(8);                // top bearing socket
-        translate([filament_x + 8, driven_y, filament_z - 4])  b608(8);                // clearance for idler
-        translate([driven_x,       driven_y, -1 + eta])        b608(8);                // bottom bearing socket
+        translate([driven_x,       driven_y, width - 7])       poly_cylinder(r = socket_rad, h = 8);  // top bearing socket
+        translate([filament_x + 8, driven_y, filament_z - 4])  cylinder(r = bearing_rad, h = 8);      // clearance for idler
+        translate([driven_x,       driven_y, -1 + eta])        poly_cylinder(r = socket_rad, h = 8);  // bottom bearing socket
 
         //
         // Hole for hot end
         //
         translate([filament_x, -extension + eta, filament_z])
             rotate([90,0,0]) {
-                if(hot_end_groove_mount(hot_end)) assign(relief = 0.5) {
+                if(hot_end_groove_mount(hot_end)) {
+                    relief = 0.5;
 
                     translate([0, 0, -insulator_depth + jhead_groove_offset() / 2 + eta])         // slot for the flange
                         keyhole(insulator / 2, jhead_groove_offset(), width - filament_z);
@@ -226,12 +239,12 @@ module wades_block_stl() {
                          rotate([0, 0, i * 120 + jhead_screw_angle])
                             translate([jhead_screw_pitch, 0, 0])
                                 rotate([0, 0, -i * 120 - jhead_screw_angle]) {
+                                    w = nut_flat_radius(screw_nut(jhead_screw));
                                     teardrop_plus(r = screw_clearance_radius(jhead_screw), h = jhead_screw_length * 2, center = true);
                                     translate([0, 0, -base_thickness - extension - jhead_nut_slot / 2]) {
                                         rotate([0, 0, [0, 30, 30][i]])
                                             nut_trap(0, nut_radius(screw_nut(jhead_screw)), jhead_nut_slot / 2, horizontal = true);
 
-                                        assign(w = nut_flat_radius(screw_nut(jhead_screw)))
                                         rotate([0, 0, [-90 ,0, 180][i]])
                                             translate([-w, 0, -jhead_nut_slot / 2])
                                                 cube([w * 2, 100, jhead_nut_slot], center = false);
@@ -269,12 +282,6 @@ module wades_gear_spacer_stl() {
             poly_cylinder(r = M8_clearance_radius, h = spacer_length + 1, center = false);
     }
 }
-
-
-
-bfbext=false;
-
-function extruder_connector_height() = motor_y - d_motor_bracket_offset(NEMA17);
 
 module wades_big_gear_stl() {
     stl("wades_big_gear");
@@ -351,7 +358,7 @@ module wade_idler_assembly() {
     translate([0, 0, idler_height - 2])
         rotate([90, 0, 0]) {
             rod(d = 8, l = idler_axel_length);
-            ball_bearing(BB608);
+            ball_bearing(bearing);
         }
 }
 
@@ -368,7 +375,7 @@ module extruder_motor_assembly(show_connector = true, exploded = exploded) {
                     small_gear_assembly();
 
             if(show_connector)
-                d_motor_bracket_assembly(NEMA17);
+                d_motor_bracket_assembly();
         }
     end("extruder_motor_assembly");
 }
@@ -426,11 +433,11 @@ module wades_assembly(show_connector = true, show_drive = true) {
 
     // hobbed bolt and gear
     translate([driven_x, driven_y, 0]) {
-        translate([0, 0, width - BB608[2] / 2 + (!show_drive ? exploded * 20 : 0)])
-            ball_bearing(BB608);
+        translate([0, 0, width - ball_bearing_width(bearing) / 2 + (!show_drive ? exploded * 20 : 0)])
+            ball_bearing(bearing);
 
-        translate([0, 0,         BB608[2] / 2 - (!show_drive ? exploded * 20 : 0)])
-            ball_bearing(BB608);
+        translate([0, 0,         ball_bearing_width(bearing) / 2 - (!show_drive ? exploded * 20 : 0)])
+            ball_bearing(bearing);
 
 
         if(show_drive) {
@@ -489,7 +496,8 @@ module wades_assembly(show_connector = true, show_drive = true) {
                 screw(M3_cap_screw, 30);
     else
         translate([filament_x, -extension, filament_z])
-            for(i = [0:2]) assign(a = i * 120 - jhead_screw_angle)
+            for(i = [0:2]) {
+                a = i * 120 - jhead_screw_angle;
                 rotate([90, a, 0]) {
                     translate([jhead_screw_pitch, 0, 0])
                         washer(jhead_washer)
@@ -503,17 +511,18 @@ module wades_assembly(show_connector = true, show_drive = true) {
                              rotate([0, 0, [0, 30, 30][i]])
                                  nut(screw_nut(jhead_screw));
                 }
+             }
 
     end("extruder_assembly");
 }
 
 module wades_extruder_stl() {
-    difference() {
+    !difference() {
         wades_block_stl();
         *translate([0, driven_y, -1])
-            cube(100);
+            cube([100,30,100]);
     }
-    translate([96, driven_y + 1, 0]) rotate([0,0,90]) wades_idler_block_stl();
+    translate([97, driven_y + 1, 0]) rotate([0,0,90]) wades_idler_block_stl();
     translate([motor_max, motor_y, 0]) wades_gear_spacer_stl();
 }
 
