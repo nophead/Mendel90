@@ -41,7 +41,7 @@ lug_width = 2 * nut_flat_radius(M3_nut) + wall;
 lug_height = thickness + slot_height / 2 + M3_nut_radius;
 screw_x = length - wall - No2_pilot_radius;
 screw_y = (d_width + slot_width) / 4;
-pitch = d_width + 2 * nut_flat_radius(M3_nut);
+pitch = d_width + 2 * nut_flat_radius(M3_nut) + eta;
 
 cable_guide_width = 20;
 cable_guide_thickness = 4;
@@ -81,6 +81,7 @@ module d_motor_bracket_lid_stl(nuts = true) {
             if(nuts) {
                 translate([length - front_thickness + lid_width - nut_cover_depth / 2, 0, 0])
                     rounded_rectangle([nut_cover_depth, nut_cover_width, nut_cover_height], 2, center = false);
+
                 for(side = [-1, 1])
                     translate([screw_x,  side * screw_y, 0])
                         cylinder(r = washer_diameter(M2p5_washer) / 2 + 2, h = lid_thickness);
@@ -116,16 +117,16 @@ module d_motor_bracket_stl(motor_mount = true) {
         union() {
             linear_extrude(height = thickness, convexity = 5)       // base
                 polygon(points = [ [0,                        0],
-                                   [overlap,                  0],
-                                   [overlap,             offset],
-                                   [length - eta,        offset],
+                                   [overlap + thickness,      0],
+                                   [overlap + thickness, offset + eta],
+                                   [length - eta,        offset + eta],
                                    [length - eta,        offset + d_width],
                                    [overlap,             offset + d_width],
                                    [overlap,             m_width],
                                    [0,                   m_width],
                                  ]);
 
-            translate([overlap , 0, eta])                               // motor wall
+            translate([overlap, 0, eta])                                // motor wall
                 cube([thickness, d_width + offset, height]);
 
             for(y = [0, m_width - thickness])                           // buttresses
@@ -141,7 +142,7 @@ module d_motor_bracket_stl(motor_mount = true) {
                         cube([front_thickness + flange_thickness + wall, d_width, height]);
 
                     // nut lugs
-                    translate([length + flange_thickness + wall - lug_depth / 2, offset + d_width / 2, eta])
+                    translate([length + flange_thickness + wall - lug_depth / 2, offset + d_width / 2, 0])
                         rounded_rectangle([lug_depth, d_width + 2 * lug_width, lug_height], r = 2, center = false);
 
                     // d side walls
@@ -161,7 +162,7 @@ module d_motor_bracket_stl(motor_mount = true) {
                     translate([nut_x + nut_slot / 2, d_width / 2 - side * pitch / 2 + offset, thickness + slot_height / 2]) //connector screws
                         rotate([90, 0, 90]) {
                             rotate([0,0,30])
-                                nut_trap(1, M3_nut_radius, nut_slot / 2, true);
+                                nut_trap(0, M3_nut_radius, nut_slot / 2, true);
 
                             translate([0, 5, 0])
                                 cube([nut_flat_radius(M3_nut) * 2, 10, nut_slot], center = true);
@@ -207,7 +208,7 @@ module d_shell_stl() {
         difference() {
             union() {
                // screw lugs
-               translate([shell_length + flange_thickness + wall - front / 2, d_width / 2, eta])
+               translate([shell_length + flange_thickness + wall - front / 2, d_width / 2, 0])
                     rounded_rectangle([front, d_width + 2 * lug_width,
                                        thickness + slot_height / 2 + washer_diameter(M3_washer) / 2 + 1], r = 2, center = false);
 
