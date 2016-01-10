@@ -156,8 +156,9 @@ module z_end(motor_end) {
             rod(Z_bar_dia, Z_bar_length);
 
         translate([z_bar_offset(), gantry_setback, Z_bar_length - bar_clamp_depth / 2]) {
-            rotate([90,motor_end ? 90 : - 90, 0])
-                z_bar_clamp_assembly(Z_bar_dia, gantry_setback, bar_clamp_depth, !motor_end);
+            rotate([90, motor_end ? 90 : - 90, 0])
+                mirror([motor_end ? 1 : 0, 0, 0])
+                    z_bar_clamp_assembly(Z_bar_dia, gantry_setback, bar_clamp_depth, !motor_end);
         }
     }
 }
