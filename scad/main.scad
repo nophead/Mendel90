@@ -247,7 +247,7 @@ module y_rail_holes() {
 
 module y_carriage() {
     difference() {
-        sheet(Y_carriage, Y_carriage_width, Y_carriage_depth, [3,3,3,3]);
+        sheet(Y_carriage, Y_carriage_width, Y_carriage_depth, [Y_carriage_rad, Y_carriage_rad, Y_carriage_rad, Y_carriage_rad]);
 
         translate([0, ribbon_clamp_y, 0])
             rotate([180, 0, 0])
@@ -490,52 +490,56 @@ module fixing_blocks(holes = false) {
     h = fixing_block_height();
     t = sheet_thickness(frame);
 
-    assign($upper = true) {     // all screws into frame
+    {     // all screws into frame
+        $upper = true;
         translate([left_stay_x + t / 2, gantry_Y + t, stay_height - base_clearance - h - w / 2]) // top
             rotate([0,-90,-90])
-                child();
+                children();
 
         translate([right_stay_x - t / 2, gantry_Y + t, stay_height - base_clearance - h - w / 2]) // top
             rotate([0,90, 90])
-                child();
+                children();
 
         translate([left_stay_x + t / 2, gantry_Y + t, base_clearance + h + w / 2])              // front
             rotate([0,-90,-90])
-                child();
+                children();
 
         translate([right_stay_x - t / 2, gantry_Y + t, base_clearance + h + w / 2])              // front
             rotate([0,90, 90])
-                child();
+                children();
     }
-    assign($upper = false) {  // one screw in the base
-        assign($rear = true) {
+    {  // one screw in the base
+        $upper = true;
+        {
+            $rear = true;
             translate([left_stay_x + t / 2, base_depth / 2 - base_clearance - w / 2, 0]) // back
                 rotate([0, 0,-90])
-                    child();
+                    children();
 
             translate([right_stay_x - t / 2, base_depth / 2 - base_clearance - w / 2, 0]) // back
                 rotate([0, 0, 90])
-                    child();
+                    children();
         }
 
-        assign($rear = false) {
+        {
+            $rear = false;
             for(x = [-base_width/2 + base_clearance + w /2,
                       base_width/2 - base_clearance - w /2,
                      -base_width/2 - base_clearance - w /2 + left_w,
                       right_stay_x + sheet_thickness(frame) / 2 + w / 2 + base_clearance])
                 translate([x, gantry_Y + t, 0])
-                    child();
+                    children();
 
 
             // extra holes for bars
             if(holes && base_nuts) {
                 translate([left_stay_x + t / 2, -base_depth / 2 + base_clearance + w / 2, 0]) // front
                     rotate([0, 0,-90])
-                        child();
+                        children();
 
                 translate([right_stay_x - t / 2, -base_depth / 2 + base_clearance + w / 2, 0]) // front
                     rotate([0,0, 90])
-                        child();
+                        children();
             }
 
         }
@@ -702,12 +706,12 @@ module frame_gantry() {
     }
 }
 
-module frame_stay(left, bodge = 0) {
+module frame_stay(left) {
     x = left ? left_stay_x : right_stay_x;
 
     difference() {
         translate([x, gantry_Y + sheet_thickness(frame) + stay_depth / 2, stay_height / 2])
-            rotate([90,0,90])
+            rotate([90, 0, 90])
                 sheet(frame, stay_depth, stay_height, [0, frame_corners, 0, 0]);
 
         fixing_block_holes();
@@ -717,7 +721,7 @@ module frame_stay(left, bodge = 0) {
         if(left)
             translate([x + (sheet_thickness(frame) + fan_depth(case_fan)) / 2, fan_y, fan_z])
                 rotate([0,90,0])
-                    scale([1 + bodge, 1 + bodge, 1]) fan_holes(case_fan);       // scale prevents OpenCSG z buffer artifacts
+                    fan_holes(case_fan);
 
         else {
             //
@@ -855,7 +859,8 @@ module frame_assembly(show_gantry = true) {
 
     place_cable_clips();
 
-    frame_base();
+    color(sheet_colour(base)) render() frame_base();
+
     if(base_nuts) {
         for(side = [ left_stay_x + fixing_block_height() / 2 + sheet_thickness(frame) / 2,
                     right_stay_x - fixing_block_height() / 2 - sheet_thickness(frame) / 2])
@@ -869,9 +874,9 @@ module frame_assembly(show_gantry = true) {
         fixing_blocks()
             fixing_block_assembly($upper, $rear);
 
-        frame_stay(true, eta);
-        frame_stay(false);
-        frame_gantry();
+        color(sheet_colour(frame)) render() frame_stay(true);
+        color(sheet_colour(frame)) render() frame_stay(false);
+        color(sheet_colour(frame)) render() frame_gantry();
     }
 
     end("frame_assembly");
@@ -890,7 +895,7 @@ module machine_assembly(show_bed = true, show_heatshield = true, show_spool = tr
             raspberry_pi_assembly();
 
         if(raspberry_pi_camera)
-            raspberry_pi_camera_assembly(light_strip);
+            raspberry_pi_camera_assembly();
 
         if(show_spool) {
             spool_assembly(left_stay_x, right_stay_x);

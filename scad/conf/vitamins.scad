@@ -78,6 +78,7 @@ include <../vitamins/bars.scad>
 include <../vitamins/pullies.scad>
 include <../vitamins/extruders.scad>
 include <../vitamins/light_strips.scad>
+include <../vitamins/raspberry_pi.scad>
 
 module rod(d , l) {
     vitamin(str("RD", d, round(l), ": Smooth rod ", d, "mm x ", round(l), "mm"));

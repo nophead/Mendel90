@@ -9,11 +9,11 @@
 //
 include <conf/config.scad>
 include <positions.scad>
+use <light_strip_clip.scad>
 use <frame_edge_clamp.scad>
 
-light = light_strip ? light_strip : SPS125;
-
-show_rays = false;
+light  = light_strip ? light_strip : RIGID5050_290;
+light2 = light_strip == RIGID5050_290 ? RIGID5050_208 : false;
 
 wall = 2;
 clearance = 0.2;
@@ -44,71 +44,82 @@ pi_cam_back_length = pi_cam_hole_pitch + 2 * (nut_flat_radius(M2_nut) + min_wall
 pi_cam_back_width = pi_cam_width + (pi_cam_back_length - pi_cam_length) / 2;
 pi_cam_centreline = -pi_cam_width / 2 + 9.5;
 
-function round_to_layer(z) = ceil(z / layer_height) * layer_height;
-
 pi_cam_front_clearance = 1.6;
 pi_cam_front_wall = 2;
 pi_cam_front_depth = pi_cam_back_depth + pi_cam_thickness + pi_cam_front_clearance + wall;
 pi_cam_front_length = pi_cam_back_length + 2 * (pi_cam_front_wall + clearance);
 pi_cam_front_width = pi_cam_back_width + 2 * (pi_cam_front_wall + clearance);
 
-bar_dia = 12;
-bar_gap = 2;
-bar_wall = 3;
+left = left_stay_x + sheet_thickness(frame) / 2;
+right = right_stay_x - sheet_thickness(frame) / 2;
 
 X_build = min(X_travel, bed_holes[0] - screw_head_radius(M3_cap_screw) * 2); // sturdy travel exceeds the bed so max object is smaller
 Y_build = min(Y_travel, bed_holes[1] - screw_head_radius(M3_cap_screw) * 2);
 
 y_limit = Y0 + (Y_travel + Y_build) / 2 + 1;
-bar_z = 240;
-bar_y = y_limit + bar_dia / 2 + wall + 2;
 
-cam_offset = pi_cam_front_width / 2 - pi_cam_width / 2 + pi_cam_back_width / 2 - pi_cam_centreline + bar_dia / 2;
-cam_x = X_origin;
-cam_y = bar_y - bar_dia / 2 - pi_cam_front_wall;
-cam_z = bar_z - cam_offset;
+pivot_screw_length = 16;
+end_cap_nut_boss_r = nut_trap_radius(M3_nut, horizontal = false) + 3 * filament_width;
+end_cap_nut_boss = pivot_screw_length - washer_thickness(M3_washer) - frame_edge_clamp_thickness() - 2;
 
-hypot = sqrt(sqr(bar_z - bed_height) + sqr(bar_y - Y0));
-angle = atan2(bar_z - bed_height, bar_y - Y0) - asin(cam_offset / hypot);
+pivot_offset = frame_edge_clamp_hinge() + washer_diameter(M3_washer) / 2;
+pivot_y = base_depth / 2 + pivot_offset;
 
-left = left_stay_x + sheet_thickness(frame) / 2;
-right = right_stay_x - sheet_thickness(frame) / 2;
+light2_z_top = light_strip_clip_length(light) / 2 + (light2 ? light_strip_clip_length(light2) - wall : 0);
+light2_distance = sqrt(sqr(Z_travel) + sqr(y_limit - Y0));
+max_light_angle = atan2(Z_travel, y_limit - Y0) - asin(light2_z_top  / light2_distance);
+max_pivot_z = bed_height + tan(max_light_angle) * (pivot_y - Y0);
+pivot_z = 240;
 
-bar_length = right - left - 2;
-bar_overlap = 2 * (cam_x -(right + left) / 2);
-clamp_length = bar_dia - frame_edge_clamp_pitch(0) + 2 * nut_flat_radius(M3_nut) + clearance * 2;
-
-band_width = 2 * (nut_trap_radius(M3_nut) + wall);
-band_tab_h = 2 * (nut_trap_flat_radius(M3_nut) + wall);
-band_ir = bar_dia / 2;
-band_or = band_ir + pi_cam_front_wall;
-band_y = pi_cam_front_width / 2 - pi_cam_width / 2 + pi_cam_back_width / 2 - pi_cam_front_wall + band_or + eta;
-
-band_tab_t = M3_nut_trap_depth + wall;
-band_slit = 1;
-band_tab_d = max(2 * band_tab_t + band_slit, 16 - washer_thickness(M3_washer) - nut_thickness(M3_nut, true) + M3_nut_trap_depth - 0.5);
-band_tab_height = band_tab_h + sqrt(sqr(band_or) - sqr(band_tab_d / 2));
+pivot_light2_distance = sqrt(sqr(bed_height + Z_travel - max_pivot_z) + sqr(y_limit - pivot_y));
+pivot_max_distance = sqrt(sqr(max_pivot_z - bed_height) + sqr(pivot_y - Y0));
 
 light_x = (left + right) / 2;
-light_z = bar_z + bar_dia / 2 + light_strip_width(light) / 2 + pi_cam_front_wall + clearance;
-bar_z_offset = light_z - bar_z;
+light_y = pivot_y - end_cap_nut_boss_r;
+light_angle = atan2(pivot_z - bed_height, pivot_y - Y0);
 
-light_angle = atan2(bar_z - bed_height, bar_y - Y0) + asin(bar_z_offset / hypot);
+hinge_screw = M2_cap_screw;
+hinge_nut = screw_nut(hinge_screw);
+hinge_screw_length = 12;
 
-light_incursion = max(0, y_limit + sin(light_angle) * (bar_z_offset + light_strip_width(light) / 2) - bar_y);
+hinge_r = nut_trap_radius(hinge_nut) + 3 * filament_width;
+hinge_h = max(wall + nut_trap_depth(hinge_nut), light_strip_clip_depth(light) / 2);
+cam_hinge_h = light_strip_clip_depth(light) - hinge_h;
 
-bar_y_offset = (light_strip_thickness(light) + light_incursion) / cos(light_angle);
-light_y = bar_y + bar_y_offset;
+light_hinge_offset = hinge_r + 0.5;
+light_hinge_z_offset = light_strip_clip_length(light) / 2 + light_hinge_offset * cos(light_angle);
+light_hinge_y_offset = light_strip_clip_width(light) + light_hinge_offset * sin(light_angle);
 
-light_band_tab_h = 2 * (nut_trap_radius(M3_nut) + wall);
-light_band_tab_height = light_band_tab_h + sqrt(sqr(band_or) - sqr(band_tab_d / 2));
+hinge_y = light_y + wall - light_hinge_y_offset;
+hinge_z = pivot_z - light_hinge_z_offset;
+
+cam_hinge_z_offset = pi_cam_front_width / 2 + hinge_r - pi_cam_width / 2 + pi_cam_back_width / 2 - pi_cam_centreline + 0.5;
+cam_hinge_y_offset = hinge_r;
+
+cam_x = X_origin;
+cam_y = hinge_y - cam_hinge_y_offset;
+cam_z = hinge_z - cam_hinge_z_offset;
+
+light2_z_offset = light2_z_top - light_strip_clip_length(light2) / 2;
+light2_x_offset = cam_x - light_x;
+dy = sqrt(sqr(pivot_light2_distance) - sqr(light2_z_top));
+light2_y_offset = -(pivot_y - light_y) + wall - light_strip_clip_width(light2) + (light2_distance < pivot_max_distance ? dy : -dy);
+
+clamp_length = 20;
+
+hypot = sqrt(sqr(pivot_z - bed_height) + sqr(pivot_y - Y0));
+adj = hypot - (pivot_y - hinge_y);
+alpha = atan2(light_hinge_z_offset, adj);
+hypot2 = sqrt(sqr(adj) + sqr(light_hinge_z_offset));
+beta = asin(cam_hinge_z_offset / hypot2);
+cam_angle = light_angle - alpha - beta;
 
 module pi_cam_holes(mid_only = false) {
     ypos = [pi_cam_centreline, pi_cam_width / 2 - 2];
     for(y = mid_only ? [ ypos[0] ] : ypos)
         for(x = [-pi_cam_length / 2 + 2, pi_cam_length / 2 - 2])
             translate([x, y, 0])
-                 child();
+                 children();
 }
 
 module raspberry_pi_camera() {
@@ -138,6 +149,10 @@ module raspberry_pi_camera() {
 
     color("red")
         render() translate(pi_cam_led_pos) cube(center = true);
+
+    if(show_rays)
+        translate([0, pi_cam_centreline, pi_cam_thickness])
+            %cylinder(r = 1, h = 100);
 }
 
 module rpi_camera_focus_ring_stl() {
@@ -149,8 +164,6 @@ module rpi_camera_focus_ring_stl() {
     angle = 180 / flutes;
     x = rad / (sin(angle / 2) + cos(angle / 2));
     r = x * sin(angle / 2);
-
-    stl("rpi_camera_focus_ring");
 
     difference() {
         linear_extrude(height = thickness, convexity = 5)
@@ -184,17 +197,8 @@ module rpi_camera_back_stl() {
 
     stl("rpi_camera_back");
     translate([0, 0, pi_cam_back_depth]) rotate([0, 180, 0]) difference() {
-        union() {
-            translate([0, -pi_cam_width / 2 + pi_cam_back_width / 2, pi_cam_back_depth / 2])
-                cube([pi_cam_back_length, pi_cam_back_width, pi_cam_back_depth], center = true);
-
-            *translate([0, pi_cam_centreline, pi_cam_back_depth + lug_height - lug_rad])
-                rotate([0, 90, 90])
-                    cylinder(r = lug_rad, h = lug_width, center = true);
-
-            *translate([ - lug_rad, pi_cam_centreline - lug_width / 2, 0])
-                cube([lug_rad * 2, lug_width, lug_height - lug_rad + pi_cam_back_depth]);
-        }
+        translate([0, -pi_cam_width / 2 + pi_cam_back_width / 2, pi_cam_back_depth / 2])
+            cube([pi_cam_back_length, pi_cam_back_width, pi_cam_back_depth], center = true);
 
         translate([0, -pi_cam_back_overlap, 0])
             cube([pi_cam_length - 2 * pi_cam_back_overlap, pi_cam_width, 2 * pi_cam_back_clearance], center = true);
@@ -207,20 +211,11 @@ module rpi_camera_back_stl() {
                 rotate([180, 0, 90])
                     nut_trap(M2_clearance_radius, nut_radius(M2_nut), M2_nut_trap_depth, supported = true);
 
-            *translate([0, 0, pi_cam_back_clearance + layer_height])
-                rotate([0, 0, 90])
-                    poly_cylinder(r = M2_clearance_radius, h = 100);
         }
-
-        *translate([0, pi_cam_centreline, pi_cam_back_depth + lug_height - lug_rad])
-            rotate([90, 0, 0])
-                teardrop_plus(r = lug_hole_r, h = lug_width + 1, center = true);
     }
 }
 
 module rpi_camera_front_stl() {
-    stl("rpi_camera_front");
-
     shelf = pi_cam_front_depth - pi_cam_back_depth;
     connector_slot = pi_cam_connector_height + 2 * layer_height;
     rad = pi_cam_front_wall;
@@ -243,24 +238,19 @@ module rpi_camera_front_stl() {
 
                             cylinder(r = rad * (sqrt(2) - 1), h = eta);
                         }
-            //
-            // bar clamp
-            //
-            hull() {
-                translate([0, band_y, band_or])
-                    rotate([-90, 0, 90])
-                        teardrop(r = band_or, h = band_width, center = true);                       // clamp band to go round bar
 
-                translate([-band_width / 2, pi_cam_front_length / 2 - rad, 0])
-                    cube([band_width, 1, 1]);
-            }
+            translate([-light_strip_clip_depth(light) / 2 + hinge_h, cam_hinge_z_offset + pi_cam_centreline, cam_hinge_y_offset])
+                hull() {
+                    rotate([-90, 0, -90])
+                        teardrop(r = hinge_r, h = cam_hinge_h);
 
-            translate([0, band_y, band_or + band_tab_height / 2])
-                cube([band_width, band_tab_d, band_tab_height], center = true);                     // tab for screw
+                    translate([0, -hinge_r - 10, - hinge_r])
+                        cube([cam_hinge_h, hinge_r + 10, 2 * hinge_r]);
+                }
         }
-        translate([0, band_y, band_or])
+        translate([0, cam_hinge_z_offset + pi_cam_centreline, cam_hinge_y_offset])
             rotate([90, 0, 90])
-                teardrop(r = band_ir, h = band_width + 1, center = true);
+                teardrop_plus(r = screw_clearance_radius(hinge_screw), h = 100, center = true);
 
         translate([0, -pi_cam_width / 2 + pi_cam_back_width / 2, pi_cam_front_depth / 2 + shelf - layer_height])   // recess for the back
             cube([pi_cam_back_length + 2 * clearance, pi_cam_back_width + 2 * clearance, pi_cam_front_depth], center = true);
@@ -289,190 +279,218 @@ module rpi_camera_front_stl() {
             cube(pi_cam_turret + 2 * clearance, center = true);                                     // hole for lens
 
         rotate([0, 180, 0]) translate(pi_cam_led_pos) cylinder(r = led_hole_r, h = 100, center = true);   // hole for led
-        //
-        // bar clamp
-        //
-        translate([-50, band_y - band_slit / 2, band_or + band_ir + 5 * layer_height / 4])
-            cube([100, band_slit, 100]);
-
-        translate([0, band_y + band_tab_d / 2, band_or + band_tab_height - band_tab_h / 2])
-            rotate([90, 0, 0])
-                nut_trap(M3_clearance_radius, nut_radius(M3_nut), M3_nut_trap_depth, horizontal = true);
-
     }
-
 }
 
-module camera_bar(male = false) {
-    length = bar_length / 2 + (male ? -bar_overlap / 2 : bar_overlap / 2);
-
-    translate([0, base_depth / 2 - bar_y, 0])
+module pivot_lug() {
+    linear_extrude(height = frame_edge_clamp_thickness(), convexity = 2)
         difference() {
-            union() {
-                tube(or = bar_dia / 2, ir = bar_dia / 2 - bar_wall, h = length, center = false);
-                if(male)
-                    translate([0, 0, length - 6 * layer_height])
-                        cylinder(r = bar_dia / 2 - wall - 0.1, h = bar_overlap + 6 * layer_height);
-            }
-            if(!male)
-                translate([0, 0, length])
-                    cylinder(r = bar_dia / 2 - wall, h = 2 * bar_overlap + 2, center = true);
+            hull() {
+                translate([-clamp_length / 2, -frame_edge_clamp_hinge()])
+                    square([clamp_length, eta]);
 
-            *translate([-100, 0, 0])
-                cube([200, 200, 200]);
-    }
+                translate([0, -pivot_offset])
+                    circle(washer_diameter(M3_washer)/ 2 + 1);
+            }
+            translate([0, -pivot_offset])
+                poly_circle(M3_clearance_radius);
+        }
 }
 
-module rpi_light_clamp_stl() {
-
-    thickness = 3;
-    overlap = 1;
-    length = light_strip_width(light) + 2 * wall;
-    gap = light_strip_width(light) + clearance;
-
-    stl("rpi_light_clamp");
+module light_strip_end_cap_stl() {
+    base_thickness = (right - left - 2 * frame_edge_clamp_thickness() - 1 - light_strip_length(light)) / 2;
 
     difference() {
         union() {
-            translate([-length / 2, - bar_y_offset, 0])
-                cube([length, thickness + bar_y_offset, band_width]);
+            linear_extrude(height = base_thickness, convexity = 2)
+                hull() {
+                    translate([-light_strip_clip_length(light) / 2, end_cap_nut_boss_r - wall])
+                        square([light_strip_clip_length(light), light_strip_clip_width(light)]);
 
-            translate([0, 0, band_width / 2 + eta])
-                rotate([-90, 0, 0])
-                    teardrop(r = nut_trap_radius(M3_nut) + wall, h = wall + M3_nut_trap_depth);
+                    circle(end_cap_nut_boss_r);
+                }
 
+            cylinder(r = end_cap_nut_boss_r, h = end_cap_nut_boss);
 
-            translate([bar_z_offset, -bar_y_offset, 0]) {
-                cylinder(r = band_or, h = band_width);
-
-                translate([light_band_tab_height / 2, 0, band_width / 2])
-                    cube([light_band_tab_height, band_tab_d, band_width], center = true);                     // tab for screw
-            }
+            translate([0, end_cap_nut_boss_r - wall, base_thickness - eta])
+                light_strip_clip(light);
         }
-        translate([-gap / 2, - bar_y_offset * 2, -1])
-            cube([gap, bar_y_offset * 2, band_width + 2]);
+        translate([0, 0, end_cap_nut_boss])
+            nut_trap(M3_clearance_radius, M3_nut_radius, M3_nut_trap_depth);
 
-        translate([-gap / 2 - wall - 1, -bar_y_offset -overlap, -1])
-            cube([wall + 2, bar_y_offset, band_width + 2]);
+        translate([-(light_strip_clip_gap(light) - eta) / 2, end_cap_nut_boss_r + eta, -1])  // extend the slot for wires
+            cube([light_strip_clip_gap(light) - 2 * eta, 100, 100]);
 
-        translate([bar_z_offset, -bar_y_offset, 0])
-            cylinder(r = band_ir, h = 100, center = true);
-
-
-        translate([0, wall + M3_nut_trap_depth, band_width / 2])
-            rotate([90, 0, 0])
-                nut_trap(M3_clearance_radius, nut_radius(M3_nut), M3_nut_trap_depth, horizontal = true);
-        //
-        // bar clamp
-        //
-        translate([bar_z_offset, -bar_y_offset, 0]) {
-            translate([0, -band_slit / 2, -1])
-                cube([100, band_slit, band_width + 2]);
-
-            translate([light_band_tab_height - light_band_tab_h / 2, -band_tab_d / 2, band_width / 2])
-                rotate([90, 0, 0])
-                    nut_trap(M3_clearance_radius, nut_radius(M3_nut), M3_nut_trap_depth, horizontal = true);
-        }
-   }
+        translate([50, end_cap_nut_boss_r - wall - eta, end_cap_nut_boss + eta])    // truncate back to level of screw boss when is short
+            rotate([0, 0, 180])
+                cube([100, 100, 100]);
+    }
 }
 
+module rpi_camera_bracket_stl(include_support = true) {
+    difference() {
+        union() {
+            light_strip_clip(light);
 
-module raspberry_pi_camera_assembly(light_strip = true) {
-    assembly("raspberry_pi_camera_assembly");
+            translate([light_hinge_z_offset, light_hinge_y_offset, 0]) union() {
+                cylinder(r = hinge_r, h = hinge_h);
 
-    translate([0, bar_y, bar_z]) {
-        rotate([angle, 0, 0])
-            translate([cam_x, cam_y - bar_y, cam_z - bar_z]) rotate([90, 0, 0]) translate([0, -pi_cam_centreline, 0]) {
-                color("lime") render()
-                    translate([0, 0, - pi_cam_front_depth - 40 * exploded])
-                        rpi_camera_back_stl();
+                rotate([0, 0, 180 + light_angle])
+                    translate([0, - wall / 2, 0])
+                        cube([light_hinge_offset + wall, wall, hinge_h]);
+            }
+        }
+        translate([light_hinge_z_offset, light_hinge_y_offset, 0])
+            nut_trap(screw_clearance_radius(hinge_screw), nut_radius(hinge_nut), nut_trap_depth(hinge_nut), supported = include_support);
+    }
+}
 
-                color("blue") render()
-                    rotate([0, 180, 0])
-                        rpi_camera_front_stl();
+module light_strip_piggy_back_clip() {
+        union() {
+            light_strip_clip(light);
 
-                translate([0, 0, pi_cam_back_depth - pi_cam_front_depth - 23 * exploded])
-                    raspberry_pi_camera();
+            translate([light2_z_offset, light2_y_offset, 0]) {
+                difference() {
+                    translate([-light_strip_clip_length(light2) / 2, 0, 0])
+                        cube([light_strip_clip_length(light2), light_strip_clip_width(light2), wall]);
 
-                pi_cam_holes(mid_only = true) group() {
-                    screw_and_washer(M2_cap_screw, 12);
-
-                    translate([0, 0, -pi_cam_front_depth + M2_nut_trap_depth - 40 * exploded])
-                        rotate([0, 180, 90])
-                            nut(M2_nut, true);
+                    translate([-(light_strip_clip_gap(light2) - eta) / 2, wall, -1])  // extend the slot for wires
+                        cube([light_strip_clip_gap(light2) - 2 * eta, 100, 100]);
                 }
-
-                translate([0, (band_y - band_tab_d / 2), -(band_or + band_tab_height - band_tab_h / 2)]) {
-                    rotate([90, 0, 0])
-                        screw_and_washer(M3_cap_screw, 16);
-
-                    translate([0, band_tab_d - M3_nut_trap_depth, 0])
-                        rotate([-90, 0, 0])
-                            nut(M3_nut, true);
-                }
-
-                translate([0, pi_cam_centreline, 1.5 + 10 * exploded]) color("lime") render() rpi_camera_focus_ring_stl();
+                translate([0, 0, wall - eta])
+                    light_strip_clip(light2);
             }
 
-        if(light_strip)
-            rotate([light_angle, 0, 0])
-                translate([light_x, bar_y_offset, bar_z_offset]) {
-                    rotate([90, 0, 0])
-                        light_strip(light);
+            translate([light_strip_clip_length(light) / 2, 0, 0])
+                rotate([0, 0, 180])
+                    cube([wall, -light2_y_offset, light_strip_clip_depth(light2)]);
+        }
+}
 
-                    for(side = [-1, 1])
-                        translate([side * light_strip_hole_pitch(light) / 2, 0, 0]) {
-                            translate([-band_width / 2, 0, 0])
-                                rotate([0, 90, 0])
-                                    color("blue") render() rpi_light_clamp_stl();
+module light_strip_piggy_back_clips_stl() {
 
-                            translate([0, -light_strip_thickness(light), 0])
-                                rotate([90, 0, 0])
-                                    screw_and_washer(M3_cap_screw, 10);
+    offset = -(light_strip_clip_length(light) / 2 + light_strip_clip_length(light2) - wall);
+    translate([offset, -light_strip_clip_width(light) - 1, 0])
+        light_strip_piggy_back_clip();
 
-                            translate([0, wall, 0])
-                                rotate([-90, 90, 0])
-                                    nut(M3_nut, true);
+    translate([offset, light_strip_clip_width(light) + 1, 0])
+        rotate([180, 0, 0])
+            mirror([0, 0, 1])
+                light_strip_piggy_back_clip();
+}
 
-                            translate([0, -bar_y_offset, -bar_z_offset]) {
-                                translate([0, band_tab_d / 2, -light_band_tab_height + light_band_tab_h / 2])
-                                    rotate([-90, 0, 0])
-                                        screw_and_washer(M3_cap_screw, 16);
+module raspberry_pi_camera_assembly() {
+    assembly("raspberry_pi_camera_assembly");
 
-                                translate([0, -band_tab_d / 2 + M3_nut_trap_depth,
-                                              -light_band_tab_height + light_band_tab_h / 2])
-                                    rotate([90, 90, 0])
-                                        nut(M3_nut, true);
-                            }
+    stl("rpi_camera_case");
+    translate([0, pivot_y, pivot_z]) {
+        rotate([light_angle, 0, 0])
+            translate([0, hinge_y - pivot_y, hinge_z - pivot_z])
+                rotate([cam_angle - light_angle, 0, 0])
+                    translate([cam_x, cam_y - hinge_y, cam_z - hinge_z - pi_cam_centreline]) rotate([90, 0, 0]) {
+                        color("lime") render()
+                            translate([0, 0, - pi_cam_front_depth - 40 * exploded])
+                                rpi_camera_back_stl();
+
+                        color("red") render()
+                            rotate([0, 180, 0])
+                                rpi_camera_front_stl();
+
+                        translate([0, 0, pi_cam_back_depth - pi_cam_front_depth - 23 * exploded])
+                            raspberry_pi_camera();
+
+                        pi_cam_holes(mid_only = true) group() {
+                            screw_and_washer(M2_cap_screw, 12);
+
+                            translate([0, 0, -pi_cam_front_depth + M2_nut_trap_depth - 40 * exploded])
+                                rotate([0, 180, 90])
+                                    nut(M2_nut, true);
                         }
-                }
 
+                        translate([0, pi_cam_centreline, 1.5 + 10 * exploded])
+                            color("lime") render()
+                                rpi_camera_focus_ring_stl();
+                    }
     }
 
-    stl("rpi_camera_bar");
+    stl("light_and_camera_brackets");
+    stl("rear_light_brackets");
 
-    for(side = [-1, 1])
-        translate([side < 0 ? left : right, base_depth / 2, bar_z])
+    translate([0, pivot_y, pivot_z])
+        rotate([light_angle, 0, 0]) {
+            translate([light_x, light_y - pivot_y, 0]) {
+                rotate([90, 0, 0]) {
+                    light_strip(light);
+
+                    if(light2) {
+                        translate([light2_x_offset, light2_z_offset, light2_y_offset])
+                            light_strip(light2);
+
+                        for(side = [-1, 1])
+                            translate([light2_x_offset + side * (light_strip_length(light2) / 2 + wall), 0, -wall])
+                                rotate([90, 0, 90])
+                                    mirror([0, 0, side > 0 ? 1 : 0])
+                                        color("lime") render()
+                                            light_strip_piggy_back_clip();
+                    }
+                }
+
+                translate([cam_x - light_x + light_strip_clip_depth(light) / 2, wall, 0])
+                    rotate([180, 90, 0]) {
+                        color("lime") render()
+                            rpi_camera_bracket_stl(false);
+
+                        translate([light_hinge_z_offset, light_hinge_y_offset, 0]) {
+                            translate([0, 0, hinge_h + cam_hinge_h])
+                                screw_and_washer(hinge_screw, hinge_screw_length);
+
+                            translate([0, 0, nut_trap_depth(hinge_nut)])
+                                rotate([180, 0, 0])
+                                    nut(hinge_nut, true);
+                        }
+                    }
+            }
+        }
+
+     for(side = [-1, 1])
+        translate([side < 0 ? left : right, base_depth / 2, pivot_z])
             explode([20 * side, 0, 0])
-                rotate([0, side * 90, 180])
-                    frame_edge_clamp_assembly(length = clamp_length, left = side < 0)
-                        camera_bar(side > 0);
+                rotate([0, side * 90, 180]) {
+                    frame_edge_clamp_assembly(length = clamp_length, kids = true)
+                        pivot_lug();
+
+                    translate([0, -pivot_offset, 0]) {
+                        rotate([180, 0, 0])
+                            screw_and_washer(M3_cap_screw, pivot_screw_length);
+
+                        translate([0, 0, frame_edge_clamp_thickness() + end_cap_nut_boss - M3_nut_trap_depth])
+                            rotate([0, 0, -side * light_angle])
+                                nut(M3_nut, true);
+                    }
+
+                    translate([0, -pivot_offset, frame_edge_clamp_thickness()])
+                        rotate([0, 0, -side * light_angle])
+                            color("lime") render()
+                                light_strip_end_cap_stl();
+                }
 
     if(show_rays) {
         %hull() {                           // light ray, should point at centre of Y axis.
-            translate([0, bar_y, bar_z])
-                rotate([angle, 0, 0])
-                    translate([cam_x, cam_y - bar_y, cam_z - bar_z])
-                        sphere();
+            translate([0, pivot_y, pivot_z])
+                rotate([light_angle, 0, 0])
+                    translate([0, hinge_y - pivot_y, hinge_z - pivot_z])
+                        rotate([cam_angle - light_angle, 0, 0])
+                            translate([cam_x, cam_y - hinge_y, cam_z - hinge_z])
+                                sphere();
 
             translate([X_origin, Y0, bed_height])
                 sphere();
         }
 
         %hull() {                           // light ray, should point at centre of Y axis.
-            translate([0, bar_y, bar_z])
+            translate([0, pivot_y, pivot_z])
                 rotate([light_angle, 0, 0])
-                    translate([X_origin, bar_y_offset - light_strip_thickness(light), bar_z_offset])
+                    translate([X_origin, -(pivot_y - light_y) - light_strip_thickness(light), 0])
                         sphere();
 
             translate([X_origin, Y0, bed_height])
@@ -486,16 +504,31 @@ module raspberry_pi_camera_assembly(light_strip = true) {
     end("raspberry_pi_camera_assembly");
 }
 
-module rpi_camera_bar_stl() {
-
-    for(side = [-1, 1])
+module rear_light_brackets_stl() {
+    for(side = [-1, 1]) {
         translate([side * (clamp_length / 2 + 1), 0, 0]) {
-            frame_edge_clamp_front_stl(length = clamp_length)
-                camera_bar(side > 0);
+            translate([0, -frame_edge_clamp_width()  + frame_edge_clamp_hinge() - 2, 0])
+                frame_edge_clamp_front_stl(length = clamp_length)
+                    pivot_lug();
 
-            translate([0, frame_edge_clamp_width() + 2, 0])
+            translate([0, frame_edge_clamp_hinge(), 0])
                 frame_edge_clamp_back_stl(length = clamp_length);
         }
+    }
+}
+
+module light_and_camera_brackets_stl() {
+    for(side = [-1, 1])
+        translate([side * (light_strip_clip_length(light) / 2 + 1), end_cap_nut_boss_r + 2, 0])
+            light_strip_end_cap_stl();
+
+    rotate([0, 0, 180])
+        rpi_camera_bracket_stl();
+
+    if(light2)
+        translate([0, light_strip_clip_width(light) + 2 * end_cap_nut_boss_r - wall + 4, 0])
+            rotate([0, 0, -90])
+                light_strip_piggy_back_clips_stl();
 }
 
 module rpi_camera_case_stl() {
@@ -503,12 +536,16 @@ module rpi_camera_case_stl() {
 
     translate([pi_cam_front_length, 0, 0])
         rpi_camera_back_stl();
+
+    translate([0, -pi_cam_front_width / 2 - 9, 0])
+        rpi_camera_focus_ring_stl();
 }
 
 if(1)
     raspberry_pi_camera_assembly();
+else if(1)
+    light_and_camera_brackets_stl();
+else if(0)
+    rpi_camera_case_stl();
 else
-    if(1)
-        rpi_camera_case_stl();
-    else
-        rpi_camera_bar_stl();
+    rear_light_brackets_stl();
