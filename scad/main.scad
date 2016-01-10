@@ -30,11 +30,12 @@ use <raspberry_pi.scad>
 use <raspberry_pi_camera.scad>
 use <light_strip.scad>
 include <positions.scad>
+use <x-carriage_assembly.scad>
 
 
 X = 0 * X_travel / 2; // - limit_switch_offset;
 Y = 0 * Y_travel / 2; // - limit_switch_offset;
-Z = 0.5 * Z_travel;
+Z = 0.5 * (Z_travel + limit_switch_offset) - hot_end_bodge(hot_end);
 
 //
 // X axis
@@ -52,7 +53,7 @@ module x_axis_assembly(show_extruder) {
 
     translate([-X + X_origin, 0, Z + Z0 + x_carriage_offset()])
         rotate([180, 0, 180])
-            x_carriage_assembly(show_extruder);
+            x_carriage_assembly(show_extruder, show_fan = true);
 
     color(belt_color)
         translate([0, x_belt_offset(), Z + Z0])

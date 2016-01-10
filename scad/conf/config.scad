@@ -75,6 +75,7 @@ thermistor_wires_hole_radius = wire_hole_radius(thermistor_wires);
 
 cnc_sheets = false;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
 base_nuts = false;                  // Need something under the base if using nuts
+pulley_type = T5x8_plastic_pulley;
 clip_handles = true;
 include_fan = false;
 squeeze = false;                    // Bodge to make Huxley as small as possible without affecting dibond kits
@@ -106,9 +107,9 @@ Y_carriage_rad = 3;                     // corner radius
 Z_clearance = 10;                       // How close the top of the object gets to the gantry
 belt_clearance = 0.2;                   // clearance of belt clamp slots
 
-X_bar_dia = X_bearings[2];      // rod sizes to match the bearings
-Y_bar_dia = Y_bearings[2];
-Z_bar_dia = Z_bearings[2];
+X_bar_dia = bearing_rod_dia(X_bearings);      // rod sizes to match the bearings
+Y_bar_dia = bearing_rod_dia(Y_bearings);
+Z_bar_dia = bearing_rod_dia(Z_bearings);
 
 Y_idler_bearing = BB624;
 X_idler_bearing = BB624;

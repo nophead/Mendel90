@@ -21,6 +21,7 @@ m90_hot_end_12p75mm = [m90,      "HEM90340: Mendel 90 hot end", 57, 10,         
 
 JHeadMk4 =            [jhead,   "HEJH16340: JHead MK4 hot end", 64, jhead_inset, 16,    50, "black", 12,            true, 10.19 + 4, [0, 2.94, -5]];
 JHeadMk5 =            [jhead,   "HEJH16340: JHead MK5 hot end", 54, jhead_inset, 16,    40, "black", 12,            true, 9     + 4, [0, 2.38, -5]];
+JHeadMk5x =           [jhead,   "HEJH16340: JHead MK5 hot end", 51.2,jhead_inset,16,    40, "black", 12,            true, 9     + 4, [0, 2.38, -5]];
 
 function hot_end_style(type)              = type[0];
 function hot_end_part(type)               = type[1];
@@ -33,5 +34,12 @@ function hot_end_screw_pitch(type)        = type[7];
 function hot_end_groove_mount(type)       = type[8];
 function hot_end_duct_radius(type)        = type[9];
 function hot_end_duct_offset(type)        = type[10];
+
+//
+// The actual length of a JHeadMk5 is 51.2 but at the time the kit was designed I thought it was 54. The effect of this is that the
+// extension on the Wades block is shorter than it should be so the tip of the hot end is higher so the fan duct needs to be
+// fitted a bit higher. This bodge allows the model to reflect reality without correcting the extruder block and changing the firmware.
+//
+function hot_end_bodge(type) = type == JHeadMk5 ? 54 - 51.2 : 0;
 
 function hot_end_length(type) = hot_end_total_length(type) - hot_end_inset(type);

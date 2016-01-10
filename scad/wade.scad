@@ -65,7 +65,7 @@ bearing_housing_bulge = driven_x - bearing_housing_x + 1;
 pscrew_length = 50;
 pscrew_x = bearing_housing_x + pscrew_length;
 
-function extruder_connector_offset() = [-filament_x + motor_x, filament_z - thickness, motor_y] + d_motor_connector_offset();
+function wades_extruder_connector_offset() = [-filament_x + motor_x, filament_z - thickness, motor_y] + d_motor_connector_offset();
 
 module keyhole(r, h, l) {
     R = r + layer_height / 4;
