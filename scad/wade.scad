@@ -57,7 +57,6 @@ bearing = BB608;
 bearing_rad = ball_bearing_diameter(bearing) / 2;
 socket_rad = bearing_rad;                           // make it a tight fit
 socket_cr = corrected_radius(socket_rad);           // actual radius
-echo(socket_cr=socket_cr*2);
 
 bearing_housing_x = 57;
 bearing_housing_x2 = driven_x + socket_cr + 2 * filament_width;
