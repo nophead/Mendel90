@@ -489,6 +489,7 @@ module fixing_blocks(holes = false) {
     w = fixing_block_width();
     h = fixing_block_height();
     t = sheet_thickness(frame);
+    right_inside = right_stay_x - sheet_thickness(frame) / 2 - (base_width / 2 - right_w) > w + 2 * base_clearance;
 
     {     // all screws into frame
         $upper = true;
@@ -526,6 +527,8 @@ module fixing_blocks(holes = false) {
             for(x = [-base_width/2 + base_clearance + w /2,
                       base_width/2 - base_clearance - w /2,
                      -base_width/2 - base_clearance - w /2 + left_w,
+                     right_inside ?
+                      base_width/2 + base_clearance + w /2 - right_w :
                       right_stay_x + sheet_thickness(frame) / 2 + w / 2 + base_clearance])
                 translate([x, gantry_Y + t, 0])
                     children();
@@ -576,7 +579,6 @@ module frame_base() {
         translate([idler_end - z_bar_offset(), 0, 0])
             cylinder(r = 4, h = 100, center = true);
 
-
         translate([X_origin, ribbon_clamp_y,0])
             ribbon_clamp_holes(bed_ways, base_screw)
                 base_screw_hole();
@@ -600,7 +602,8 @@ module frame_base() {
                 wire_hole(motor_wires_hole_radius);
 
             // Y limit
-            translate([X_origin + Y_bar_spacing / 2 + bar_rail_offset(Y_bar_dia) - bar_clamp_tab / 2,
+            translate([min(X_origin + Y_bar_spacing / 2 + bar_rail_offset(Y_bar_dia) - bar_clamp_tab / 2,
+                           Y_cable_clip_x - cable_clip_offset(base_screw, endstop_wires)),
                        Y_front_cable_clip_y - 5, 0])
                 wire_hole(endstop_wires_hole_radius);
 
@@ -745,6 +748,11 @@ module frame_stay(left) {
                         psu_screw_positions(psu)
                             cylinder(r = psu_screw_hole_radius(psu), h = 100, center = true);
 
+            if(!pi_on_psu())
+                rpi_position()
+                    rpi_bracket_holes()
+                        poly_cylinder(r = M3_clearance_radius, h = 100, center = true);
+
             //
             // Wiring holes
             //
@@ -792,12 +800,13 @@ module bed_fan_assembly(show_fan = false) {
 
 module electronics_assembly() {
     assembly("electronics_assembly");
+    extra_spacers = raspberry_pi && pi_on_psu();
     translate([right_stay_x + sheet_thickness(frame) / 2, controller_y, controller_z])
         rotate([90, 0, 90]) {
             controller_screw_positions(controller)
-                pcb_spacer_assembly(raspberry_pi ? 2 : 1, raspberry_pi ? $i >= 2 : true);
+                pcb_spacer_assembly(extra_spacers ? 2 : 1, extra_spacers ? $i >= 2 : true);
 
-            translate([0, 0, pcb_spacer_height() * (raspberry_pi ? 2 : 1)])
+            translate([0, 0, pcb_spacer_height() * (extra_spacers ? 2 : 1)])
                 controller(controller);
         }
 
