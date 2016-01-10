@@ -284,42 +284,43 @@ module y_carriage() {
 
 module y_heatshield() {
     layers = pillar_height(bed_pillars) / sheet_thickness(Cardboard);
-    width =  Y_carriage_width - 2 * bar_clamp_tab;
+    width =  bed_holes[0] - washer_diameter(M3_washer) - 1;
     for(i = [0 : layers - 1])
         translate([0, 0, (sheet_thickness(Cardboard) + exploded * 50) * i]) {
-            assign(k = ((i % 2) ? 0.9 : 1), c = sheet_colour(Cardboard))
-                color([c[0] * k, c[1] * k, c[2] * k, c[3]])
-                    difference() {
-                        sheet(Cardboard, width, Y_carriage_depth);
+            k = (i % 2) ? 0.9 : 1;
+            c = sheet_colour(Cardboard);
+            color([c[0] * k, c[1] * k, c[2] * k, c[3]])
+                render() difference() {
+                    sheet(Cardboard, width, Y_carriage_depth);
 
-                        if(i == 0) {
-                            translate([Y_bar_spacing / 2, 0, 0])
+                    if(i == 0) {
+                        translate([Y_bar_spacing / 2, 0, 0])
+                            rotate([0,180,0])
+                                bearing_mount_holes()
+                                    cube([10,10, 100], center = true);
+
+                        for(end = [-1, 1])
+                            translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
                                 rotate([0,180,0])
                                     bearing_mount_holes()
-                                        cube([10,10, 100], center = true);
+                                        cube([10, 10, 100], center = true);
 
-                            for(end = [-1, 1])
-                                translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
-                                    rotate([0,180,0])
-                                        bearing_mount_holes()
-                                            cube([10, 10, 100], center = true);
-
-                            for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
-                                translate([Y_belt_line - X_origin, end[0], 0])
-                                    rotate([0, 180, end[1]])
-                                        hull()
-                                            y_belt_anchor_holes()
-                                                cube([10, 10, 100],center =true);
-                        }
-
-                        if(i == layers - 1)
-                            translate([0, Y_carriage_depth / 2, 0])
-                                cube([15, 180, 100], center = true);
-
-                        translate([0, Y_carriage_depth / 2, 0])
-                            cube([ribbon_clamp_length(bed_ways, cap_screw) + 5, 70, 100], center = true);
+                        for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
+                            translate([Y_belt_line - X_origin, end[0], 0])
+                                rotate([0, 180, end[1]])
+                                    hull()
+                                        y_belt_anchor_holes()
+                                            cube([10, 10, 100],center =true);
                     }
+
+                    if(i == layers - 1)
+                        translate([0, Y_carriage_depth / 2, 0])
+                            cube([15, 180, 100], center = true);
+
+                    translate([0, Y_carriage_depth / 2, 0])
+                        cube([ribbon_clamp_length(bed_ways, cap_screw) + 5, 70, 100], center = true);
                 }
+            }
 }
 
 
