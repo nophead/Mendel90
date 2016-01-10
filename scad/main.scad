@@ -492,8 +492,7 @@ module fixing_blocks(holes = false) {
     t = sheet_thickness(frame);
     right_inside = right_stay_x - sheet_thickness(frame) / 2 - (base_width / 2 - right_w) > w + 2 * base_clearance;
 
-    {     // all screws into frame
-        $upper = true;
+    for($upper = true, $rear = false) {     // all screws into frame
         translate([left_stay_x + t / 2, gantry_Y + t, stay_height - base_clearance - h - w / 2]) // top
             rotate([0,-90,-90])
                 children();
@@ -510,10 +509,8 @@ module fixing_blocks(holes = false) {
             rotate([0,90, 90])
                 children();
     }
-    {  // one screw in the base
-        $upper = true;
-        {
-            $rear = true;
+    for($upper = false) {  // one screw in the base
+        for($rear = true) {
             translate([left_stay_x + t / 2, base_depth / 2 - base_clearance - w / 2, 0]) // back
                 rotate([0, 0,-90])
                     children();
@@ -523,8 +520,7 @@ module fixing_blocks(holes = false) {
                     children();
         }
 
-        {
-            $rear = false;
+        for($rear = false) {
             for(x = [-base_width/2 + base_clearance + w /2,
                       base_width/2 - base_clearance - w /2,
                      -base_width/2 - base_clearance - w /2 + left_w,

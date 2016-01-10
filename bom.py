@@ -6,6 +6,7 @@ import os
 import sys
 import shutil
 import openscad
+from time import *
 
 source_dir = "scad"
 
@@ -114,6 +115,7 @@ def boms(machine, assembly = None):
         assembly = "machine_assembly"
         if os.path.isdir(bom_dir):
             shutil.rmtree(bom_dir)
+            sleep(0.1)
         os.makedirs(bom_dir)
 
     f = open("scad/conf/machine.scad","wt")
