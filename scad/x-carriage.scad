@@ -57,8 +57,6 @@ lug_depth = X_carriage_clearance + belt_width(X_belt) + belt_clearance + M3_clea
 lug_screw = -(X_carriage_clearance + belt_width(X_belt) + belt_clearance + M3_clearance_radius);
 slot_y =  -X_carriage_clearance - (belt_width(X_belt) + belt_clearance) / 2;
 
-echo(bar_x, zip_x);
-
 function x_carriage_belt_gap() = length - lug_width;
 
 clamp_thickness = 3;
