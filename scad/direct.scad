@@ -322,7 +322,8 @@ module extruder_motor_assembly(show_connector = true, exploded = exploded) {
     end("extruder_motor_assembly");
 }
 
-module idler_lever_stl() {
+module direct_idler_lever_stl() {
+    stl("direct_idler_lever");
     w = lever_width;
     h = width - motor_thickness - nut_thickness(M3_nut) - 3 * washer_thickness(M3_washer);
     h2 = width - idler_z -  ball_bearing_width(idler) / 2 - washer_thickness(M4_washer);
@@ -384,7 +385,7 @@ module direct_idler_assembly() {
     translate([-idler_x, idler_z - width / 2, idler_y]) {
         rotate([90, 0, 0]) {
             translate([0, 0, idler_z - width])
-                color("lime") render() idler_lever_stl();
+                color("lime") render() direct_idler_lever_stl();
 
             ball_bearing(idler)
                 screw(M4_hex_screw, 16);
@@ -501,7 +502,7 @@ module direct_extruder_stl() {
     direct_block_stl();
 
     translate([34, 37, 0])
-        idler_lever_stl();
+        direct_idler_lever_stl();
 }
 
 

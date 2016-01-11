@@ -34,7 +34,11 @@ def plates(machine):
     # Make the stls in the list
     #
     if machine == "dibond" or machine == "huxley":
-        plate_list.remove("cable_clips.stl");
+        plate_list.remove("cable_clips.stl")
+    if machine == "huxley":
+        plate_list.remove("atx_brackets.stl")
+        plate_list.remove("wades_extruder.stl")
+        plate_list.append("direct_extruder.stl")
     used = stls(machine, plate_list)
     #
     # Move them to the plates directory
