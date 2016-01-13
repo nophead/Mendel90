@@ -7,12 +7,12 @@
 //
 // Wade's motor assembly view
 //
-// assembly  1141 965 51.27 13.11 -39.31 57.80 2.10 5.40 350
-// assembled 1141 965 51.27 13.11 -39.31 57.80 2.10 5.40 250
+// assembly  1141 965 -24 26 13 226 0 108 350
+// assembled 1141 965 -24 26 13 226 0 108 250
 //
 $exploded = 1;
 
-use <../scad/wade.scad>
+use <../scad/extruder.scad>
 
 rotate([0, 90, -30])
     extruder_motor_assembly();

@@ -7,19 +7,12 @@
 //
 // X carriage, carries the extruder
 //
-
 include <x-carriage.scad>
 
 module x_carriage_assembly(show_extruder = true, show_fan = true) {
     if(show_extruder) {
-        if(extruder == Wades)
-            translate([75, extruder_width / 2, eta])
-                rotate([-90,0,180])
-                    wades_assembly();
-
-        if(extruder == Direct14)
-            rotate([180, 0, 180])
-                direct_assembly();
+        rotate([0, 180, 0])
+             extruder_assembly();
 
         for(end = [-1, 1])
             translate([extruder_mount_pitch / 2 * end, 0, nut_trap_thickness])

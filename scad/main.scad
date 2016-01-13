@@ -19,7 +19,7 @@ use <z-coupling.scad>
 use <z-motor-bracket.scad>
 use <z-limit-switch-bracket.scad>
 use <fan-guard.scad>
-use <wade.scad>
+use <extruder.scad>
 use <cable_clip.scad>
 use <pcb_spacer.scad>
 use <ATX_PSU_brackets.scad>

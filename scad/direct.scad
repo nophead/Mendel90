@@ -304,21 +304,19 @@ module direct_block_stl(include_support = true) {
     }
 }
 
-module extruder_motor_assembly(show_connector = true, exploded = exploded) {
+module direct_motor_assembly(show_connector = true, exploded = exploded) {
     assembly("extruder_motor_assembly");
     // motor and gear
-    translate([-motor_x, motor_z - width / 2, motor_y])
-        rotate([90,0,180]) {
-            rotate([0, 0, 180]) {
-                NEMA(motor);
+    rotate([0, 0, 180]) {
+        NEMA(motor);
 
-                translate([0, 0, filament_z - hobbed_offset(pulley)])
-                    rotate([0, 0, -90])
-                        hobbed_pulley_assembly(pulley);
-            }
-            if(show_connector)
-                d_motor_bracket_assembly();
-        }
+        translate([0, 0, filament_z - hobbed_offset(pulley) + exploded * 20])
+            rotate([0, 0, -90])
+                hobbed_pulley_assembly(pulley);
+    }
+    if(show_connector)
+        d_motor_bracket_assembly();
+
     end("extruder_motor_assembly");
 }
 
@@ -348,7 +346,7 @@ module direct_idler_lever_stl() {
                     }
                 }
             }
-            *linear_extrude(height = h4)                                                 // release handle
+            linear_extrude(height = h4)                                                 // release handle
                 hull() {
                     translate([idler_x - idler_pivot_x, idler_pivot_y - idler_y])
                         circle(w / 2 - 2);
@@ -359,9 +357,6 @@ module direct_idler_lever_stl() {
         }
         translate([0, 0, h2])
             poly_cylinder(r = ball_bearing_diameter(idler) / 2 + 0.5, h = 10);          // bearing socket
-
-        *translate([idler_x - idler_pivot_x - w / 2 - 1, lever_bottom_y - idler_y - 1, h3])
-            cube([w + 2, 2 * (motor_y - motor_screw_offset - lever_bottom_y) + 1, 10]); // miss the bottom motor screw
 
         rotate([0, 0, 90])
             nut_trap(2, nut_trap_radius(M4_nut, horizontal = false, snug = false), nut_trap_depth(M4_nut), supported = true); // nut trap for axle
@@ -382,15 +377,16 @@ module direct_idler_lever_stl() {
 }
 
 module direct_idler_assembly() {
-    translate([-idler_x, idler_z - width / 2, idler_y]) {
+    translate([-idler_x, idler_z - width / 2 + exploded * 50, idler_y]) {
         rotate([90, 0, 0]) {
             translate([0, 0, idler_z - width])
                 color("lime") render() direct_idler_lever_stl();
 
-            ball_bearing(idler)
-                screw(M4_hex_screw, 16);
+            explode([0, 0, 20])
+                ball_bearing(idler)
+                    screw(M4_hex_screw, 16);
 
-            translate([0, 0, -ball_bearing_width(idler) / 2])
+            translate([0, 0, -ball_bearing_width(idler) / 2 + exploded * 10])
                 rotate([180, 0, 0])
                     washer(M4_washer);
 
@@ -399,7 +395,6 @@ module direct_idler_assembly() {
                     nut(M4_nut, true);
         }
     }
-
     translate([-spring_x, spring_z - width / 2, spring_y])
         rotate([0, 90, 0])
             washer(M4_washer)
@@ -429,22 +424,32 @@ module direct_assembly(show_connector = true, show_drive = true) {
                 screw(M4_hex_screw, 20);
 
         // motor
-        translate([0, 0, 50 * exploded])
-            extruder_motor_assembly(show_connector, 0);
+        translate([0, -40 * exploded, 0])
+            translate([-motor_x, motor_z - width / 2, motor_y])
+                rotate([90,0,180])
+                    direct_motor_assembly(show_connector, 0);
 
-        translate([-motor_x, -width / 2 + motor_thickness, motor_y]) {
+        // motor screws
+        translate([-motor_x, -width / 2 + motor_thickness, motor_y])
             rotate([-90, 0, 0])
                 NEMA_screws(motor, 3, 8, M3_pan_screw);
-        }
+
+        // idler axle
         translate([-idler_pivot_x,  width / 2, idler_pivot_y])
             rotate([-90, 0, 0]) {
-                screw_and_washer(M3_cap_screw, 25);
-                translate([0, 0, -(width - motor_thickness)])
+                explode([0, 0, 50])
+                    screw_and_washer(M3_cap_screw, 25);
+
+            translate([0, 0, -width + motor_thickness])
+                explode([0, 0, 5])
                     washer(M3_washer)
-                        star_washer(M3_washer)
-                            nut(M3_nut)
-                                washer(M3_washer);
-            }
+                        explode([0, 0, 2])
+                            star_washer(M3_washer)
+                                explode([0, 0, 2])
+                                    nut(M3_nut)
+                                        explode([0, 0, 2])
+                                            washer(M3_washer);
+        }
         //
         // Filament
         //
@@ -456,10 +461,9 @@ module direct_assembly(show_connector = true, show_drive = true) {
 
         translate([-bulkhead_x - bulkhead_depth, spring_z - width / 2, spring_y])
             rotate([0, 90, 0])
-                nut(M4_nut);
+                explode([0, 0, -5])
+                    nut(M4_nut);
     }
-
-
     //
     // Hot end
     //
@@ -487,10 +491,8 @@ module direct_assembly(show_connector = true, show_drive = true) {
                         screw_and_washer(jhead_screw, jhead_screw_length, true);
 
                 translate([jhead_screw_pitch, 0, jhead_nut_pos - jhead_nut_slot / 2 + nut_thickness(screw_nut(jhead_screw)) / 2])
-                    explode([ [ 10 * cos(a),  10 * sin(a), 0],
-                              [ 10 * sin(a), -10 * cos(a), 0],
-                              [-10 * sin(a),  10 * cos(a), 0] ][i])
-                         rotate([180, 0, -a + 90])
+                     explode( [ 15 * sin(-a),  15 * cos(-a), 0] * [-1,1,-1,1][i])
+                        rotate([180, 0, -a + 90])
                              nut(screw_nut(jhead_screw));
             }
         }
@@ -508,6 +510,6 @@ module direct_extruder_stl() {
 
 
 if(1)
-    direct_assembly(true);
+    direct_assembly(true, true);
 else
     direct_extruder_stl();

@@ -10,10 +10,7 @@
 
 include <conf/config.scad>
 use <bearing-holder.scad>
-use <wade.scad>
-use <direct.scad>
-
-function extruder_connector_offset() = extruder == Wades ? wades_extruder_connector_offset() : direct_extruder_connector_offset();
+use <extruder.scad>
 
 hole = extruder_hole(extruder);
 width = hole[1] + 2 * bearing_holder_width(X_bearings);

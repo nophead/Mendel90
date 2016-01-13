@@ -12,7 +12,6 @@ include <conf/config.scad>
 use <x-carriage.scad>
 use <pulley.scad>
 use <ribbon_clamp.scad>
-use <wade.scad>
 
 bwall = 2.3;
 

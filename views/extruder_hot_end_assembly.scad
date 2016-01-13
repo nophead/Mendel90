@@ -7,9 +7,13 @@
 //
 // Wade's assembly view
 //
-// assembly 910 904 61.89 7.66 0.30 13.70 25.90 348.60 300
+$vpt = [-10, 6, 3];
+$vpr = [107, 12, 24];
+$vpd = 300;
 //
-use <../scad/wade.scad>
+// assembly 910 904
+//
+use <../scad/extruder.scad>
 include <../scad/conf/config.scad>
 
-wades_assembly(show_connector = !exploded, show_drive = false);
+extruder_assembly(show_connector = !exploded, show_drive = false);

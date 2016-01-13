@@ -5,11 +5,13 @@ from bom import boms
 from sheets import sheets
 from stls import stls
 from plates import plates
+from accessories import accessories
 
 def make_machine(machine):
     boms(machine)
     sheets(machine)
     stls(machine)
+    accessories(machine)
     plates(machine)
 
 if __name__ == '__main__':

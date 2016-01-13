@@ -9,7 +9,6 @@
 //
 include <conf/config.scad>
 include <positions.scad>
-use <wade.scad>
 
 small_bearing = false;
 
