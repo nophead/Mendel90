@@ -9,9 +9,7 @@
 //
 include <conf/config.scad>
 use <d-motor_bracket.scad>
-use <vitamins/m90_hot_end.scad>
-use <vitamins/stoffel_hot_end.scad>
-use <vitamins/jhead_hot_end.scad>
+use <hot_end.scad>
 
 spring = false;             // use two nuts or one nut and a spring
 
@@ -481,17 +479,9 @@ module wades_assembly(show_connector = true, show_drive = true) {
             //
             // Hot end
             //
-            assembly("hot_end_assembly");
             translate([filament_x, -extension, filament_z])
-                rotate([-90, 0, 0]) {
-                    if(hot_end_style(hot_end) == m90)
-                        m90_hot_end(hot_end);
-                    if(hot_end_style(hot_end) == Stoffel)
-                        stoffel_hot_end(hot_end);
-                    if(hot_end_style(hot_end) == jhead)
-                        jhead_hot_end(hot_end, exploded = 0);
-               }
-            end("hot_end_assembly");
+                rotate([-90, 0, 0])
+                    hot_end_assembly();
 
             if(!hot_end_groove_mount(hot_end))
                 for(side = [-1, 1])

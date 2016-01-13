@@ -12,6 +12,7 @@ jhead   = 3;
 
 function jhead_groove() = 4.64;
 function jhead_groove_offset() = 5.1; //4.76;
+function jhead_groove_dia() = 12;
 
 jhead_inset = jhead_groove_offset();
 

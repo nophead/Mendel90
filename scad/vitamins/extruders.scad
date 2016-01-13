@@ -10,6 +10,7 @@ extruder_mount_pitch = 50;
 
 Wades    = [96, 16, 26, [36, 36,   5], NEMA17, 45];
 Direct14 = [63,  0, 20, [28, 26,   3], NEMA14, 35];
+Direct17 = [63,  0, 20, [28, 26,   3], NEMA17, 35];
 
 function extruder_length(type)         = type[0];
 function extruder_x_offset(type)       = type[1];

@@ -9,7 +9,7 @@
 //
 include <conf/config.scad>
 use <d-motor_bracket.scad>
-use <vitamins/jhead_hot_end.scad>
+use <hot_end.scad>
 
 MiniHyena = [5, 8, 13, 4, 6.3, 5.3, 1.5, 9, M3_grub_screw, 3];
 
@@ -52,20 +52,40 @@ module hobbed_pulley_assembly(type) {
             screw(hobbed_screw_type(type), hobbed_screw_l(type));
 }
 
-peg_spring = [ 6.5,    0.96, 16, 8];
+peg_spring = [6.5, 0.96, 16, 8];
 
 pulley = MiniHyena;
 idler = BB624;
-motor = extruder_motor(extruder);
+
+d_extruder = extruder == Direct14 || extruder == Direct17 ? extruder : Direct17;
+
+motor = extruder_motor(d_extruder);
 spring = peg_spring;
 
 compressed_spring = 9.5;
 
-width = extruder_width(extruder);
-length = extruder_length(extruder);
+jhead_screw = M3_cap_screw;
+jhead_screw_length = 16;
+jhead_washer = M4_washer;
+jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
+                          jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
+jhead_nut_slot = nut_thickness(screw_nut(jhead_screw)) + 0.3;
+
+angle = 30;
+jhead_screw_angles = [angle, -angle, 180 - angle, -180 + angle];
+
+extension = max(0, nozzle_length - hot_end_length(hot_end));
+extension_width = extruder_hole(d_extruder)[0] - 1;
+extension_rad = jhead_screw_pitch + 5;
+extension_clearance = 1;
+
+width = extruder_width(d_extruder);
+length = extruder_length(d_extruder);
 motor_thickness = 5;
-base_thickness = 8;
+base_thickness = max(8, jhead_screw_length - extension - 2 * washer_thickness(M3_washer) - washer_thickness(M4_washer));
 height = base_thickness + NEMA_width(motor) + 1;
+
+jhead_nut_offset = -(extension + base_thickness - 2 - jhead_nut_slot); // offset of nut from screw head
 
 filament_r = 1.75 / 2;
 filament_x = 0;
@@ -101,24 +121,6 @@ spring_x = idler_pivot_x - lever_width / 2;
 spring_z = filament_z + filament_path_r + 3 * layer_height + screw_clearance_radius(M3_cap_screw);
 spring_y = lever_bottom_y + 5;
 
-jhead_screw = M3_cap_screw;
-jhead_screw_length = 16;
-jhead_washer = M4_washer;
-jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
-                          jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
-
-angle = 30;
-
-jhead_screw_angles = [angle, -angle, 180 - angle, -180 + angle];
-
-jhead_nut_slot = nut_thickness(screw_nut(jhead_screw)) + 0.3;
-
-extension = max(0, nozzle_length - hot_end_length(hot_end));
-extension_width = extruder_hole(extruder)[0] - 1;
-extension_rad = jhead_screw_pitch + 5;
-extension_clearance = 1;
-
-jhead_nut_pos = -extension - base_thickness + 2 + jhead_nut_slot;
 
 filament_top_guide_r = tubing_od(PF7) / 2 + 2;
 
@@ -134,6 +136,7 @@ filament_botton_guide_height = filament_z - hobbed_offset(pulley) + hobbed_screw
 filament_bottom_guide_x = filament_x - filament_bottom_guide_w / 2;
 bulkhead_x = filament_bottom_guide_x;
 bulkhead_depth = filament_x + cos(angle) * jhead_screw_pitch - nut_trap_flat_radius(screw_nut(jhead_screw)) - bulkhead_x;
+spring_screw_length = screw_longer_than(compressed_spring + 2 * washer_thickness(M4_washer) - (spring_x - bulkhead_x) + bulkhead_depth);
 
 grub_screw_clearance_r = NEMA_shaft_dia(motor) / 2 + hobbed_screw_l(pulley);
 
@@ -290,7 +293,7 @@ module direct_block_stl(include_support = true) {
                                 translate([0, 0, washer_thickness(M4_washer) + washer_thickness(M3_washer) - extension_clearance])
                                     teardrop_plus(r = screw_clearance_radius(jhead_screw), h = jhead_screw_length * 2, center = true);
 
-                                translate([0, 0, jhead_nut_pos - jhead_nut_slot / 2]) {
+                                translate([0, 0, jhead_nut_offset - jhead_nut_slot / 2]) {
                                     w = nut_flat_radius(screw_nut(jhead_screw));
                                     rotate([0, 0, 90])
                                         nut_trap(0, nut_radius(screw_nut(jhead_screw)), jhead_nut_slot / 2, horizontal = true);
@@ -400,7 +403,7 @@ module direct_idler_assembly() {
             washer(M4_washer)
                 comp_spring(spring, compressed_spring)
                     washer(M4_washer)
-                        screw(M4_cap_screw, 35);
+                        screw(M4_cap_screw, spring_screw_length);
 }
 
 module direct_assembly(show_connector = true, show_drive = true) {
@@ -467,17 +470,8 @@ module direct_assembly(show_connector = true, show_drive = true) {
     //
     // Hot end
     //
-    assembly("hot_end_assembly");
     translate([filament_x, 0, -extension])
-        rotate([0, 0, 0]) {
-            if(hot_end_style(hot_end) == m90)
-                m90_hot_end(hot_end);
-            if(hot_end_style(hot_end) == Stoffel)
-                stoffel_hot_end(hot_end);
-            if(hot_end_style(hot_end) == jhead)
-                jhead_hot_end(hot_end, exploded = 0);
-       }
-    end("hot_end_assembly");
+        hot_end_assembly();
 
     //
     // Hot end screws
@@ -490,7 +484,7 @@ module direct_assembly(show_connector = true, show_drive = true) {
                     washer(jhead_washer)
                         screw_and_washer(jhead_screw, jhead_screw_length, true);
 
-                translate([jhead_screw_pitch, 0, jhead_nut_pos - jhead_nut_slot / 2 + nut_thickness(screw_nut(jhead_screw)) / 2])
+                translate([jhead_screw_pitch, 0, jhead_nut_offset - jhead_nut_slot / 2 + nut_thickness(screw_nut(jhead_screw)) / 2])
                      explode( [ 15 * sin(-a),  15 * cos(-a), 0] * [-1,1,-1,1][i])
                         rotate([180, 0, -a + 90])
                              nut(screw_nut(jhead_screw));
@@ -503,7 +497,8 @@ module direct_assembly(show_connector = true, show_drive = true) {
 module direct_extruder_stl() {
     direct_block_stl();
 
-    translate([34, 37, 0])
+    translate([filament_x + filament_bottom_guide_w + (idler_pivot_x - idler_x) + 2 * motor_screw_offset + lever_width / 2,
+               height - (idler_pivot_y - idler_y) + lever_width / 2, 0])
         direct_idler_lever_stl();
 }
 

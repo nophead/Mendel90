@@ -23,8 +23,6 @@ barrel_tap_dia = 5;
 barrel_dia = 6;
 insulator_dia = 12;
 
-function jhead_groove_dia() = 12;
-
 module heater_block(type, resistor, thermistor) {
     color("gold") render(convexity = 10) difference() {
         cube([heater_length(type), heater_width(type), heater_height(type)], center = true);
