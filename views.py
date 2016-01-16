@@ -89,5 +89,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         views(sys.argv[1])
     else:
-        print "usage: views dibond|mendel|sturdy|your_machine"
+        print "usage: views dibond|mendel|sturdy|huxley|your_machine"
         sys.exit(1)

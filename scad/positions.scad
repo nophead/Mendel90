@@ -23,7 +23,7 @@ Y_carriage_height = y_motor_bracket_height() + X_carriage_clearance + sheet_thic
 
 bed_height =  Y_carriage_height + sheet_thickness(Y_carriage) / 2 + pillar_height(bed_pillars) + washer_thickness(M3_washer) + bed_thickness;
 
-Z0 = floor(bed_height + nozzle_length - x_carriage_offset());
+Z0 = floor(bed_height + nozzle_length(hot_end) - x_carriage_offset());
 
 height = ceil(Z0 + Z_travel + limit_switch_offset + x_end_height() + bar_clamp_depth + axis_end_clearance + base_clearance);
 

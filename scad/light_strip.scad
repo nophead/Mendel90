@@ -15,7 +15,7 @@ include <positions.scad>
 
 wall = 2;
 
-light = light_strip ? light_strip : RIGID5050_290;
+light  = light_strip ? light_strip : (right_stay_x - left_stay_x) > 300 ? RIGID5050_290 : RIGID5050_208;
 
 use_screws = light_strip_has_holes(light);
 use_clips = !use_screws;

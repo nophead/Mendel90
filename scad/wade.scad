@@ -27,23 +27,23 @@ thickness = 5;
 base_thickness = 6;
 width = 26;
 height = 52;
-mount_pitch = 25;
 
 filament_x = 75;
 filament_z = 13;
 feed_tube_socket = 4;
 
-extension = max(0, nozzle_length - hot_end_length(hot_end));
+extension_clearance = hot_end_style(hot_end) == e3d ? 0.5 : 1;
+extension = max(extension_clearance, nozzle_length(hot_end) - hot_end_length(hot_end));
 extension_width = 30;
 
 jhead_screw = M3_cap_screw;
-jhead_screw_length = 16;
+jhead_screw_length = screw_longer_than(extension + base_thickness + nut_thickness(M3_nut)
+                                       + washer_thickness(M3_washer) + washer_thickness(M4_washer));
 jhead_washer = M4_washer;
 jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
-                          jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
+                          hot_end_groove_dia(hot_end) / 2 + washer_diameter(jhead_washer) / 2);
 
 extension_rad = jhead_screw_pitch + 5;
-extension_clearance = 1;
 
 pscrew_y = [17.5, 45.5];
 pscrew_z = [filament_z - 6.5, filament_z + 6.5];
@@ -95,7 +95,6 @@ module wades_block_stl() {
 
     nut_slot = nut_thickness(M4_nut) + 0.3;
 
-
     difference(){
         union(){
             cube([81, height, thickness]);                                  // motor plate
@@ -137,17 +136,15 @@ module wades_block_stl() {
 
         translate([filament_x, 20, filament_z])
             rotate([90,0,0])
-                teardrop_plus(h = 70, r=3.5/2, center=true);                       // filament
+                teardrop_plus(h = 70, r = (extruder_filament(extruder) + 0.5) / 2, center=true);                       // filament
 
         translate([filament_x, height,  filament_z])
             rotate([90,0,0])
                 teardrop_plus(h = feed_tube_socket * 2, r = tubing_od(PF7) / 2, center = true);   // feed tube socket
 
         // mounting holes
-        for(side = [-1, 1])
-            translate([filament_x + mount_pitch * side, base_thickness, filament_z])
-                rotate([90,0,0])
-                    nut_trap(M4_clearance_radius, M4_nut_radius, 3, true);
+        translate([filament_x, base_thickness, filament_z])
+            extruder_mounting_holes();
 
         // pressure screws
         for(i = [0, 1]) {
@@ -222,11 +219,11 @@ module wades_block_stl() {
         //
         translate([filament_x, -extension + eta, filament_z])
             rotate([90,0,0]) {
-                if(hot_end_groove_mount(hot_end)) {
+                if(hot_end_groove(hot_end)) {
                     relief = 0.5;
 
-                    translate([0, 0, -insulator_depth + jhead_groove_offset() / 2 + eta])         // slot for the flange
-                        keyhole(insulator / 2, jhead_groove_offset(), width - filament_z);
+                    translate([0, 0, -insulator_depth + hot_end_inset(hot_end) / 2 + eta])         // slot for the flange
+                        keyhole(insulator / 2, hot_end_inset(hot_end), width - filament_z);
 
                     translate([0, 0, -insulator_depth + relief / 2])
                         keyhole(insulator / 2 + 0.5, relief, width - filament_z);           // relief to avoid corner radius
@@ -238,7 +235,9 @@ module wades_block_stl() {
                             translate([jhead_screw_pitch, 0, 0])
                                 rotate([0, 0, -i * 120 - jhead_screw_angle]) {
                                     w = nut_flat_radius(screw_nut(jhead_screw));
+
                                     teardrop_plus(r = screw_clearance_radius(jhead_screw), h = jhead_screw_length * 2, center = true);
+
                                     translate([0, 0, -base_thickness - extension - jhead_nut_slot / 2]) {
                                         rotate([0, 0, [0, 30, 30][i]])
                                             nut_trap(0, nut_radius(screw_nut(jhead_screw)), jhead_nut_slot / 2, horizontal = true);
@@ -258,7 +257,7 @@ module wades_block_stl() {
                 }
             }
 
-        if(!hot_end_groove_mount(hot_end))
+        if(!hot_end_groove(hot_end))
             for(side = [-1, 1])
                 translate([filament_x + screw_pitch * side, screw_depth - extension, -1])
                     rotate([0, 0, -90 + 90 * side])
@@ -411,10 +410,9 @@ module wades_assembly(show_connector = true, show_drive = true) {
                         }
 
                 // mounting screws
-                for(side = [-1, 1])
-                    translate([filament_x + mount_pitch * side, base_thickness - 3, filament_z])
-                        rotate([-90,0,0])
-                            screw(M4_hex_screw, 20);
+                translate([filament_x, base_thickness, filament_z])
+                    rotate([-90, 0, 0])
+                        extruder_mounting_screws();
 
                 //idler
                 translate([filament_x + 22 + 39 * exploded, driven_y, filament_z])
@@ -483,7 +481,7 @@ module wades_assembly(show_connector = true, show_drive = true) {
                 rotate([-90, 0, 0])
                     hot_end_assembly();
 
-            if(!hot_end_groove_mount(hot_end))
+            if(!hot_end_groove(hot_end))
                 for(side = [-1, 1])
                     translate([filament_x + hot_end_screw_pitch(hot_end) * side, screw_depth - extension, width])
                         screw(M3_cap_screw, 30);

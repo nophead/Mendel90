@@ -42,7 +42,7 @@ module heater_block(type, resistor, thermistor) {
 
 
 
-module jhead_hot_end(type, exploded = exploded) {
+module jhead_hot_end(type, filament, exploded = exploded) {
     resistor = RIE1212UB5C5R6;
     thermistor = Epcos;
     heater = type == JHeadMk4 ? MK4_heater : MK5_heater;
@@ -59,7 +59,7 @@ module jhead_hot_end(type, exploded = exploded) {
     tape_overlap = 10;
     tape_thickness = 0.8;
 
-    vitamin(hot_end_part(type));
+    vitamin(str(hot_end_part(type)," ",filament,"mm"));
     vitamin("ST25110: 110mm x 25mm self amalgamating silicone tape");
     //
     // silcone tape
@@ -86,8 +86,8 @@ module jhead_hot_end(type, exploded = exploded) {
             difference() {
                 cylinder(r = hot_end_insulator_diameter(type) / 2, h = insulator_length);
                 cylinder(r = 3.2 / 2, h = insulator_length * 2 + 1, center = true);
-                translate([0, 0, insulator_length - jhead_groove_offset() - jhead_groove() / 2])
-                    tube(ir = jhead_groove_dia() / 2, or = 17 / 2, h = jhead_groove());
+                translate([0, 0, insulator_length - hot_end_inset(type) - hot_end_groove(type) / 2])
+                    tube(ir = hot_end_groove_dia(type) / 2, or = 17 / 2, h = hot_end_groove(type));
             }
     //
     // nozzle

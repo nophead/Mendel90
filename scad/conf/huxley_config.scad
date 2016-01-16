@@ -49,9 +49,9 @@ part_fan = fan40x11;
 
 psu = External;
 controller = Melzi;
-raspberry_pi = true;
-raspberry_pi_camera = true;
-light_strip =  RIGID5050_208;
+//raspberry_pi = true;
+//raspberry_pi_camera = true;
+//light_strip =  RIGID5050_208;
 
 spool = spool_200x55;
 bottom_limit_switch = false;

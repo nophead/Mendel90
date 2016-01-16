@@ -5,7 +5,7 @@
 // nop.head@gmail.com
 // hydraraptor.blogspot.com
 //
-// Virual extruder
+// Virtual extruder
 //
 include <conf/config.scad>
 use <wade.scad>

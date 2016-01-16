@@ -64,41 +64,45 @@ spring = peg_spring;
 
 compressed_spring = 9.5;
 
+motor_thickness = 5;
+motor_screw_depth = 3;
+min_base_thickness = 8;
+extension_clearance = 0.5;
+extension = max(extension_clearance, nozzle_length(hot_end) - hot_end_length(hot_end));
+
 jhead_screw = M3_cap_screw;
 jhead_screw_length = 16;
 jhead_washer = M4_washer;
 jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
-                          jhead_groove_dia() / 2 + washer_diameter(jhead_washer) / 2);
+                          hot_end_groove_dia(hot_end) / 2 + washer_diameter(jhead_washer) / 2);
 jhead_nut_slot = nut_thickness(screw_nut(jhead_screw)) + 0.3;
 
 angle = 30;
 jhead_screw_angles = [angle, -angle, 180 - angle, -180 + angle];
 
-extension = max(0, nozzle_length - hot_end_length(hot_end));
 extension_width = extruder_hole(d_extruder)[0] - 1;
 extension_rad = jhead_screw_pitch + 5;
-extension_clearance = 1;
 
 width = extruder_width(d_extruder);
-length = extruder_length(d_extruder);
-motor_thickness = 5;
-base_thickness = max(8, jhead_screw_length - extension - 2 * washer_thickness(M3_washer) - washer_thickness(M4_washer));
+length = min(extruder_length(d_extruder), 64);
+base_thickness = max(min_base_thickness, jhead_screw_length - extension - 2 * washer_thickness(M3_washer) - washer_thickness(M4_washer));
 height = base_thickness + NEMA_width(motor) + 1;
 
 jhead_nut_offset = -(extension + base_thickness - 2 - jhead_nut_slot); // offset of nut from screw head
 
-filament_r = 1.75 / 2;
+filament_r = extruder_filament(d_extruder) / 2;
 filament_x = 0;
 filament_z = width / 2;
-filament_path_r = 1;
+filament_path_r = filament_r + 0.125;
 
 motor_y = height - NEMA_width(motor) / 2 - 1;
 motor_x = filament_x + filament_r + hobbed_hob_id(pulley) / 2;
 motor_z = 0;
+motor_screw_length = 8;
+motor_screw_z = motor_screw_length - 2 * washer_thickness(M3_washer) - motor_screw_depth;
 
 motor_plate_width = NEMA_width(motor) + 2;
 motor_plate_rad = (motor_plate_width - NEMA_hole_pitch(motor)) / 2;
-mount_pitch = 25;
 
 idler_closed_x = motor_x - hobbed_od(pulley) / 2 - ball_bearing_diameter(idler) / 2;
 idler_x = filament_x - filament_r - ball_bearing_diameter(idler) / 2;
@@ -113,6 +117,9 @@ idler_pivot_y = motor_y + motor_screw_offset;
 
 idler_swing_r = sqrt(sqr(idler_x -idler_pivot_x) + sqr(idler_y - idler_pivot_y));
 idler_max_swing = atan((idler_closed_x - idler_pivot_x) / idler_swing_r);
+
+pivot_screw_length = 25;
+pivot_screw_z = min(pivot_screw_length - washer_thickness(M3_washer) - motor_screw_depth, width + eta);
 
 lever_bottom_y = base_thickness + 1;
 lever_width = 2 * motor_plate_rad + 1;
@@ -199,15 +206,19 @@ module direct_block_stl(include_support = true) {
             // base
             hull()
                 for(end = [-1 , 1])
-                    translate([end * (length / 2 - base_rad), base_thickness / 2, filament_z])
+                    translate([end * (length / 2 - base_rad), min_base_thickness / 2, filament_z])
                         intersection() {
-                            union() {
+                            union()
                                 for(a = [-90, 90])
                                     rotate([a, 0, 0])
-                                        teardrop(r = base_rad, h = base_thickness, truncate = false, center = true);
-                            }
+                                        teardrop(r = base_rad, h = min_base_thickness, truncate = false, center = true);
+
                             cube([width * 2, base_thickness + 1, width], center = true);
                         }
+
+            if(base_thickness > min_base_thickness)                 // nut housing
+                translate([motor_x - motor_plate_width / 2, 1, 0])
+                    cube([2 * (filament_x - (motor_x - motor_plate_width / 2)), base_thickness - 1, width]);
 
             if(extension)
                 translate([filament_x - extension_width / 2, -extension + extension_clearance + eta, 0])
@@ -248,14 +259,8 @@ module direct_block_stl(include_support = true) {
                 }
 
         // mounting holes
-        for(side = [-1, 1])
-            translate([filament_x + mount_pitch * side, base_thickness, filament_z])
-                rotate([90,0,0])
-                    intersection () {
-                        nut_trap(M4_clearance_radius, M4_nut_radius, 3, true);
-                        translate([0, 0, base_thickness / 2])
-                            cylinder(r = 20, h = base_thickness + 1, center = true);
-                    }
+        translate([filament_x, min_base_thickness, filament_z])
+             extruder_mounting_holes(true);
         //
         // holes for motor
         //
@@ -266,10 +271,13 @@ module direct_block_stl(include_support = true) {
             translate([0, 0, hub_recess + (include_support ? layer_height : -1)])
                 poly_cylinder(r = hobbed_od(pulley) / 2 + 0.5, h = width, center = false);  // hole for shaft and pulley
 
-            for(x = NEMA_holes(motor))                                                      // motor screw slots
-                for(y = NEMA_holes(motor))
-                    translate([x, y, -1])
-                        poly_cylinder(r = M3_clearance_radius, h = 100, center = false);
+            for(x = NEMA_holes(motor), y = NEMA_holes(motor))                               // motor screw holes
+                translate([x, y, motor_screw_z]) {
+                    poly_cylinder(r = M3_clearance_radius, h = 100, center = true);
+
+                    if(x > 0 || y < 0)
+                        poly_cylinder(r = washer_diameter(M3_washer) / 2 + 0.5, h = 100, center = false);
+                }
         }
         //
         // Hole for hot end
@@ -278,8 +286,8 @@ module direct_block_stl(include_support = true) {
             rotate([90,0,0]) {
                 relief = 0.5;
 
-                translate([0, 0, -insulator_depth + jhead_groove_offset() / 2 + eta])   // slot for the flange
-                    keyhole(insulator / 2, jhead_groove_offset(), width - filament_z);
+                translate([0, 0, -insulator_depth + hot_end_inset(hot_end) / 2])        // slot for the flange
+                    keyhole(insulator / 2, hot_end_inset(hot_end), width - filament_z);
 
                 *translate([0, 0, -insulator_depth + relief / 2])
                     keyhole(insulator / 2 + 0.5, relief, width - filament_z);           // relief to avoid corner radius
@@ -364,8 +372,13 @@ module direct_idler_lever_stl() {
         rotate([0, 0, 90])
             nut_trap(2, nut_trap_radius(M4_nut, horizontal = false, snug = false), nut_trap_depth(M4_nut), supported = true); // nut trap for axle
 
-        translate([idler_x - idler_pivot_x, idler_pivot_y - idler_y, 0])
-            poly_cylinder(r = 3/2, h = 100, center = true);                             // pivot hole
+        translate([idler_x - idler_pivot_x, idler_pivot_y - idler_y, width - pivot_screw_z]) {
+            translate([0, 0, width > pivot_screw_z ? layer_height : -1])                // support membrane if needed
+                poly_cylinder(r = 3/2, h = 100, center = false);                        // pivot hole
+
+            rotate([180, 0, 0])
+                poly_cylinder(r = washer_diameter(M3_washer) / 2 + 0.5, h = 10);          // counterbore
+        }
 
         translate([idler_closed_x - spring_x, spring_y - idler_y, width - spring_z])
             rotate([90, 0, 90])
@@ -422,9 +435,8 @@ module direct_assembly(show_connector = true, show_drive = true) {
 
     if(show_drive) {
         // mounting screws
-        for(side = [-1, 1])
-            translate([filament_x + mount_pitch * side, 0, base_thickness - 3])
-                screw(M4_hex_screw, 20);
+        translate([filament_x, 0, min_base_thickness])
+            extruder_mounting_screws();
 
         // motor
         translate([0, -40 * exploded, 0])
@@ -433,26 +445,27 @@ module direct_assembly(show_connector = true, show_drive = true) {
                     direct_motor_assembly(show_connector, 0);
 
         // motor screws
-        translate([-motor_x, -width / 2 + motor_thickness, motor_y])
+        translate([-motor_x, -width / 2 + motor_screw_z, motor_y])
             rotate([-90, 0, 0])
-                NEMA_screws(motor, 3, 8, M3_pan_screw);
+                NEMA_screws(motor, 3, motor_screw_length, M3_pan_screw);
 
         // idler axle
-        translate([-idler_pivot_x,  width / 2, idler_pivot_y])
+        translate([-idler_pivot_x,  -width / 2, idler_pivot_y])
             rotate([-90, 0, 0]) {
-                explode([0, 0, 50])
-                    screw_and_washer(M3_cap_screw, 25);
+                translate([0, 0, pivot_screw_z])
+                    explode([0, 0, 50])
+                        screw_and_washer(M3_cap_screw, pivot_screw_length);
 
-            translate([0, 0, -width + motor_thickness])
-                explode([0, 0, 5])
-                    washer(M3_washer)
-                        explode([0, 0, 2])
-                            star_washer(M3_washer)
-                                explode([0, 0, 2])
-                                    nut(M3_nut)
-                                        explode([0, 0, 2])
-                                            washer(M3_washer);
-        }
+                translate([0, 0, motor_thickness])
+                    explode([0, 0, 5])
+                        washer(M3_washer)
+                            explode([0, 0, 2])
+                                star_washer(M3_washer)
+                                    explode([0, 0, 2])
+                                        nut(M3_nut)
+                                            explode([0, 0, 2])
+                                                washer(M3_washer);
+            }
         //
         // Filament
         //

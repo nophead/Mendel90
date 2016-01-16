@@ -1,10 +1,21 @@
+Standard variants
+-----------------
+dibond is the version that was sold as a kit with 3mm sheets, 8mm rods and uses nuts and machine screws through the frame.
+
+sturdy is 12mm MDF sheets, 10mm rods and uses wood screws into pilot holes in the frame. It can be built without CNC.
+
+mendel is 6mm acrylic sheets with a 10mm acrylic base, 8mm rods and uses machine screws into tapped holes in the frame.
+
+huxley is a scaled down version of dibond using 6mm rods and NEMA14 motors.
+
 Limitations
 -----------
-Currently only supports mendel and sturdy machine variants, the huxley version needs more work.
+The dibond and sturdy versions are well tested and popular. The acrylic version, called mendel, hasn't been built for a long time and is not recommened.
+The Huxley version hasn't been tested in its final form although one prototype has been made of an earlier version and a few snags fixed since.
 
 Use
 ---
-Add the directory of the OpenScad executable to your search path. OpenSCAD-2013.06 or later is required.
+Add the directory of the OpenScad executable to your search path. OpenSCAD-2015.05 or later is required.
 To get PDF versions of the sheet drawings add InkScape to your search path.
 
 To make all the files for a machine run
@@ -14,9 +25,9 @@ make_machine.py machine_name
 
 To make just the bom, sheets or stls run bom.py, sheets.py or stls.py machine\_name.
 
-machine\_name can be mendel or sturdy. To make your own variant copy scad\conf\mendel\_config.scad or scad\conf\sturdy\_config.scad to yourname\_config.scad.  Then run `make_machine.py yourname`.
+machine\_name can be dibond, mendel, sturdy or huxley. To make your own variant copy scad\conf\mendel\_config.scad or scad\conf\sturdy\_config.scad to yourname\_config.scad.  Then run `make_machine.py yourname`.
 
-To view the model of the whole machine, open scad\main.scad. It will take several minutes to render (about about 8 minutes on my computer) but after that you can pan and zoom it at reasonable speed and changes takes less time to render.  (Note: main.scad will only render correctly if conf\machine.scad exists, which is created by the make_machine.py script.)
+To view the model of the whole machine, open scad\main.scad. It will take several minutes to render (about about 5 minutes on my computer) but after that you can pan and zoom it at reasonable speed and changes takes less time to render.  (Note: main.scad will only render correctly if conf\machine.scad exists, which is created by the make_machine.py script.)
 
 To view a sub-assembly, open the individual scad files. Set the exploded flag in config.scad to make exploded views.
 

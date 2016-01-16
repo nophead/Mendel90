@@ -53,5 +53,5 @@ if __name__ == '__main__':
         else:
             accessories(sys.argv[1])
     else:
-        print("usage: accessories dibond|mendel|sturdy|your_machine [assembly_name]")
+        print("usage: accessories dibond|mendel|sturdy|huxley|your_machine [assembly_name]")
         sys.exit(1)

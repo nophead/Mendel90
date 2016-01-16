@@ -32,7 +32,7 @@ hook_r = 3;
 left = left_stay_x + sheet_thickness(frame) / 2;
 right =  right_stay_x - sheet_thickness(frame) / 2;
 spool_x = (left + right) / 2;
-spool_y = gantry_Y + sheet_thickness(frame) + 10 + spool_height(spool) / 2;
+spool_y = gantry_Y + sheet_thickness(frame) + (squeeze ? 15 : 10) + spool_height(spool) / 2;
 
 bearing_r = (spool_diameter(spool) + ball_bearing_diameter(bearing)) / 2;
 bearing_x = cos(angle) * bearing_r;
@@ -54,6 +54,7 @@ tube_spacing = sqrt(dx * dx + dy * dy);
 width = bearing_y * 2 - 2 * (thickness + washer_thickness(spool_washer) + ball_bearing_width(bearing) / 2);
 
 function spool_holder_gap() = spool_y - width / 2 - thickness - (gantry_Y + sheet_thickness(frame));
+function spool_holder_view_pos() = [spool_x - bearing_x, spool_y, bearing_z]; // for assembly view
 
 sponge_length = 15;
 sponge_depth  = 15;
@@ -386,7 +387,7 @@ module spool_assembly(show_spool = true) {
     }
 
 
-    vitamin("PLA3040: PLA sample 3mm ~50m");
+    vitamin(extruder_filament(extruder) == 3 ? "PLA3050: PLA sample 3mm ~50m" : "PLA1750: PLA sample 1.75mm ~50m");
 
     end("spool_holder_assembly");
 }

@@ -42,5 +42,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         render(sys.argv[1], sys.argv[2:])
     else:
-        print "usage: render dibond|mendel|sturdy|your_machine, [part.stl ...]"
+        print "usage: render dibond|mendel|sturdy|huxley|your_machine, [part.stl ...]"
         sys.exit(1)

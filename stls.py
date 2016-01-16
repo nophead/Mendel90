@@ -99,5 +99,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         stls(sys.argv[1], sys.argv[2:])
     else:
-        print("usage: stls dibond|mendel|sturdy|your_machine [part.stl ...]")
+        print("usage: stls dibond|mendel|sturdy|huxley|your_machine [part.stl ...]")
         sys.exit(1)

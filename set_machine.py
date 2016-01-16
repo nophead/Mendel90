@@ -19,5 +19,5 @@ if __name__ == '__main__':
     if args == 2:
        set_machine(sys.argv[1])
     else:
-        print("usage: set_machine dibond|mendel|sturdy|huxley|your_machine")
+        print("usage: set_machine dibond|mendel|sturdy|huxley|huxley|your_machine")
         sys.exit(1)

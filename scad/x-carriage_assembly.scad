@@ -16,8 +16,12 @@ module x_carriage_assembly(show_extruder = true, show_fan = true) {
 
         for(end = [-1, 1])
             translate([extruder_mount_pitch / 2 * end, 0, nut_trap_thickness])
-                rotate([0, 0, 45])
-                    wingnut(M4_wingnut);
+                if(end < 0 && hot_end_invert_screw(hot_end))
+                    translate([0, 0, - screw_head_height(M4_hex_screw)])
+                        screw(M4_hex_screw, 20);
+                else
+                    rotate([0, 0, 45])
+                        wingnut(M4_wingnut);
     }
     //
     // Fan assembly

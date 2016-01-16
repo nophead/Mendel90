@@ -12,7 +12,10 @@ include <positions.scad>
 use <light_strip_clip.scad>
 use <frame_edge_clamp.scad>
 
-light  = light_strip ? light_strip : RIGID5050_290;
+left = left_stay_x + sheet_thickness(frame) / 2;
+right = right_stay_x - sheet_thickness(frame) / 2;
+
+light  = light_strip ? light_strip : (right - left) > 300 ? RIGID5050_290 : RIGID5050_208;
 light2 = light_strip == RIGID5050_290 ? RIGID5050_208 : false;
 
 wall = 2;
@@ -49,9 +52,6 @@ pi_cam_front_wall = 2;
 pi_cam_front_depth = pi_cam_back_depth + pi_cam_thickness + pi_cam_front_clearance + wall;
 pi_cam_front_length = pi_cam_back_length + 2 * (pi_cam_front_wall + clearance);
 pi_cam_front_width = pi_cam_back_width + 2 * (pi_cam_front_wall + clearance);
-
-left = left_stay_x + sheet_thickness(frame) / 2;
-right = right_stay_x - sheet_thickness(frame) / 2;
 
 X_build = min(X_travel, bed_holes[0] - screw_head_radius(M3_cap_screw) * 2); // sturdy travel exceeds the bed so max object is smaller
 Y_build = min(Y_travel, bed_holes[1] - screw_head_radius(M3_cap_screw) * 2);

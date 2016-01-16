@@ -184,5 +184,5 @@ if __name__ == '__main__':
         else:
             boms(sys.argv[1])
     else:
-        print("usage: bom mendel|sturdy|your_machine [assembly_name]")
+        print("usage: bom dibond|mendel|sturdy|huxley|your_machine [assembly_name]")
         sys.exit(1)

@@ -60,5 +60,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         plates(sys.argv[1])
     else:
-        print("usage: plates [mendel|sturdy|your_machine]")
+        print("usage: plates dibond|mendel|sturdy|huxley|your_machine")
         sys.exit(1)

@@ -1,1 +1,1 @@
-include <sturdy_config.scad>
+include <dibond_config.scad>
