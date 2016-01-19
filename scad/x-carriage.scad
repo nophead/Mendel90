@@ -241,9 +241,9 @@ module x_belt_tensioner_stl()
     }
 }
 
-duct_wall = 2 * 0.35 * 1.5;
-duct_bottom_thickness = duct_wall;
-duct_top_thickness = 2;
+duct_wall = 1;   // Skeinforge always makes two walls, so if this is less than twice the filament width it ends about twice the filament width but more strongly bonded.
+duct_bottom_thickness = 3 * layer_height;
+duct_top_thickness = 4 * layer_height;
 fan_nut_trap_thickness = 4;
 fan_bracket_thickness = 3;
 
@@ -274,7 +274,7 @@ throat_width = (or + skew) * 2;
 zip_x = min(length / 2 - lug_width - zipslot_width() / 2 - eta, bar_x);
 
 fan_x = base_offset;
-fan_y = -(width / 2 + fan_width(part_fan) / 2) - (X_carriage_clearance + belt_width(X_belt) + belt_clearance);
+fan_y = -(width / 2 + fan_width(part_fan) / 2) - (2 * X_carriage_clearance + belt_width(X_belt) + belt_clearance);
 fan_z = nozzle_length(hot_end) + hot_end_duct_offset(hot_end)[2] - duct_height_fan - fan_depth(part_fan) / 2;
 
 fan_x_duct = fan_x - hot_end_duct_offset(hot_end)[0];
@@ -284,20 +284,47 @@ module throat(inner) {
     y = or + skew - duct_wall;
     if(inner)
         translate([-throat_width / 2 + duct_wall, y, nozzle_height])
-            cube([throat_width - 2 * duct_wall, 2 * eta, (duct_height_nozzle - nozzle_height) - duct_top_thickness]);
+            cube([throat_width - 2 * duct_wall, 2 * eta, duct_height_nozzle - nozzle_height - duct_top_thickness]);
     else
-        translate([-throat_width / 2, y - duct_wall, 0])
+        translate([-throat_width / 2, y, 0])
             cube([throat_width, 2 * eta, duct_height_nozzle]);
 }
 
 module neck(inner) {
-    iw = 2 * (fan_hole_pitch(part_fan) - fan_screw_boss_r) - 3;
+    iw = 2 * (fan_hole_pitch(part_fan) - fan_screw_boss_r + eta);
+    //
+    // The roof slope is trucated by the fan entrance so need to calculate where it it ends such
+    // that it is the correct thickness at the truncation.
+    //
+    y1 = or + skew - duct_wall;                     // start of slope
+    z1 = duct_height_nozzle - duct_top_thickness;
+    y2 = fan_y_duct - fan_bore(part_fan) / 2;       // truncation point
+    z2 = duct_height_fan - duct_top_thickness;
+    y = fan_y_duct - fan_hole_pitch(part_fan);      // end of slope before truncation
     if(inner)
-        translate([fan_x_duct - iw / 2, fan_y_duct - fan_bore(part_fan) / 2, duct_bottom_thickness])
-            cube([iw, 2 * eta, duct_height_fan - duct_bottom_thickness - duct_top_thickness]);
+        translate([fan_x_duct - iw / 2, y, duct_bottom_thickness])
+            cube([iw, 2 * eta, z1 + (y - y1) * (z2 - z1) / (y2 - y1) - duct_bottom_thickness]);
     else
         translate([fan_x_duct - fan_width / 2, fan_y_duct - fan_width / 2, 0])
             cube([fan_width, 2 * eta, duct_height_fan]);
+}
+
+module input_and_neck() {
+    union() {
+        // fan entrance
+        hull() {
+            translate([fan_x_duct, fan_y_duct, duct_height_fan - duct_top_thickness])
+                rotate([180, 0, 0])
+                    rounded_cylinder(r = fan_bore(part_fan) / 2, h = duct_height_fan - duct_bottom_thickness - duct_top_thickness, r2 = duct_height_fan / 2);
+
+            neck(true);
+        }
+    }
+    // neck
+    hull() {
+        neck(true);
+        throat(true);
+    }
 }
 
 module x_carriage_fan_duct_stl() {
@@ -307,7 +334,7 @@ module x_carriage_fan_duct_stl() {
         union() {
             difference() {
                 union() {
-                    // fan input
+                    // fan input box
                     hull() {
                         for(side = [-1, 1])
                             translate([fan_x_duct + side * fan_hole_pitch(part_fan), fan_y_duct + fan_hole_pitch(part_fan), 0])
@@ -325,38 +352,29 @@ module x_carriage_fan_duct_stl() {
                         union() {
                             cylinder(r1 = or, r2 = or + skew, h = nozzle_height);
                             translate([0, 0, nozzle_height - eta])
-                                cylinder(r = or + skew, h = duct_height_nozzle - nozzle_height);
+                                cylinder(r = or + skew, h = duct_height_nozzle - nozzle_height + eta);
                         }
                         throat(false);
                     }
                 }
-                // hole in the middle
+                // fan entrance and neck
+                input_and_neck();
+
+                // fan hole
+                translate([0, 0, duct_height_fan - duct_top_thickness - 1])
+                    linear_extrude(height = duct_top_thickness + 2)
+                        intersection() {
+                            offset(-eta) projection() input_and_neck();
+
+                            translate([fan_x_duct, fan_y_duct])
+                                square(fan_bore(part_fan), center = true);
+                        }
+                // space the for hot end
                 translate([0, 0,  -2 * eta])
                     cylinder(r1 = ir, r2 = ir + skew, h = nozzle_height + 4 * eta);
+
                 translate([0, 0, nozzle_height - 2 * eta])
                     cylinder(r = ir + skew, h = duct_height_nozzle);
-
-                // fan entrance
-                hull() {
-                    translate([fan_x_duct, fan_y_duct, duct_height_fan - duct_top_thickness])
-                        rotate([180, 0, 0])
-                            rounded_cylinder(r = fan_bore(part_fan) / 2, h = duct_height_fan - duct_bottom_thickness - duct_top_thickness, r2 = duct_height_fan / 2);
-
-                    neck(true);
-                }
-                translate([0, 0, duct_height_fan - duct_wall - duct_top_thickness - 1])
-                    hull() {
-                        translate([fan_x_duct, fan_y_duct, duct_wall])
-                            cylinder(r = fan_bore(part_fan) / 2, h = duct_height_fan - duct_wall - duct_top_thickness);
-
-                        neck(true);
-                    }
-
-                // neck
-                hull() {
-                    neck(true);
-                    throat(true);
-                }
 
                 // nozzle exit slot
                 translate([0, 0, -2 * eta])
@@ -364,8 +382,8 @@ module x_carriage_fan_duct_stl() {
                         union() {
                             cylinder(r1 = or - duct_wall, r2 = or + skew - duct_wall, h = nozzle_height);
                             hull() {
-                                translate([0, 0, nozzle_height - 2 * eta])
-                                    cylinder(r = or + skew - duct_wall, h = duct_height_nozzle - nozzle_height - duct_top_thickness);
+                                translate([0, 0, nozzle_height - eta])
+                                    cylinder(r = or + skew - duct_wall, h = duct_height_nozzle - nozzle_height - duct_top_thickness + eta);
                                 throat(true);
                             }
                         }
@@ -375,7 +393,6 @@ module x_carriage_fan_duct_stl() {
 
                         translate([0, 0, nozzle_height - 2 * eta])
                             cylinder(r = ir + skew + duct_wall, h = duct_height_nozzle - nozzle_height + 4 * eta);
-
                     }
             }
             for(side = [-1, 1])
@@ -663,3 +680,5 @@ module x_carriage_fan_ducts_stl() {
         rotate([0, 0, 180])
             x_carriage_fan_duct_stl();
 }
+
+module x_carriage_fan_duct_rot90_stl() rotate([0, 0, 90]) x_carriage_fan_duct_stl();

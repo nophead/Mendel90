@@ -37,9 +37,15 @@ extension = max(extension_clearance, nozzle_length(hot_end) - hot_end_length(hot
 extension_width = 30;
 
 jhead_screw = M3_cap_screw;
-jhead_screw_length = screw_longer_than(extension + base_thickness + nut_thickness(M3_nut)
-                                       + washer_thickness(M3_washer) + washer_thickness(M4_washer));
 jhead_washer = M4_washer;
+jhead_screw_length = screw_longer_than(
+        extension +
+        base_thickness +
+        nut_thickness(screw_nut(jhead_screw)) +
+        washer_thickness(screw_washer(jhead_screw)) +
+        washer_thickness(jhead_washer)
+    );
+
 jhead_screw_pitch = max(hot_end_insulator_diameter(hot_end) / 2 + screw_head_radius(jhead_screw),
                           hot_end_groove_dia(hot_end) / 2 + washer_diameter(jhead_washer) / 2);
 
@@ -245,7 +251,6 @@ module wades_block_stl() {
                                         rotate([0, 0, [-90 ,0, 180][i]])
                                             translate([-w, 0, -jhead_nut_slot / 2])
                                                 cube([w * 2, 100, jhead_nut_slot], center = false);
-
                                     }
 
                                 }
@@ -508,7 +513,7 @@ module wades_assembly(show_connector = true, show_drive = true) {
 }
 
 module wades_extruder_stl() {
-    !difference() {
+    difference() {
         wades_block_stl();
         *translate([0, driven_y, -1])
             cube([100,30,100]);
