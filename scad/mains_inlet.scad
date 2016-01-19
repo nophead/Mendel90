@@ -76,7 +76,7 @@ module mains_inlet_holes()
         for(z = side > 0 ? [depth - holes, holes] : [depth - terminal_depth - holes])
             translate([side * (mains_inlet_width() / 2 - tab / 2), -mains_inlet_height() / 2 + foot, z])
                 rotate([-90, 0, 0])
-                        child();
+                        children();
 
 
 

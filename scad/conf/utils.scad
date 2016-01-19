@@ -13,24 +13,32 @@ include <../utils/teardrops.scad>
 include <../utils/cables.scad>
 include <../utils/shields.scad>
 
+function round_to_layer(z) = ceil(z / layer_height) * layer_height;
+
 module slot(h, r, l, center = true)
     linear_extrude(height = h, convexity = 6, center = center)
         hull() {
             translate([l/2,0,0])
-                circle(r = r, center = true);
+                circle(r);
             translate([-l/2,0,0])
-                circle(r = r, center = true);
+                circle(r);
         }
 
-module hole_support(r, h, max_r = 999, closed = false) {
+module hole_support(r, h, max_r = 999, closed = false, capped = false) {
     n = sides(r);
     cr = corrected_radius(r, n);
     ir = min(cr, max_r - 2.25 * filament_width);
     or = ir + 2 * filament_width;
     difference() {
         cylinder(r = or, h = h, $fn = n);
-        translate([0, 0, closed ? layer_height : -1])
-            cylinder(r = ir, h = h + 2, $fn = n);
+        difference() {
+            translate([0, 0, closed ? layer_height : -1])
+                cylinder(r = ir, h = h + 2, $fn = n);
+
+            if(capped)
+                translate([0, 0, h - 4 * layer_height])
+                    cylinder(r = or, h = 3 * layer_height + eta);
+        }
     }
 }
 
@@ -43,31 +51,6 @@ module nut_trap_support(h, r, r2 = 0) {
         cylinder(r2 = or, r1 = or2, h = h, $fn = 6);
         translate([0, 0, -1])
             cylinder(r2 = ir, r1 = or2, h = h + 2, $fn = 6);
-    }
-}
-
-function nut_trap_radius(nut) = nut_radius(nut) + layer_height / 4;
-function nut_trap_flat_radius(nut) = nut_trap_radius(nut) * cos(30);
-
-module nut_trap(screw_r, nut_r, depth, horizontal = false, supported = false) {
-    render(convexity = 5) union() {
-        if(horizontal) {
-            if(screw_r)
-                teardrop_plus(r = screw_r, h = 200, center = true);
-            cylinder(r = nut_r + layer_height / 4, h = depth * 2, center = true, $fn = 6);
-        }
-        else {
-            difference() {
-                union() {
-                    if(screw_r)
-                        poly_cylinder(r = screw_r, h = 200, center = true);
-                    cylinder(r = nut_r, h = depth * 2, center = true, $fn = 6);
-                }
-                if(supported)
-                    translate([0, 0, depth - eta])
-                        cylinder(r = nut_r, h = layer_height, center = false);
-            }
-        }
     }
 }
 
@@ -99,13 +82,13 @@ module right_triangle(width, height, h, center = true) {
 
 module rounded_square(w, h, r)
 {
-    union() {
+    hull() {
         square([w - 2 * r, h], center = true);
         square([w, h - 2 * r], center = true);
         for(x = [-w/2 + r, w/2 - r])
             for(y = [-h/2 + r, h/2 - r])
                 translate([x, y])
-                    circle(r = r);
+                    circle(r);
     }
 }
 
@@ -122,16 +105,14 @@ module rounded_rectangle(size, r, center = true)
 //
 module rounded_cylinder(r, h, r2)
 {
-    r2=min(h, r2, r);
     rotate_extrude()
-        union() {
-            square([r - r2, h]);
-            square([r, h - r2]);
+        hull() {
+            square([1, h]);
+            square([r, 1]);
             translate([r - r2, h - r2])
-                difference() {
-                    circle(r = r2);
-                    translate([-r2, -r2]) square([2*r2, r2]);
-                    translate([-r2, -r2]) square([r2, 2*r2]);
+                intersection() {
+                    circle(r2);
+                    square(r2);
                 }
         }
 }
@@ -162,7 +143,7 @@ module tube(or, ir, h, center = true) {
 module explode(v, offset = [0,0,0]) {
     if(exploded) {
         translate(v * exploded)
-            child();
+            children();
         render() hull() {
             sphere(0.2);
             translate(v * exploded + offset)
@@ -170,16 +151,5 @@ module explode(v, offset = [0,0,0]) {
         }
     }
     else
-        child();
+        children();
 }
-//
-// Restore the view point
-//
-module view(t,r,d = 1000)
-    rotate([55, 0, 25])
-        translate([0, 0, -d + 500])
-            rotate([-r[0], 0, 0])
-                rotate([0, -r[1], 0])
-                    rotate([0, 0, -r[2]])
-                        translate(-t)
-                            child();

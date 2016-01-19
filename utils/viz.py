@@ -1,9 +1,19 @@
 import bpy
 import sys
+import os
+import math
 
 global ob
 global cam_target
 mat = 'abs'
+
+rotations = {
+    "fixing_block.stl"      : 180,
+    "rear_fixing_block.stl" : 180,
+    "atx_short_bracket.stl" : -90,
+    "z_bar_clamp.stl"       : 180
+}
+
 
 def load_stl(file_path):
     global cam_target,ob
@@ -24,6 +34,9 @@ def load_stl(file_path):
     # place
     z_dim = ob.dimensions[2]
     print(z_dim)
+    filename = file_path.split(os.sep)[-1]
+    if filename in rotations:
+        bpy.ops.transform.rotate(value = rotations[filename] * math.pi / 180.0, axis = (False, False, True))
     bpy.ops.transform.translate(value=(0,0,z_dim/2.0))
     cam_target = (0,0,z_dim/3.0)
     # assign material

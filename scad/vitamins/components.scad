@@ -105,7 +105,7 @@ function al_clad_wire_length(type) = type[10];
 module al_clad_resistor_hole_positions(type)
     for(end = [-1,1])
         translate([end * al_clad_hpitch(type) / 2, end * al_clad_vpitch(type) / 2, al_clad_thickness(type)])
-            child();
+            children();
 
 module al_clad_resistor_holes(type) {
     al_clad_resistor_hole_positions(type)

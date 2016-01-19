@@ -4,6 +4,8 @@ import os
 import sys
 import shutil
 import openscad
+import re
+from set_machine import *
 
 
 
@@ -16,9 +18,8 @@ def views(machine):
     #
     # Set the target machine
     #
-    f = open("scad/conf/machine.scad","wt")
-    f.write("include <%s_config.scad>\n" % machine);
-    f.close()
+    set_machine(machine)
+
     #
     # List of individual part files
     #
@@ -28,23 +29,45 @@ def views(machine):
         scad_name = scad_dir + os.sep + scad
         png_name = render_dir + os.sep + scad[:-4] + "png"
 
+        dx = None
+        rx = None
+        d = None
         for line in open(scad_name, "r").readlines():
+            m = re.match(r'\$vpt *= *\[ *(.*) *, *(.*) *, *(.*) *\].*', line[:-1])
+            if m:
+                dx = float(m.group(1))
+                dy = float(m.group(2))
+                dz = float(m.group(3))
+            m = re.match(r'\$vpr *= *\[ *(.*) *, *(.*) *, *(.*) *\].*', line[:-1])
+            if m:
+                rx = float(m.group(1))
+                ry = float(m.group(2))
+                rz = float(m.group(3))
+            m = re.match(r'\$vpd *= * *(.*) *;.*', line[:-1])
+            if m:
+                d = float(m.group(1))
             words = line.split()
-            if len(words) > 10 and words[0] == "//":
+            if len(words) > 3 and words[0] == "//":
                 cmd = words[1]
                 if cmd == "view" or cmd == "assembled" or cmd == "assembly":
                     w = int(words[2]) * 2
                     h = int(words[3]) * 2
 
-                    dx = -float(words[4])
-                    dy = -float(words[5])
-                    dz = -float(words[6])
+                    if len(words) > 10:
+                        dx = float(words[4])
+                        dy = float(words[5])
+                        dz = float(words[6])
 
-                    rx = 360.0 - float(words[7]) + 90
-                    ry = 360.0 - float(words[8])
-                    rz = 360.0 - float(words[9])
+                        rx = float(words[7])
+                        ry = float(words[8])
+                        rz = float(words[9])
 
-                    d = float(words[10])
+                        d = float(words[10])
+
+                    if dx == None or rx == None or d == None:
+                        print "Missing camera data in " + scad_name
+                        sys.exit(1)
+
                     camera = "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f" % (dx, dy, dz, rx, ry, rz, d)
 
                     exploded = "0"
@@ -66,5 +89,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         views(sys.argv[1])
     else:
-        print "usage: views [mendel|sturdy|your_machine]"
+        print "usage: views dibond|mendel|sturdy|huxley|your_machine"
         sys.exit(1)

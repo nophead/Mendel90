@@ -7,14 +7,14 @@
 //
 // Washers
 //
-M2_nut    =   [2, 4.9, 1.6, 2.4,  M2_washer,     M2_nut_trap_depth];
-M2p5_nut  = [2.5, 5.8, 2.2, 3.8,  M2p5_washer, M2p5_nut_trap_depth];
-M3_nut      = [3, 6.4, 2.4, 4,    M3_washer,     M3_nut_trap_depth];
-M4_nut      = [4, 8.1, 3.2, 5,    M4_washer,     M4_nut_trap_depth];
-M5_nut      = [5, 9.2,   4, 6.25, M5_washer,     M5_nut_depth];
-M6_nut      = [6, 11.5,  5, 8,    M6_washer,     M6_nut_depth];
-M6_half_nut = [6, 11.5,  3, 8,    M6_washer,     3];
-M8_nut      = [8, 15,  6.5, 8,    M8_washer,     M8_nut_depth];
+M2_nut    =   [2, 4.9, 1.6, 2.4,  M2_washer,     M2_nut_trap_depth, 5/2];
+M2p5_nut  = [2.5, 5.8, 2.2, 3.8,  M2p5_washer, M2p5_nut_trap_depth, 5.9 / 2];
+M3_nut      = [3, 6.4, 2.4, 4,    M3_washer,     M3_nut_trap_depth, M3_nut_radius];
+M4_nut      = [4, 8.1, 3.2, 5,    M4_washer,     M4_nut_trap_depth, M4_nut_radius];
+M5_nut      = [5, 9.2,   4, 6.25, M5_washer,     M5_nut_depth,      M5_nut_radius];
+M6_nut      = [6, 11.5,  5, 8,    M6_washer,     M6_nut_depth,      M6_nut_radius];
+M6_half_nut = [6, 11.5,  3, 8,    M6_washer,     3,                 M6_nut_radius];
+M8_nut      = [8, 15,  6.5, 8,    M8_washer,     M8_nut_depth,      M8_nut_radius];
 
 function nut_radius(type) = type[1] / 2;
 function nut_flat_radius(type) = nut_radius(type) * cos(30);
@@ -49,6 +49,9 @@ module nut(type, nyloc = false, brass = false) {
         translate([0, 0, -1])
             cylinder(r = hole_rad, h = nyloc_thickness + 2);
     }
+    if($children)
+        translate([0, 0, thickness])
+            children();
 }
 
 module nut_and_washer(type, nyloc) {
@@ -95,5 +98,29 @@ module wingnut(type) {
         }
         translate([0,0,-1])
             cylinder(r = hole_rad, h = thickness + 2);
+    }
+}
+function nut_trap_radius(nut, horizontal = true, snug = true) = (snug ? nut_radius(nut) : nut[6]) + (horizontal ? layer_height / 4 : 0);
+function nut_trap_flat_radius(nut, horizontal = true, snug = true) = nut_trap_radius(nut, horizontal, snug) * cos(30);
+
+module nut_trap(screw_r, nut_r, depth, horizontal = false, supported = false) {
+    render(convexity = 5) union() {
+        if(horizontal) {
+            if(screw_r)
+                teardrop_plus(r = screw_r, h = 200, center = true);
+            cylinder(r = nut_r + layer_height / 4, h = depth * 2, center = true, $fn = 6);
+        }
+        else {
+            difference() {
+                union() {
+                    if(screw_r)
+                        poly_cylinder(r = screw_r, h = 200, center = true);
+                    cylinder(r = nut_r, h = depth * 2, center = true, $fn = 6);
+                }
+                if(supported)
+                    translate([0, 0, depth - eta])
+                        cylinder(r = nut_r, h = layer_height, center = false);
+            }
+        }
     }
 }

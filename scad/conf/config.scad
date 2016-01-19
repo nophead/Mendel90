@@ -7,14 +7,12 @@
 //
 // Configuration file
 //
-
-function sqr(x) = x * x;            // shortcut
-
 bom = $bom == undef ? 0: $bom;                 // 0 no bom, 1 assemblies and stls, 2 vitamins as well
 exploded = $exploded == undef ? 0 : $exploded; // 1 for exploded view
 
 show_jigs = true;               // show printed jigs required to build the machine
 show_support = true;            // show support structures, must be set when generating STLs
+show_rays = false;              // show light and camera rays to check orientation is correct
 
 // Real-world colors for various parts & vitamins
 use_realistic_colors = false;    // true for "real" colors, false for "distinct" colors (useful during design and for build instructions)
@@ -27,49 +25,23 @@ eta = 0.01;                     // small fudge factor to stop CSG barfing on coi
 $fa = 5;
 $fs = 0.5;
 
-//
-// Hole sizes
-//
-No2_pilot_radius = 1.7 / 2;       // self tapper into ABS
-No4_pilot_radius = 2.0 / 2;       // wood screw into soft wood
-No6_pilot_radius = 2.0 / 2;       // wood screw into soft wood
+function sqr(x) = x * x;            // shortcut
 
-No2_clearance_radius = 2.5 / 2;
-No4_clearance_radius = 3.5 / 2;
-No6_clearance_radius = 4.0 / 2;
-
-M2_tap_radius = 1.6 / 2;
-M2_clearance_radius = 2.4 / 2;
-M2_nut_trap_depth = 2.5;
-
-M2p5_tap_radius = 2.05 / 2;
-M2p5_clearance_radius= 2.8 / 2;   // M2.5
-M2p5_nut_trap_depth = 2.5;
-
-M3_tap_radius = 2.5 / 2;
-M3_clearance_radius = 3.3 / 2;
-M3_nut_radius = 6.5 / 2;
-M3_nut_trap_depth = 3;
-
-M4_tap_radius = 3.3 / 2;
-M4_clearance_radius = 2.2;
-M4_nut_radius = 8.2 / 2;
-M4_nut_trap_depth = 4;
-
-M5_tap_radius = 4.2 / 2;
-M5_clearance_radius = 5.3 / 2;
-M5_nut_radius = 9.2 / 2;
-M5_nut_depth = 4;
-
-M6_tap_radius = 5 / 2;
-M6_clearance_radius = 6.4 / 2;
-M6_nut_radius = 11.6 / 2;
-M6_nut_depth = 5;
-
-M8_tap_radius = 6.75 / 2;
-M8_clearance_radius = 8.4 / 2;
-M8_nut_radius = 15.4 / 2;
-M8_nut_depth = 6.5;
+module rotate(a)
+{
+ cx = cos(a[0]);
+ cy = cos(a[1]);
+ cz = cos(a[2]);
+ sx = sin(a[0]);
+ sy = sin(a[1]);
+ sz = sin(a[2]);
+ multmatrix([
+  [ cy * cz, cz * sx * sy - cx * sz, cx * cz * sy + sx * sz, 0],
+  [ cy * sz, cx * cz + sx * sy * sz,-cz * sx + cx * sy * sz, 0],
+  [-sy,      cy * sx,                cx * cy,                0],
+  [ 0,       0,                      0,                      1]
+ ]) children();
+}
 
 cnc_tool_dia = 2.4;
 layer_height = 0.4;
@@ -81,8 +53,7 @@ pcb_thickness = 1.6;
 feed_tube_rad = 5 / 2;              // Filament feed tube
 feed_tube_tape_rad = 6.2 / 2;
 feed_tube_tape = 12;
-function nozzle_length(hot_end) = max(54, hot_end_length(hot_end));      // how far nozzle is below top of carriage. Can be more than that if the hot end is bigger
-
+function nozzle_length(hot_end) = max(54, hot_end_length(hot_end));    // how far nozzle extends below top of carriage
 
 include <colors.scad>
 include <utils.scad>
@@ -109,9 +80,11 @@ clip_handles = true;
 include_fan = false;
 squeeze = false;                    // Bodge to make Huxley as small as possible without affecting dibond kits
 part_fan = fan60x15;
+extruder = Wades;                   // Default extruder
 raspberry_pi = false;               // Raspberry pi mounted on PSU
 raspberry_pi_camera = false;        // RPI camera on bar across the back
 light_strip = false;
+vero_bed = false;                   // Bed made from vero board rather than custom PCB.
 include <machine.scad>              // this file is generated from the command line parameter to include one of the machine configs
 
 screw_clearance_radius = screw_clearance_radius(cap_screw);
@@ -130,12 +103,13 @@ limit_switch_offset = 1;                // the over travel to reach the limit sw
 X_carriage_clearance = 2;               // how close the X carriage is to the XZ plane
                                         // how close the Y carriage is to the window in the XZ plane
 Y_carriage_clearance = 2 + (clip_handles ? (bulldog_handle_length(small_bulldog) - (Y_carriage_width - bed_width) / 2) : 0);
+Y_carriage_rad = 3;                     // corner radius
 Z_clearance = 10;                       // How close the top of the object gets to the gantry
 belt_clearance = 0.2;                   // clearance of belt clamp slots
 
-X_bar_dia = X_bearings[2];      // rod sizes to match the bearings
-Y_bar_dia = Y_bearings[2];
-Z_bar_dia = Z_bearings[2];
+X_bar_dia = bearing_rod_dia(X_bearings);      // rod sizes to match the bearings
+Y_bar_dia = bearing_rod_dia(Y_bearings);
+Z_bar_dia = bearing_rod_dia(Z_bearings);
 
 Y_idler_bearing = BB624;
 X_idler_bearing = BB624;

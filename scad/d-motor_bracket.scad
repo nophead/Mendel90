@@ -10,14 +10,17 @@
 include <conf/config.scad>
 use <ribbon_clamp.scad>
 
+wall = 2;
 connector = DCONN15;
+motor = extruder_motor(extruder);
+screw_length = extruder_d_screw_length(extruder);
+
 pcb = true;
 idc = true;
 
 thickness = 2.4;
 lid_thickness = 2.4;
 
-wall = 2;
 front_thickness = wall + No2_pilot_radius + washer_diameter(M2p5_washer) / 2 + 1;
 slot_width = d_slot_length(connector);
 slot_height = 11;
@@ -29,8 +32,7 @@ flange_thickness = d_flange_thickness(connector) + flange_clearance;
 
 
 overlap = 5;                            // how much it overlaps the side of the motor
-//length = overlap + thickness + (pcb ? 14 : 20);
-length = overlap + thickness + 20;
+length = overlap + thickness + (pcb && squeeze ? 14 : 20);
 height = slot_height / 2 + face_height / 2 + thickness;
 d_width = flange_width + 2 * wall;
 nut_slot = nut_thickness(M3_nut) + 0.3;
@@ -39,7 +41,7 @@ lug_width = 2 * nut_flat_radius(M3_nut) + wall;
 lug_height = thickness + slot_height / 2 + M3_nut_radius;
 screw_x = length - wall - No2_pilot_radius;
 screw_y = (d_width + slot_width) / 4;
-pitch = d_width + 2 * nut_flat_radius(M3_nut);
+pitch = d_width + 2 * nut_flat_radius(M3_nut) + eta;
 
 cable_guide_width = 20;
 cable_guide_thickness = 4;
@@ -56,12 +58,14 @@ pcb_offset = 3 * 1.27;
 
 nut_x = length + flange_thickness + wall -lug_depth + wall;
 
-function d_motor_bracket_offset(motor) = NEMA_holes(motor)[0] + screw_head_radius(M3_cap_screw) + d_width / 2 + lug_width;
+function d_motor_bracket_offset() = NEMA_holes(motor)[0] + screw_head_radius(M3_cap_screw) + d_width / 2 + lug_width;
+
+m_width = NEMA_width(motor) + 2 * thickness;
 
 //
 // Lid to retain connector and nuts
 //
-module d_motor_bracket_lid_stl(motor = NEMA17, nuts = true) {
+module d_motor_bracket_lid_stl(nuts = true) {
     if(nuts)
         stl("d_motor_bracket_lid");
     else
@@ -77,6 +81,7 @@ module d_motor_bracket_lid_stl(motor = NEMA17, nuts = true) {
             if(nuts) {
                 translate([length - front_thickness + lid_width - nut_cover_depth / 2, 0, 0])
                     rounded_rectangle([nut_cover_depth, nut_cover_width, nut_cover_height], 2, center = false);
+
                 for(side = [-1, 1])
                     translate([screw_x,  side * screw_y, 0])
                         cylinder(r = washer_diameter(M2p5_washer) / 2 + 2, h = lid_thickness);
@@ -97,31 +102,31 @@ module d_motor_bracket_lid_stl(motor = NEMA17, nuts = true) {
     }
 }
 
-module d_shell_lid_stl() d_motor_bracket_lid_stl(motor = NEMA17, nuts = false);
+module d_shell_lid_stl() d_motor_bracket_lid_stl(nuts = false);
 //
 // Attaches to the motor
 //
-module d_motor_bracket_stl(motor = NEMA17) {
+module d_motor_bracket_stl(motor_mount = true) {
     stl("d_motor_bracket");
 
-    m_width = NEMA_width(motor) + 2 * thickness;
-    offset = d_motor_bracket_offset(motor) + (m_width - d_width) / 2;
+    offset = motor_mount ? (m_width - d_width) / 2 + d_motor_bracket_offset() : 0;
+    overlap = motor_mount ? overlap : 0;
     mouth = pitch + 2 * M3_clearance_radius + layer_height / 2;
 
-    difference() {
+    translate([0, -offset - d_width / 2, 0]) difference() {
         union() {
             linear_extrude(height = thickness, convexity = 5)       // base
                 polygon(points = [ [0,                        0],
-                                   [overlap,                  0],
-                                   [overlap,             offset],
-                                   [length - eta,        offset],
+                                   [overlap + thickness,      0],
+                                   [overlap + thickness, offset + eta],
+                                   [length - eta,        offset + eta],
                                    [length - eta,        offset + d_width],
                                    [overlap,             offset + d_width],
                                    [overlap,             m_width],
                                    [0,                   m_width],
                                  ]);
 
-            translate([overlap , 0, eta])                               // motor wall
+            translate([overlap, 0, eta])                                // motor wall
                 cube([thickness, d_width + offset, height]);
 
             for(y = [0, m_width - thickness])                           // buttresses
@@ -137,7 +142,7 @@ module d_motor_bracket_stl(motor = NEMA17) {
                         cube([front_thickness + flange_thickness + wall, d_width, height]);
 
                     // nut lugs
-                    translate([length + flange_thickness + wall - lug_depth / 2, offset + d_width / 2, eta])
+                    translate([length + flange_thickness + wall - lug_depth / 2, offset + d_width / 2, 0])
                         rounded_rectangle([lug_depth, d_width + 2 * lug_width, lug_height], r = 2, center = false);
 
                     // d side walls
@@ -157,7 +162,7 @@ module d_motor_bracket_stl(motor = NEMA17) {
                     translate([nut_x + nut_slot / 2, d_width / 2 - side * pitch / 2 + offset, thickness + slot_height / 2]) //connector screws
                         rotate([90, 0, 90]) {
                             rotate([0,0,30])
-                                nut_trap(1, M3_nut_radius, nut_slot / 2, true);
+                                nut_trap(0, M3_nut_radius, nut_slot / 2, true);
 
                             translate([0, 5, 0])
                                 cube([nut_flat_radius(M3_nut) * 2, 10, nut_slot], center = true);
@@ -174,20 +179,21 @@ module d_motor_bracket_stl(motor = NEMA17) {
 
 
         }
-        for(y = NEMA_holes(motor))                                                          // motor screws
-            for(z = NEMA_holes(motor))
-                translate([overlap - 1, m_width / 2 + y, NEMA_width(motor) / 2 + thickness + z])
-                    rotate([90,0,90])
-                        teardrop_plus(r = M3_clearance_radius, h = thickness + 2, center = false);
+        if(motor_mount)
+            for(y = NEMA_holes(motor))                                                          // motor screws
+                for(z = NEMA_holes(motor))
+                    translate([overlap - 1, m_width / 2 + y, NEMA_width(motor) / 2 + thickness + z])
+                        rotate([90,0,90])
+                            teardrop_plus(r = M3_clearance_radius, h = thickness + 2, center = false);
     }
 }
 //
 // Attaches connector to ribbon cable and plastic strip
 //
-function d_motor_connector_offset(motor) = [
+function d_motor_connector_offset() = [
     NEMA_width(motor) / 2 + thickness - cable_guide_thickness + ribbon_clamp_slot_depth(),
     -NEMA_length(motor) + overlap - length - d_mate_distance(connector) - shell_length + ribbon_clamp_width(cable_screw),
-    d_motor_bracket_offset(motor)
+    d_motor_bracket_offset()
 ];
 
 module d_shell_stl() {
@@ -198,11 +204,11 @@ module d_shell_stl() {
     clamp_pitch = ribbon_clamp_pitch(extruder_ways, cable_screw);
 
     front = shell_front + flange_thickness + wall;
-    union() {
+    translate([0, - d_width / 2, 0]) union() {
         difference() {
             union() {
                // screw lugs
-               translate([shell_length + flange_thickness + wall - front / 2, d_width / 2, eta])
+               translate([shell_length + flange_thickness + wall - front / 2, d_width / 2, 0])
                     rounded_rectangle([front, d_width + 2 * lug_width,
                                        thickness + slot_height / 2 + washer_diameter(M3_washer) / 2 + 1], r = 2, center = false);
 
@@ -255,22 +261,22 @@ module d_shell_stl() {
     }
 }
 
-module d_shell_assembly(motor) {
+module d_shell_assembly() {
     translate([slot_height / 2, 0, shell_length])
         rotate([0, 0, 90])
             explode([0, -15, 0])
                 d_socket(connector, idc = idc);
 
-    translate([-thickness, d_width / 2, 0])
+    translate([-thickness, 0, 0])
         rotate([0, -90, 180])  {
             color(d_shell_color) render() d_shell_stl();
-            translate([0, d_width / 2, height + lid_thickness])
+            translate([0, 0, height + lid_thickness])
                 explode([0, 0, 20])
                     translate([shell_length - length, 0, 0])
-                        color(d_shell_lid_color) render() rotate([180, 0, 0]) d_shell_lid_stl(motor);
+                        color(d_shell_lid_color) render() rotate([180, 0, 0]) d_shell_lid_stl();
 
             for(side = [-1, 1]) {
-                translate([shell_length - shell_front, d_width / 2 - side * pitch / 2, thickness + slot_height / 2]) //connector screws
+                translate([shell_length - shell_front, side * pitch / 2, thickness + slot_height / 2]) //connector screws
                     rotate([90, 0, -90]) {
                         screw_and_washer(M3_cap_screw, 20);
                         translate([0, 0, -(shell_front + flange_thickness + wall) - 0.8])
@@ -278,29 +284,36 @@ module d_shell_assembly(motor) {
                                 O_ring(2.5, 1.6, 3);
                     }
 
-                translate([shell_screw_x,  d_width / 2 - side * screw_y, height + lid_thickness])
+                translate([shell_screw_x, side * screw_y, height + lid_thickness])
                      explode([0, 0, 20])
                          screw_and_washer(No2_screw, 13);
             }
-            translate([ribbon_clamp_width(M3_cap_screw) / 2, d_width / 2, cable_guide_thickness])
+            translate([ribbon_clamp_width(M3_cap_screw) / 2, 0, cable_guide_thickness])
                 rotate([0, 0, 90])
                     ribbon_clamp_assembly(extruder_ways, cable_screw, 16, cable_guide_thickness, vertical = false, washer = true, nutty = true, slotted = false);
         }
 }
 
-module d_motor_bracket_assembly(motor) {
-    rotate([0, 90, 0])
-        translate([NEMA_length(NEMA17) - overlap, -NEMA_width(NEMA17) / 2 - thickness, -NEMA_width(NEMA17) / 2 - thickness]) {
-            color(d_motor_bracket_color) render() d_motor_bracket_stl(NEMA17);
-            translate([0, NEMA_width(NEMA17) / 2 + d_motor_bracket_offset(NEMA17) + thickness, height + lid_thickness])
+module d_motor_bracket_assembly(motor_mounted = true) {
+    offset = motor_mounted ? d_motor_bracket_offset() : 0;
+    translate(motor_mounted ? [-NEMA_width(motor) / 2 - thickness,
+                               -NEMA_width(motor) / 2 - thickness + offset + m_width / 2,
+                               -NEMA_length(motor) + overlap]
+                            : [0, 0, 0]) {
+        rotate([0, 90, 0]) {
+            if(motor_mounted)
+                color(d_motor_bracket_color) render()
+                    d_motor_bracket_stl(motor_mounted);
+
+            translate([0,  0, height + lid_thickness])
                 translate([length, 0, 0])
                     explode([0, 0, 40])
                         translate([-length, 0, 0])
-                            color(d_motor_bracket_lid_color) render() rotate([180, 0, 0]) d_motor_bracket_lid_stl(motor);
+                            color(d_motor_bracket_lid_color) render() rotate([180, 0, 0])
+                                d_motor_bracket_lid_stl();
         }
 
-    translate([-NEMA_width(motor) / 2 + slot_height / 2,  d_motor_bracket_offset(motor), -NEMA_length(motor) + overlap]) {
-        translate([0, 0, -length])
+        translate([slot_height / 2 + thickness, 0, -length])
             rotate([180, 0, -90])
                 explode([0, -15, 0]) group() {
                     if(pcb)
@@ -330,51 +343,60 @@ module d_motor_bracket_assembly(motor) {
                 }
 
         for(side = [-1, 1]) {
-            translate([0, pitch / 2 * side, -nut_x])
+            translate([slot_height / 2 + thickness, pitch / 2 * side, -nut_x])
                 rotate([180, 0, 0])
                     explode([10,0,0])
                         nut(M3_nut);
 
-            translate([height - slot_height / 2 - thickness + lid_thickness, side * screw_y, - screw_x])
+            translate([height + lid_thickness, side * screw_y, - screw_x])
                 rotate([0, 90, 0])
                     explode([0, 0, 40])
                         screw_and_washer(No2_screw, 13);
         }
     }
 
-    for(y = NEMA_holes(motor))                                                          // motor screws
-        for(x = NEMA_holes(motor))
-            if(x < 0)
-                translate([x, y, -NEMA_length(motor) - thickness])
-                    rotate([180, 0, 0])
-                        screw_and_washer(M3_cap_screw, 45);
+    if(motor_mounted)
+        for(y = NEMA_holes(motor))                                                          // motor screws
+            for(x = NEMA_holes(motor))
+                if(x < 0)
+                    translate([x, y, -NEMA_length(motor) - thickness])
+                        rotate([180, 0, 0])
+                            screw_and_washer(M3_cap_screw, screw_length);
 }
 
 module d_motor_brackets_stl() {
-    d_motor_bracket_stl(NEMA17);
-    translate([12, 40, 0])
-        d_motor_bracket_lid_stl(NEMA17);
+    translate([0, d_motor_bracket_offset() + m_width / 2, 0])
+        d_motor_bracket_stl();
 
-    translate([23, 40, 0])
-        d_shell_lid_stl(NEMA17);
+    translate([12, d_motor_bracket_offset() + m_width / 2, 0])
+        d_motor_bracket_lid_stl();
 
-    translate([-33, 8, 0])
-        d_shell_stl(NEMA17);
+    translate([23, d_motor_bracket_offset() + m_width / 2, 0])
+        d_shell_lid_stl();
 
-    translate([26, 5, 0]) {
+    translate([-shell_length - flange_thickness - wall - 1, d_width / 2 + lug_width, 0])
+        d_shell_stl();
+
+    translate([26, 4, 0])
         ribbon_clamp_stl(extruder_ways, cable_screw, nutty = true, slotted = false);
-        *color("grey")
-            ribbon_clamp_support(extruder_ways, cable_screw);
-    }
 }
 
-if(01) {
-    NEMA(NEMA17);
-    d_motor_bracket_assembly(NEMA17);
-    translate([-NEMA_width(NEMA17) / 2,
-               d_motor_bracket_offset(NEMA17),
-               -NEMA_length(NEMA17) -length - d_mate_distance(connector)  - shell_length + overlap + (exploded ? - 20 : 0)])
-        d_shell_assembly(NEMA17);
+module d_motor_extruder_brackets_stl() {
+    translate([0, d_motor_bracket_offset() + m_width / 2, 0])
+        d_motor_bracket_stl();
+
+    translate([12, d_motor_bracket_offset() + m_width / 2, 0])
+        d_motor_bracket_lid_stl();
+
+}
+
+if(1) {
+    NEMA(motor);
+    d_motor_bracket_assembly();
+    translate([-NEMA_width(motor) / 2,
+               d_motor_bracket_offset(),
+               -NEMA_length(motor) -length - d_mate_distance(connector)  - shell_length + overlap + (exploded ? - 20 : 0)])
+        d_shell_assembly();
 
 }
 else

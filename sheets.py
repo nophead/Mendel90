@@ -6,6 +6,8 @@ import InkCL
 import shutil
 import sys
 from dxf import *
+from set_machine import *
+from time import *
 
 source_dir = "scad"
 
@@ -15,20 +17,16 @@ def sheets(machine):
     #
     target_dir = machine + "/sheets"
     if os.path.isdir(target_dir):
-        try:
-            shutil.rmtree(target_dir)
-            os.makedirs(target_dir)
-        except:
-            pass
+        shutil.rmtree(target_dir)
+        sleep(0.1)
+        os.makedirs(target_dir)
     else:
         os.makedirs(target_dir)
 
     #
     # Set the target machine
     #
-    f = open("scad/conf/machine.scad","wt")
-    f. write("include <%s_config.scad>\n" % machine);
-    f.close()
+    set_machine(machine)
 
     #
     # Find all the scad files
@@ -65,10 +63,11 @@ def sheets(machine):
                         # Make PDF for printing
                         #
                         InkCL.run("-f", base_name + ".svg", "-A", base_name + ".pdf")
+                        os.remove(dxf_maker_name)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         sheets(sys.argv[1])
     else:
-        print("usage: sheets [mendel|sturdy|your_machine]")
+        print("usage: sheets dibond|mendel|sturdy|huxley|your_machine")
         sys.exit(1)

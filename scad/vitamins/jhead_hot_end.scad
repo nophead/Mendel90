@@ -6,8 +6,8 @@
 //
 include <../conf/config.scad>
 
-MK4_heater = [ 12.76, 15.88, 8.22, (15.88 / 2 - 4.5), (12.76 / 2 - 0.5 - 2.5 / 2),  (-15.88 / 2 + 5), 9.5];
-MK5_heater = [ 12.76, 12.76, 8.22, (12.76 / 2 - 3.75), (12.76 / 2 - 0.5 - 2.5 / 2), (-12.76 / 2 + 4), 7.5];
+MK4_heater = [ 12.76, 15.88, 8.22, (15.88 / 2 - 4.5), (12.76 / 2 - 0.5 - 2.5 / 2),  (-15.88 / 2 + 5), 9.5, 3];
+MK5_heater = [ 12.76, 12.76, 8.22, (12.76 / 2 - 3.75), (12.76 / 2 - 0.5 - 2.5 / 2), (-12.76 / 2 + 4), 8,   2];
 
 function heater_width(type)  = type[0];
 function heater_length(type) = type[1];
@@ -16,6 +16,7 @@ function resistor_x(type)    = type[3];
 function thermistor_y(type)  = type[4];
 function nozzle_x(type)      = type[5];
 function nozzle_cone(type)   = type[6];
+function nozzle_cone_length(type) = type[7];
 
 barrel_tap_dia = 5;
 
@@ -41,15 +42,16 @@ module heater_block(type, resistor, thermistor) {
 
 
 
-module jhead_hot_end(type, exploded = exploded) {
+module jhead_hot_end(type, filament, exploded = exploded) {
     resistor = RIE1212UB5C5R6;
     thermistor = Epcos;
-    heater = type == JHeadMk5 ? MK5_heater : MK4_heater;
+    heater = type == JHeadMk4 ? MK4_heater : MK5_heater;
 
     insulator_length = hot_end_insulator_length(type);
     inset = hot_end_inset(type);
-    barrel_length = hot_end_total_length(type) - insulator_length;
-    cone_length = 3;
+    length = hot_end_total_length(type) - hot_end_bodge(type);
+    barrel_length = length - insulator_length;
+    cone_length = nozzle_cone_length(heater);
     cone_end = 1;
     cone_start = nozzle_cone(heater);
     bundle = 3.2;
@@ -57,9 +59,11 @@ module jhead_hot_end(type, exploded = exploded) {
     tape_overlap = 10;
     tape_thickness = 0.8;
 
-    vitamin(hot_end_part(type));
+    vitamin(str(hot_end_part(type)," ",filament,"mm"));
     vitamin("ST25110: 110mm x 25mm self amalgamating silicone tape");
-
+    //
+    // silcone tape
+    //
     color("red")
             if(exploded)
                 translate([0, max(hot_end_insulator_diameter(type) / 2, heater_length(heater) / 2 - nozzle_x(heater)),
@@ -70,29 +74,33 @@ module jhead_hot_end(type, exploded = exploded) {
                     translate([0, 0, + inset - insulator_length])
                         cylinder(r = hot_end_insulator_diameter(type) / 2 + 2 * tape_thickness, h = tape_overlap);
 
-                    translate([0, -nozzle_x(heater), -hot_end_length(type) + cone_length  + 1 + heater_height(heater) / 2 + eta])
+                    translate([0, -nozzle_x(heater), inset - length + cone_length  + 1 + heater_height(heater) / 2 + eta])
                         cube([heater_width(heater) + 4 * tape_thickness,
                               heater_length(heater) + 4 * tape_thickness, heater_height(heater)], center = true);
                 }
-
-    translate([0, 0, inset - insulator_length]) {
+    //
+    // insulator
+    //
+    translate([0, 0, inset - insulator_length])
         color(hot_end_insulator_colour(type)) render(convexity = 10)
             difference() {
                 cylinder(r = hot_end_insulator_diameter(type) / 2, h = insulator_length);
                 cylinder(r = 3.2 / 2, h = insulator_length * 2 + 1, center = true);
-                translate([0, 0, insulator_length - hot_end_inset(type) - hot_end_groove_heigh(type) / 2])
-                    tube(ir = hot_end_screw_pitch(type) / 2, or = 17 / 2, h = hot_end_groove_heigh(type));
+                translate([0, 0, insulator_length - hot_end_inset(type) - hot_end_groove(type) / 2])
+                    tube(ir = hot_end_groove_dia(type) / 2, or = 17 / 2, h = hot_end_groove(type));
             }
-
+    //
+    // nozzle
+    //
+    translate([0, 0, inset - length + cone_length])
         color("gold")  render(convexity = 10) union() {
-            translate([0, 0, -barrel_length + cone_length + eta]) {
-                cylinder(r = cone_start / 2, h = barrel_length - cone_length);
-                translate([0, 0, -cone_length + eta])
-                    cylinder(r1 = cone_end / 2, r = cone_start / 2, h = cone_length);
-            }
+            cylinder(r = cone_start / 2, h = barrel_length - cone_length);
+            translate([0, 0, -cone_length + eta])
+                cylinder(r1 = cone_end / 2, r = cone_start / 2, h = cone_length);
         }
-    }
-
+    //
+    // Zip tie and heatshrink
+    //
     rotate([0, 0, 10]) {
         scale([1, (bundle + hot_end_insulator_diameter(type)) / hot_end_insulator_diameter(type)])
                 translate([0, -bundle / 2, -7])
@@ -111,9 +119,11 @@ module jhead_hot_end(type, exploded = exploded) {
     }
     wire("Red PTFE", 16, 170);
     wire("Red PTFE", 16, 170);
-
+    //
+    // heater block
+    //
     rotate([0, 0, 90])
-        translate([-nozzle_x(heater), 0, -hot_end_length(type) + cone_length  + 1 + heater_height(heater) / 2]) {
+        translate([-nozzle_x(heater), 0, inset - length + heater_height(heater) / 2 + cone_length + 1]) {
             heater_block(heater, resistor, thermistor);
 
             intersection() {
@@ -132,4 +142,4 @@ module jhead_hot_end(type, exploded = exploded) {
     }
 }
 
-jhead_hot_end(JHeadMk5);
+jhead_hot_end(hot_end);

@@ -33,7 +33,7 @@ function y_belt_anchor_depth() = depth;
 module y_belt_anchor_holes() {
     for(side = [-1, 1])
         translate([0, side * (depth / 2 + M3_nut_radius * cos(30) + eta) + depth / 2, 0])
-            child();
+            children();
 
 }
 

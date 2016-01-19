@@ -12,7 +12,6 @@ include <conf/config.scad>
 use <x-carriage.scad>
 use <pulley.scad>
 use <ribbon_clamp.scad>
-use <wade.scad>
 
 bwall = 2.3;
 
@@ -96,16 +95,19 @@ idler_front = min(belt_edge - belt_width(X_belt) / 2 + idler_stack / 2, -bar_y -
 idler_screw_length = 45;
 idler_depth = idler_screw_length - idler_stack - 1;
 idler_back = idler_front + idler_depth;
-idler_width = ceil(2 * (M4_nut_radius + wall));
+idler_min_offset = max(M4_nut_radius + 0.5, 4 / 2 + wall);
+idler_max_offset = M4_nut_radius + wall;
+idler_width = ceil((squeeze ? idler_min_offset : idler_max_offset) + M4_nut_radius + wall);
+idler_offset = squeeze ? idler_min_offset : idler_width / 2;
 
+motor_washers = X_motor == NEMA14 ? 5 : 3;
 mbracket_thickness = 4;
-mbracket_corner = 7;
 motor_angle = 45;
 motor_w = ceil(min(max(sin(motor_angle) + cos(motor_angle)) * NEMA_width(X_motor), NEMA_radius(X_motor) * 2) + 1);
 mbracket_width = motor_w + 2 * mbracket_thickness;
 mbracket_height = thickness / 2 + NEMA_radius(X_motor) + mbracket_thickness + 0.5;
 mbracket_front = belt_edge + 14;
-mbracket_depth = NEMA_length(X_motor) + 3 * washer_thickness(M3_washer) + 2 * mbracket_thickness;
+mbracket_depth = NEMA_length(X_motor) + motor_washers * washer_thickness(M3_washer) + 2 * mbracket_thickness;
 mbracket_centre = mbracket_front + mbracket_depth / 2 - mbracket_thickness;
 nut_shelf = bearing_height -thickness / 2 - wall - nut_trap_depth(Z_nut);
 
@@ -114,12 +116,12 @@ switch_op_z = x_carriage_offset() - 2;      // hit the edge of the carriage
 sbracket_top = switch_op_z + 12;
 sbracket_height = sbracket_top + thickness / 2;
 sbracket_depth = switch_op_x - 3 - front;
-sbracket_thickness = bar_y - (X_bar_dia / 2) * sin(45) - bearing_width / 2 - 1.5 - microswitch_thickness();
+sbracket_thickness = bar_y - bearing_width / 2 - (squeeze ? 0 : (X_bar_dia / 2) * sin(45) + 1.5) - microswitch_thickness();
 sbracket_y = -bearing_width / 2 - 1 - sbracket_thickness / 2;
 
 function x_motor_offset() = back - mbracket_thickness - motor_w / 2;
-function x_motor_overhang() = back - mbracket_width;
-function x_idler_offset() = back - idler_width / 2;
+function x_motor_overhang() = back - mbracket_width + (squeeze ? mbracket_thickness : 0);
+function x_idler_offset() = back - idler_offset;
 function x_idler_overhang() = x_idler_offset() - washer_diameter(M5_penny_washer) / 2;
 function x_end_bar_length() = -back;
 function x_end_height() = bearing_height - thickness / 2;
@@ -127,6 +129,7 @@ function x_end_thickness() = thickness;
 function x_motor_height() = mbracket_height - thickness / 2;
 function x_end_clearance() = switch_op_x;
 function x_end_z_nut_z() = nut_shelf;
+function x_end_length() = length;
 
 ribbon_screw = M3_cap_screw;
 ribbon_nut = screw_nut(ribbon_screw);
@@ -175,8 +178,9 @@ module x_end_clamp_stl() {
     }
 }
 
-function ribbon_bracket_counterbore() = washer_thickness(M3_washer) + screw_head_height(M3_cap_screw) + 0.5;
-function ribbon_bracket_thickness() = ribbon_bracket_counterbore() + 2.4;
+function ribbon_bracket_counterbore() = squeeze ? round_to_layer(screw_head_height(M3_cap_screw))
+                                                : washer_thickness(M3_washer) + screw_head_height(M3_cap_screw) + 0.5;
+function ribbon_bracket_thickness() = ribbon_bracket_counterbore() + (squeeze ? 1.6 : 2.4);
 
 module x_motor_ribbon_bracket_stl(support = true) {
     stl("x_motor_ribbon_bracket");
@@ -209,15 +213,20 @@ module x_motor_ribbon_bracket_stl(support = true) {
         difference() {
             union() {
                 poly_cylinder(r = M3_clearance_radius, h = 100, center = true);
-                poly_cylinder(r = washer_diameter(M3_washer) / 2 + 0.5, h = counterbore * 2, center = true);
+                poly_cylinder(r = (squeeze ? screw_head_radius(M3_cap_screw) : washer_diameter(M3_washer) / 2) + 0.5, h = counterbore * 2, center = true);
             }
             if(support)
-                hole_support(M3_clearance_radius, counterbore);
+                if(squeeze)
+                    translate([0, 0, counterbore])
+                        cylinder(r = 10, h = layer_height);
+
+                else
+                    hole_support(M3_clearance_radius, counterbore);
         }
         //
         // ribbon clamp holes
         //
-        translate([0, 0, height])
+        translate([0, 0, squeeze ? height * 2 : height])
             ribbon_clamp_holes(x_end_ways, ribbon_screw)
                 nut_trap(screw_clearance_radius(ribbon_screw), nut_radius(ribbon_nut), ribbon_nut_trap_depth);
     }
@@ -226,24 +235,46 @@ module x_motor_ribbon_bracket_stl(support = true) {
 nut_trap_support_height = 10;
 
 module x_idler_support_stl() {
+    hole_r = (Z_screw_dia + 1) / 2;
+    outer_r = corrected_radius(hole_r) + 2 * filament_width;
+
+    max_r = corrected_radius((Z_screw_dia + 1) / 2);
     color("grey") {
         translate([-z_bar_offset(), 0, 0])
-            hole_support(r = (Z_screw_dia + 1) / 2, h = bearing_height - wall);
+            hole_support(r = hole_r, h = bearing_height - wall, max_r = outer_r, closed = true, capped = true);
 
-        translate([-z_bar_offset(), 0,  nut_shelf  + thickness / 2 - nut_trap_support_height])
-            nut_trap_support(r = Z_nut_radius, h = nut_trap_support_height + eta, r2 = (Z_screw_dia + 1) / 2);
+        translate([-z_bar_offset(), 0,  nut_shelf  + thickness / 2])
+            difference() {
+                hull() {
+                    nut_trap_support(r = Z_nut_radius, h = eta);
+                    translate([0, 0, - nut_trap_support_height])
+                        cylinder(r = outer_r - filament_width / 4 - eta, h = eta, $fn = sides(hole_r));
+                }
+                difference() {
+                    hull() {
+                        nut_trap_support(r = Z_nut_radius - 2 * filament_width, h = 2 * eta);
+                        translate([0, 0, - nut_trap_support_height - eta])
+                            cylinder(r = outer_r - 2 * filament_width - filament_width / 4 - eta, h = eta, $fn = sides(hole_r));
+                    }
+                    translate([0, 0, -4 * layer_height])
+                        cylinder(r = Z_nut_radius + 1, h = 3 * layer_height);
+                }
+
+            }
 
         for(side = [-1,1])
             for(x = [front - clamp_hole_inset, back + clamp_hole_inset])
                 for(i = [-1,1])
                     translate([x, side * bar_y + i * (X_bar_dia / 2 + M3_clearance_radius), 0])
-                        hole_support(r = M3_clearance_radius, h = M3_nut_trap_depth, max_r = nut_flat_radius(M3_nut));
+                        hole_support(r = M3_clearance_radius, h = M3_nut_trap_depth + eta, max_r = nut_flat_radius(M3_nut));
     }
 }
 
 module x_motor_support_stl() mirror([1,0,0]) x_idler_support_stl();
 
 module x_end_bracket(motor_end, integral_support = false){
+    // Slope the front of the motor bracket to clear the screws and the motor boss if possible
+    slope_x = sqrt(2) * min(NEMA_big_hole(X_motor), NEMA_hole_pitch(X_motor) / 2 - washer_diameter(M3_washer) / 2 - 0.8);
 
     if(motor_end)
         stl("x_motor_bracket");
@@ -295,6 +326,7 @@ module x_end_bracket(motor_end, integral_support = false){
                     // idler end
                     //
                     difference() {
+                        screw_angle = atan2(M4_clearance_radius - 3.9 / 2, idler_depth);
                         union() {
                             translate([back - idler_width / 2 + eta + corner_rad, idler_back - idler_depth / 2, 0])
                                 rounded_rectangle([idler_width + 2 * corner_rad, idler_depth, thickness], r = corner_rad, center = true);
@@ -308,10 +340,9 @@ module x_end_bracket(motor_end, integral_support = false){
                             rotate([90, 0, 90])
                                 teardrop(r = X_bar_dia / 2 + 0.5, h = 100, center = true);
 
-                        assign(screw_angle = atan2(M4_clearance_radius - 3.9 / 2, idler_depth))
-                            translate([x_idler_offset(), idler_back, 0])
-                                rotate([90, 0, -screw_angle])
-                                    nut_trap(M4_clearance_radius, M4_nut_radius, M4_nut_trap_depth);
+                        translate([x_idler_offset(), idler_back, 0])
+                            rotate([90, 0, -screw_angle])
+                                nut_trap(M4_clearance_radius, M4_nut_radius, M4_nut_trap_depth);
 
                     }
                 }
@@ -379,10 +410,26 @@ module x_end_bracket(motor_end, integral_support = false){
                             translate([-M3_clearance_radius - wall - 100, -50, - 50])               // truncate front
                                 cube(100);
 
-                            translate([NEMA_big_hole(X_motor) * sqrt(2), 0, -mbracket_height / 2 + thickness / 2])
-                                rotate([0, 45, 180])                                                 // slope front tangential to motor boss
-                                    translate([0, 0, -50])
-                                        cube(100);
+                            difference() {
+                                union() {
+                                    translate([slope_x, 0, -mbracket_height / 2 + thickness / 2])
+                                        rotate([0, 45, 180])                                                 // slope front tangential to motor boss
+                                            translate([0, 0, -50])
+                                                cube(100);
+                                    //
+                                    // big hole for motor boss
+                                    //
+                                    if(slope_x < sqrt(2) * NEMA_big_hole(X_motor))
+                                        translate([0, -mbracket_depth / 2, -50 / 2 - mbracket_height / 2 + thickness / 2])
+                                            rotate([90,0,0])
+                                                vertical_tearslot(r = NEMA_big_hole(X_motor), h = 2 * mbracket_thickness + 1, l = 50, center = true);
+                                 }
+                                 if(slope_x < sqrt(2) * NEMA_big_hole(X_motor) && integral_support)
+                                    translate([slope_x - NEMA_big_hole(X_motor), -mbracket_depth / 2, - mbracket_height / 2 - 1]) union() {
+                                        cube([8,8,4], true);
+                                        cube([filament_width * 2, mbracket_thickness + eta, mbracket_height]);
+                                    }
+                            }
 
                             translate([-100 - NEMA_holes(X_motor)[0] * sqrt(2) - screw_head_radius(M3_cap_screw) - wall, 0, - 50])
                                 cube(100);                                                           // truncate back
@@ -421,7 +468,7 @@ module x_end_bracket(motor_end, integral_support = false){
                     //
                     // Mounting holes
                     //
-                    assign(screw_offset = M3_clearance_radius - 2.9 / 2)
+                    screw_offset = M3_clearance_radius - 2.9 / 2;
                     for(x = NEMA_holes(X_motor))                                                        // motor screw holes
                         for(z = NEMA_holes(X_motor))
                             rotate([0, motor_angle, 0])
@@ -452,7 +499,10 @@ module x_end_bracket(motor_end, integral_support = false){
     }
 }
 
+module washer_stack(washer, n) if(n == 1) washer(washer) children(); else washer(washer) washer_stack(washer, n - 1) children();
+
 module x_end_assembly(motor_end) {
+    motor_rear_screw = screw_shorter_than(NEMA_length(X_motor) + mbracket_thickness + (motor_washers + 2) * washer_thickness(M3_washer) - 8);
     shift = exploded ? 2 : 0;
     if(!motor_end)
         assembly("x_idler_assembly");
@@ -499,9 +549,9 @@ module x_end_assembly(motor_end) {
 
                 rotate([0, 0, -180]) translate(NEMA_holes(X_motor)) translate([0, 0, -NEMA_length(X_motor)])
                     rotate([180, 0, 0])
-                        washer(M3_washer) washer(M3_washer) washer(M3_washer) screw(M3_cap_screw, 45);
+                        washer_stack(M3_washer, motor_washers) screw(M3_cap_screw, motor_rear_screw);
 
-                translate([0, 0, 4])
+                translate([0, 0, 5])
                     pulley_assembly();
                 //
                 // Heatshrink for motor connections
@@ -528,12 +578,17 @@ module x_end_assembly(motor_end) {
 
                 translate([0, 0, ribbon_bracket_counterbore() - exploded * 7])
                     rotate([180, 0, 0])
-                        washer(M3_washer)
-                            screw(M3_cap_screw, 45);
+                        if(squeeze)
+                            screw(M3_cap_screw, motor_rear_screw);
+                        else
+                            screw_and_washer(M3_cap_screw, motor_rear_screw);
             }
             explode([0, 8, 0])
                 rotate([-90, 0, 0])
-                    ribbon_clamp_assembly(x_end_ways, M3_cap_screw, 16, ribbon_bracket_thickness() - M3_nut_trap_depth);
+                    if(!squeeze)
+                        ribbon_clamp_assembly(x_end_ways, M3_cap_screw, 16, ribbon_bracket_thickness() - M3_nut_trap_depth);
+                    else
+                        ribbon_clamp_assembly(x_end_ways, M3_hex_screw, 16, ribbon_bracket_thickness(), hex = true, washer = true);
         }
 
 
@@ -582,10 +637,10 @@ module x_ends_stl() {
 }
 
 module facing_pair(dir = 1) {
-    child();
+    children();
     translate([-dir * bearing_width / 4, dir * bearing_width / 2, 0])
         rotate([0, 0, 180])
-            child();
+            children();
 }
 
 
@@ -606,5 +661,7 @@ else
     else
         mirror ([1,0,0]) x_end_assembly(true);
 
-//x_motor_bracket_stl();
-//x_motor_ribbon_bracket_stl();
+
+
+//!x_motor_bracket_stl();
+//!x_motor_ribbon_bracket_stl();

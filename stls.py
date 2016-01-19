@@ -5,6 +5,8 @@ import openscad
 import shutil
 import sys
 import c14n_stl
+from set_machine import *
+from time import *
 
 from bom import source_dir
 
@@ -33,6 +35,7 @@ def stls(machine, parts = None):
     if os.path.isdir(target_dir):
         if not parts:
             shutil.rmtree(target_dir)   #if making the BOM clear the directory first
+            sleep(0.1)
             os.makedirs(target_dir)
     else:
         os.makedirs(target_dir)
@@ -40,9 +43,7 @@ def stls(machine, parts = None):
     #
     # Set the target machine
     #
-    f = open(source_dir + "/conf/machine.scad","wt")
-    f. write("include <%s_config.scad>\n" % machine);
-    f.close()
+    set_machine(machine)
 
     #
     # Decide which files to make
@@ -98,5 +99,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         stls(sys.argv[1], sys.argv[2:])
     else:
-        print("usage: stls [mendel|sturdy|your_machine] [part.stl ...]")
-    sys.exit(1)
+        print("usage: stls dibond|mendel|sturdy|huxley|your_machine [part.stl ...]")
+        sys.exit(1)

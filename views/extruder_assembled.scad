@@ -7,9 +7,14 @@
 //
 // Wade's assembly view
 //
-// view 929 904 51.73 40.12 18.31 55.00 0.00 26.40 762.08
+$vpt = [-21, 23, 11];
+$vpr = [55, 0, 26];
+$vpd = 380;
 //
-use <../scad/wade.scad>
+// view 929 904
+//
+include <../scad/conf/config.scad>
+use <../scad/extruder.scad>
 
-//view([ 51.73, 40.12, 18.31 ], [ 55.00, 0.00, 26.40 ], 762.08)
-wades_assembly(show_connector = true);
+rotate(extruder == Wades ? [-90, 0, 0] : [0, 0, 180])
+    extruder_assembly(show_connector = true);

@@ -82,7 +82,7 @@ module bearing_mount_holes()
     for(end = [-1, 1])
         translate([end * (bearing_holder_width(Y_bearings) / 2 + tab_length / 2 + nut_offset),
                   -end * (bearing_holder_length(Y_bearings) - bearing_clamp_tab ) / 2, 0])
-             child();
+             children();
 
 module y_bearing_assembly(height)
 {

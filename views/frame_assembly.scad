@@ -6,7 +6,7 @@
 // hydraraptor.blogspot.com
 //
 // The frame assembly view
-// assembly 1032 965 -20 119 168 70 0 184 2700
+// assembly 1032 965 -20 119 168 70 0 184 1350
 //
 use <../scad/main.scad>
 

@@ -48,15 +48,15 @@ top_limit_switch = true;
 single_piece_frame = true;
 stays_from_window = false;
 cnc_sheets = true;                 // If sheets are cut by CNC we can use slots, etc instead of just round holes
-pulley_type = T2p5x16_metal_pulley;
 //raspberry_pi = true;
 //raspberry_pi_camera = true;
 //light_strip = SPS125;
 
 Y_carriage = DiBond;
 
-X_belt = T2p5x6;
-Y_belt = T2p5x6;
+pulley_type = GT2x20_metal_pulley;
+X_belt = GT2x6;
+Y_belt = GT2x6;
 
 motor_shaft = 5;
 Z_screw_dia = 6;            // Studding for Z axis

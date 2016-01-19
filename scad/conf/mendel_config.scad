@@ -17,7 +17,7 @@ X_motor = NEMA17;
 Y_motor = NEMA17;
 Z_motor = NEMA17;
 
-hot_end = JHeadMk5;
+hot_end = e3dv6;
 
 X_travel = 200;
 Y_travel = 200;
@@ -52,8 +52,9 @@ stays_from_window = false;
 
 Y_carriage = PMMA6;
 
-X_belt = T5x6;
-Y_belt = T5x6;
+pulley_type = GT2x20_metal_pulley;
+X_belt = GT2x6;
+Y_belt = GT2x6;
 
 motor_shaft = 5;
 Z_screw_dia = 8;            // Studding for Z axis

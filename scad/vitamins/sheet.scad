@@ -80,12 +80,14 @@ module taped_area(type, tape_width, w, d, overlap) {
     pitch = total_width / strips;
     intersection() {
         group() {
-            for(i = [0 : strips - 1])
-                assign(k = ((i % 2) ? 0.9 : 1), c = sheet_colour(type))
-                    translate([-w / 2 - overlap + tape_width / 2 + i * pitch, 0, sheet_thickness(type) / 2 + i * eta])
-                        explode([0, 0, d / 2 + i * 10])
-                            color([c[0] * k, c[1] * k, c[2] * k, c[3]])
-                                sheet(type, tape_width, d + 2 * overlap);
+            for(i = [0 : strips - 1]) {
+                k = (i % 2) ? 0.9 : 1;
+                c = sheet_colour(type);
+                translate([-w / 2 - overlap + tape_width / 2 + i * pitch, 0, sheet_thickness(type) / 2 + i * eta])
+                    explode([0, 0, d / 2 + i * 10])
+                        color([c[0] * k, c[1] * k, c[2] * k, c[3]])
+                            sheet(type, tape_width, d + 2 * overlap);
+            }
         }
         if(!exploded)
             cube([w + 2 * eta, d + 2 * eta, 100], center = true);

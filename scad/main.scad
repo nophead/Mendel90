@@ -19,7 +19,7 @@ use <z-coupling.scad>
 use <z-motor-bracket.scad>
 use <z-limit-switch-bracket.scad>
 use <fan-guard.scad>
-use <wade.scad>
+use <extruder.scad>
 use <cable_clip.scad>
 use <pcb_spacer.scad>
 use <ATX_PSU_brackets.scad>
@@ -30,11 +30,12 @@ use <raspberry_pi.scad>
 use <raspberry_pi_camera.scad>
 use <light_strip.scad>
 include <positions.scad>
+use <x-carriage_assembly.scad>
 
 
 X = 0 * X_travel / 2; // - limit_switch_offset;
 Y = 0 * Y_travel / 2; // - limit_switch_offset;
-Z = 0.5 * Z_travel;
+Z = 0.5 * (Z_travel + limit_switch_offset) - hot_end_bodge(hot_end);
 
 //
 // X axis
@@ -52,7 +53,7 @@ module x_axis_assembly(show_extruder) {
 
     translate([-X + X_origin, 0, Z + Z0 + x_carriage_offset()])
         rotate([180, 0, 180])
-            x_carriage_assembly(show_extruder);
+            x_carriage_assembly(show_extruder, show_fan = true);
 
     color(belt_color)
         translate([0, x_belt_offset(), Z + Z0])
@@ -156,8 +157,9 @@ module z_end(motor_end) {
             rod(Z_bar_dia, Z_bar_length);
 
         translate([z_bar_offset(), gantry_setback, Z_bar_length - bar_clamp_depth / 2]) {
-            rotate([90,motor_end ? 90 : - 90, 0])
-                z_bar_clamp_assembly(Z_bar_dia, gantry_setback, bar_clamp_depth, !motor_end);
+            rotate([90, motor_end ? 90 : - 90, 0])
+                mirror([motor_end ? 1 : 0, 0, 0])
+                    z_bar_clamp_assembly(Z_bar_dia, gantry_setback, bar_clamp_depth, !motor_end);
         }
     }
 }
@@ -247,7 +249,7 @@ module y_rail_holes() {
 
 module y_carriage() {
     difference() {
-        sheet(Y_carriage, Y_carriage_width, Y_carriage_depth, [3,3,3,3]);
+        sheet(Y_carriage, Y_carriage_width, Y_carriage_depth, [Y_carriage_rad, Y_carriage_rad, Y_carriage_rad, Y_carriage_rad]);
 
         translate([0, ribbon_clamp_y, 0])
             rotate([180, 0, 0])
@@ -283,42 +285,43 @@ module y_carriage() {
 
 module y_heatshield() {
     layers = pillar_height(bed_pillars) / sheet_thickness(Cardboard);
-    width =  Y_carriage_width - 2 * bar_clamp_tab;
+    width =  bed_holes[0] - washer_diameter(M3_washer) - 1;
     for(i = [0 : layers - 1])
         translate([0, 0, (sheet_thickness(Cardboard) + exploded * 50) * i]) {
-            assign(k = ((i % 2) ? 0.9 : 1), c = sheet_colour(Cardboard))
-                color([c[0] * k, c[1] * k, c[2] * k, c[3]])
-                    difference() {
-                        sheet(Cardboard, width, Y_carriage_depth);
+            k = (i % 2) ? 0.9 : 1;
+            c = sheet_colour(Cardboard);
+            color([c[0] * k, c[1] * k, c[2] * k, c[3]])
+                render() difference() {
+                    sheet(Cardboard, width, Y_carriage_depth);
 
-                        if(i == 0) {
-                            translate([Y_bar_spacing / 2, 0, 0])
+                    if(i == 0) {
+                        translate([Y_bar_spacing / 2, 0, 0])
+                            rotate([0,180,0])
+                                bearing_mount_holes()
+                                    cube([10,10, 100], center = true);
+
+                        for(end = [-1, 1])
+                            translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
                                 rotate([0,180,0])
                                     bearing_mount_holes()
-                                        cube([10,10, 100], center = true);
+                                        cube([10, 10, 100], center = true);
 
-                            for(end = [-1, 1])
-                                translate([-Y_bar_spacing / 2, end * (Y_carriage_depth / 2 - Y_bearing_inset), 0])
-                                    rotate([0,180,0])
-                                        bearing_mount_holes()
-                                            cube([10, 10, 100], center = true);
-
-                            for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
-                                translate([Y_belt_line - X_origin, end[0], 0])
-                                    rotate([0, 180, end[1]])
-                                        hull()
-                                            y_belt_anchor_holes()
-                                                cube([10, 10, 100],center =true);
-                        }
-
-                        if(i == layers - 1)
-                            translate([0, Y_carriage_depth / 2, 0])
-                                cube([15, 180, 100], center = true);
-
-                        translate([0, Y_carriage_depth / 2, 0])
-                            cube([ribbon_clamp_length(bed_ways, cap_screw) + 5, 70, 100], center = true);
+                        for(end = [[Y_belt_anchor_m, 0], [Y_belt_anchor_i, 180]])
+                            translate([Y_belt_line - X_origin, end[0], 0])
+                                rotate([0, 180, end[1]])
+                                    hull()
+                                        y_belt_anchor_holes()
+                                            cube([10, 10, 100],center =true);
                     }
+
+                    if(i == layers - 1)
+                        translate([0, Y_carriage_depth / 2, 0])
+                            cube([15, 180, 100], center = true);
+
+                    translate([0, Y_carriage_depth / 2, 0])
+                        cube([ribbon_clamp_length(bed_ways, cap_screw) + 5, 70, 100], center = true);
                 }
+            }
 }
 
 
@@ -489,53 +492,56 @@ module fixing_blocks(holes = false) {
     w = fixing_block_width();
     h = fixing_block_height();
     t = sheet_thickness(frame);
+    right_inside = right_stay_x - sheet_thickness(frame) / 2 - (base_width / 2 - right_w) > w + 2 * base_clearance;
 
-    assign($upper = true) {     // all screws into frame
+    for($upper = true, $rear = false) {     // all screws into frame
         translate([left_stay_x + t / 2, gantry_Y + t, stay_height - base_clearance - h - w / 2]) // top
             rotate([0,-90,-90])
-                child();
+                children();
 
         translate([right_stay_x - t / 2, gantry_Y + t, stay_height - base_clearance - h - w / 2]) // top
             rotate([0,90, 90])
-                child();
+                children();
 
         translate([left_stay_x + t / 2, gantry_Y + t, base_clearance + h + w / 2])              // front
             rotate([0,-90,-90])
-                child();
+                children();
 
         translate([right_stay_x - t / 2, gantry_Y + t, base_clearance + h + w / 2])              // front
             rotate([0,90, 90])
-                child();
+                children();
     }
-    assign($upper = false) {  // one screw in the base
-        assign($rear = true) {
+    for($upper = false) {  // one screw in the base
+        for($rear = true) {
             translate([left_stay_x + t / 2, base_depth / 2 - base_clearance - w / 2, 0]) // back
                 rotate([0, 0,-90])
-                    child();
+                    children();
 
             translate([right_stay_x - t / 2, base_depth / 2 - base_clearance - w / 2, 0]) // back
                 rotate([0, 0, 90])
-                    child();
+                    children();
         }
 
-        assign($rear = false) {
+        for($rear = false) {
             for(x = [-base_width/2 + base_clearance + w /2,
                       base_width/2 - base_clearance - w /2,
                      -base_width/2 - base_clearance - w /2 + left_w,
+                     right_inside ?
+                      base_width/2 + base_clearance + w /2 - right_w :
                       right_stay_x + sheet_thickness(frame) / 2 + w / 2 + base_clearance])
                 translate([x, gantry_Y + t, 0])
-                    child();
+                    children();
 
 
             // extra holes for bars
             if(holes && base_nuts) {
                 translate([left_stay_x + t / 2, -base_depth / 2 + base_clearance + w / 2, 0]) // front
                     rotate([0, 0,-90])
-                        child();
+                        children();
 
                 translate([right_stay_x - t / 2, -base_depth / 2 + base_clearance + w / 2, 0]) // front
                     rotate([0,0, 90])
-                        child();
+                        children();
             }
 
         }
@@ -572,7 +578,6 @@ module frame_base() {
         translate([idler_end - z_bar_offset(), 0, 0])
             cylinder(r = 4, h = 100, center = true);
 
-
         translate([X_origin, ribbon_clamp_y,0])
             ribbon_clamp_holes(bed_ways, base_screw)
                 base_screw_hole();
@@ -596,7 +601,8 @@ module frame_base() {
                 wire_hole(motor_wires_hole_radius);
 
             // Y limit
-            translate([X_origin + Y_bar_spacing / 2 + bar_rail_offset(Y_bar_dia) - bar_clamp_tab / 2,
+            translate([min(X_origin + Y_bar_spacing / 2 + bar_rail_offset(Y_bar_dia) - bar_clamp_tab / 2,
+                           Y_cable_clip_x - cable_clip_offset(base_screw, endstop_wires)),
                        Y_front_cable_clip_y - 5, 0])
                 wire_hole(endstop_wires_hole_radius);
 
@@ -702,12 +708,12 @@ module frame_gantry() {
     }
 }
 
-module frame_stay(left, bodge = 0) {
+module frame_stay(left) {
     x = left ? left_stay_x : right_stay_x;
 
     difference() {
         translate([x, gantry_Y + sheet_thickness(frame) + stay_depth / 2, stay_height / 2])
-            rotate([90,0,90])
+            rotate([90, 0, 90])
                 sheet(frame, stay_depth, stay_height, [0, frame_corners, 0, 0]);
 
         fixing_block_holes();
@@ -717,7 +723,7 @@ module frame_stay(left, bodge = 0) {
         if(left)
             translate([x + (sheet_thickness(frame) + fan_depth(case_fan)) / 2, fan_y, fan_z])
                 rotate([0,90,0])
-                    scale([1 + bodge, 1 + bodge, 1]) fan_holes(case_fan);       // scale prevents OpenCSG z buffer artifacts
+                    fan_holes(case_fan);
 
         else {
             //
@@ -740,6 +746,11 @@ module frame_stay(left, bodge = 0) {
                     rotate([0, 90, 0])
                         psu_screw_positions(psu)
                             cylinder(r = psu_screw_hole_radius(psu), h = 100, center = true);
+
+            if(!pi_on_psu())
+                rpi_position()
+                    rpi_bracket_holes()
+                        poly_cylinder(r = M3_clearance_radius, h = 100, center = true);
 
             //
             // Wiring holes
@@ -788,12 +799,13 @@ module bed_fan_assembly(show_fan = false) {
 
 module electronics_assembly() {
     assembly("electronics_assembly");
+    extra_spacers = raspberry_pi && pi_on_psu();
     translate([right_stay_x + sheet_thickness(frame) / 2, controller_y, controller_z])
         rotate([90, 0, 90]) {
             controller_screw_positions(controller)
-                pcb_spacer_assembly(raspberry_pi ? 2 : 1, raspberry_pi ? $i >= 2 : true);
+                pcb_spacer_assembly(extra_spacers ? 2 : 1, extra_spacers ? $i >= 2 : true);
 
-            translate([0, 0, pcb_spacer_height() * (raspberry_pi ? 2 : 1)])
+            translate([0, 0, pcb_spacer_height() * (extra_spacers ? 2 : 1)])
                 controller(controller);
         }
 
@@ -855,7 +867,8 @@ module frame_assembly(show_gantry = true) {
 
     place_cable_clips();
 
-    frame_base();
+    color(sheet_colour(base)) render() frame_base();
+
     if(base_nuts) {
         for(side = [ left_stay_x + fixing_block_height() / 2 + sheet_thickness(frame) / 2,
                     right_stay_x - fixing_block_height() / 2 - sheet_thickness(frame) / 2])
@@ -869,9 +882,9 @@ module frame_assembly(show_gantry = true) {
         fixing_blocks()
             fixing_block_assembly($upper, $rear);
 
-        frame_stay(true, eta);
-        frame_stay(false);
-        frame_gantry();
+        color(sheet_colour(frame)) render() frame_stay(true);
+        color(sheet_colour(frame)) render() frame_stay(false);
+        color(sheet_colour(frame)) render() frame_gantry();
     }
 
     end("frame_assembly");
@@ -890,7 +903,7 @@ module machine_assembly(show_bed = true, show_heatshield = true, show_spool = tr
             raspberry_pi_assembly();
 
         if(raspberry_pi_camera)
-            raspberry_pi_camera_assembly(light_strip);
+            raspberry_pi_camera_assembly();
 
         if(show_spool) {
             spool_assembly(left_stay_x, right_stay_x);

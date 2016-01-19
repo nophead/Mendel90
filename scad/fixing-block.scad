@@ -17,7 +17,7 @@ thin_wall = filament_width * 2 + eta;
 wall = 3;
 
 counter_bore_rad = washer_diameter(base_washer) / 2 + 0.2;
-width = 2 * wall + 2 * thin_wall + 6 * counter_bore_rad;
+width = 2 * wall + 2 * thin_wall + 2 * counter_bore_rad + 4 * (squeeze && base_nuts && frame_nuts ? nut_trap_radius(base_nut) : counter_bore_rad);
 shear = min(counter_bore_rad - screw_clearance_radius(frame_screw), 2.5);
 
 
@@ -35,13 +35,13 @@ function fixing_block_height() = height;
 
 module fixing_block_v_hole(h)
     translate([0, hole_offset, h])
-        child();
+        children();
 
 module fixing_block_h_holes(h)
     for(end = [-1, 1])
         translate([end * hole_pitch / 2, h, hole_offset])
             rotate([90, 0, 180])
-                child();
+                children();
 
 
 module fixing_block(upper, rear) {
@@ -50,17 +50,23 @@ module fixing_block(upper, rear) {
     v_screw = upper ? frame_screw : base_screw;
 
     difference() {
-        translate([-(width - 2 * corner_rad) / 2, 0, 0])
-            minkowski() {
-                cube([width - 2 * corner_rad, depth- corner_rad, height -corner_rad]);
-                intersection() {
-                    sphere(r = corner_rad);
-                    translate([0, 5, 5])
-                        cube([10, 10, 10], center = true);
-                }
-            }
+        hull()
+            for(side = [-1,1])
+                translate([side * (width / 2 - corner_rad), 0, 0]) {
+                    translate([0, corner_rad, corner_rad])
+                        cube(corner_rad * 2, center = true);
 
-        translate([-width / 2 - 1, thickness, height + eta])                // diagonal slice of the front
+                    translate([0, 0, height - corner_rad])
+                        rotate([-90, 0, 0])
+                            cylinder(r = corner_rad, h = depth -corner_rad);
+
+                    translate([0, depth - corner_rad, 0])
+                        cylinder(r = corner_rad, h = height - corner_rad);
+                 }
+
+
+
+        translate([-width / 2 - 1, thickness, height + eta])                // diagonal slice off the front
             rotate([-45, 0, 0])
                 cube([width + 2, depth * 2, height]);
 
@@ -134,4 +140,4 @@ module fixing_blocks_stl()
 if(0)
     fixing_blocks_stl();
 else
-    fixing_block_assembly();
+    fixing_block_assembly(false, true);

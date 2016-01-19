@@ -10,7 +10,7 @@
 T5x6 =  [  5,  6, 2.25];
 T5x10 = [  5, 10, 2.25];
 T2p5x6 =[2.5,  6,  1.7];
-GT2 =   [2.0,  6,  1.38];
+GT2x6 = [2.0,  6,  1.38];
 
 function belt_pitch(type) = type[0];
 function belt_width(type) = type[1];

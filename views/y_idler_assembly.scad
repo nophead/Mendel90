@@ -7,8 +7,8 @@
 //
 // The y idler assembly view
 //
-// assembly 1123 965 -12 -5 16 47 0 211 500
-// assembled  1123 965 -2 6.5 11 59 0 38 240
+// assembly 1123 965 -12 -5 16 47 0 211 250
+// assembled  1123 965 -2 6.5 11 59 0 38 120
 //
 use <../scad/y-idler-bracket.scad>
 

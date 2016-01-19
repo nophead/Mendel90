@@ -17,7 +17,7 @@ thickness = 4;
 back_thickness = part_base_thickness + (frame_nut_traps ? nut_trap_depth(frame_nut) : 0);
 back_height = 24;
 big_hole = NEMA_big_hole(Z_motor);
-clamp_height = washer_diameter(washer) + 3;
+clamp_height = washer_diameter(washer) + default_wall;
 clamp_thickness = bar_clamp_band;
 clamp_screw_clearance = 2;
 clamp_length = Z_bar_dia / 2 + bar_clamp_tab - 2;
@@ -125,7 +125,7 @@ module z_motor_bracket_hole_positions(gantry_setback)
     for(side = [-1, 1])
         translate([side * z_motor_bracket_hole_offset(), gantry_setback - part_base_thickness,  back_height / 2 + thickness / 2])
             rotate([90, 0, 0])
-                child();
+                children();
 
 module z_motor_bracket_holes(gantry_setback)
     z_motor_bracket_hole_positions(gantry_setback)
