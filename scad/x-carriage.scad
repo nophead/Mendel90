@@ -361,14 +361,14 @@ module x_carriage_fan_duct_stl() {
                 input_and_neck();
 
                 // fan hole
-                translate([0, 0, duct_height_fan - duct_top_thickness - 1])
-                    linear_extrude(height = duct_top_thickness + 2)
-                        intersection() {
-                            offset(-eta) projection() input_and_neck();
+                translate([0, 0, duct_top_thickness + 2])
+                    intersection() {
+                        input_and_neck();
 
-                            translate([fan_x_duct, fan_y_duct])
-                                square(fan_bore(part_fan), center = true);
-                        }
+                        translate([fan_x_duct, fan_y_duct, duct_height_fan - duct_top_thickness - 2])
+                            cube([fan_bore(part_fan) + eta, fan_bore(part_fan) + eta, duct_top_thickness + 4], center = true);
+                    }
+
                 // space the for hot end
                 translate([0, 0,  -2 * eta])
                     cylinder(r1 = ir, r2 = ir + skew, h = nozzle_height + 4 * eta);
