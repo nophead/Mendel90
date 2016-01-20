@@ -1,12 +1,15 @@
 Standard variants
 -----------------
-dibond is the version that was sold as a kit with 3mm sheets, 8mm rods and uses nuts and machine screws through the frame.
+[dibond](https://github.com/nophead/Mendel90/tree/master/dibond) is the version that was sold as a kit with 3mm sheets, 8mm rods and uses nuts and machine screws through the frame.
 
-sturdy is 12mm MDF sheets, 10mm rods and uses wood screws into pilot holes in the frame. It can be built without CNC.
+[sturdy](https://github.com/nophead/Mendel90/tree/master/sturdy) is 12mm MDF sheets, 10mm rods and uses wood screws into pilot holes in the frame. It can be built without CNC.
 
-mendel is 6mm acrylic sheets with a 10mm acrylic base, 8mm rods and uses machine screws into tapped holes in the frame.
+[mendel](https://github.com/nophead/Mendel90/tree/master/mendel) is 6mm acrylic sheets with a 10mm acrylic base, 8mm rods and uses machine screws into tapped holes in the frame.
 
-huxley is a scaled down version of dibond using 6mm rods and NEMA14 motors.
+[huxley](https://github.com/nophead/Mendel90/tree/master/huxley) is a scaled down version of dibond using 6mm rods and NEMA14 motors.
+
+The dibond, sturdy and mendel versions can be modified to accept the E3D v6 hot end. The files that change are [dibond_E3D](https://github.com/nophead/Mendel90/tree/master/dibond_E3D)
+and [sturdy_E3D](https://github.com/nophead/Mendel90/tree/master/sturdy_E3D).
 
 Limitations
 -----------
