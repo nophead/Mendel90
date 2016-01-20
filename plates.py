@@ -33,7 +33,7 @@ def plates(machine):
     #
     # Make the stls in the list
     #
-    if machine == "dibond" or machine == "huxley":
+    if not machine in ["sturdy", "mendel"]:
         plate_list.remove("cable_clips.stl")
     if machine == "huxley":
         plate_list.remove("atx_brackets.stl")
