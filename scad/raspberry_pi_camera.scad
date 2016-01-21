@@ -16,7 +16,7 @@ left = left_stay_x + sheet_thickness(frame) / 2;
 right = right_stay_x - sheet_thickness(frame) / 2;
 
 light  = light_strip ? light_strip : (right - left) > 300 ? RIGID5050_290 : RIGID5050_208;
-light2 = light_strip == RIGID5050_290 ? RIGID5050_208 : false;
+light2 = light == RIGID5050_290 ? RIGID5050_208 : false;
 
 wall = 2;
 clearance = 0.2;
