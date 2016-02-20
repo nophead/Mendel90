@@ -750,7 +750,7 @@ module frame_stay(left) {
             if(!pi_on_psu())
                 rpi_position()
                     rpi_bracket_holes()
-                        poly_cylinder(r = M3_clearance_radius, h = 100, center = true);
+                        cylinder(r = M3_clearance_radius, h = 100, center = true);
 
             //
             // Wiring holes

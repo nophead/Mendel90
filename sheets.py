@@ -11,7 +11,7 @@ from time import *
 
 source_dir = "scad"
 
-def sheets(machine):
+def sheets(machine, parts):
     #
     # Make the target directory
     #
@@ -38,9 +38,9 @@ def sheets(machine):
             #
             for line in open(source_dir + "/" + filename, "r").readlines():
                 words = line.split()
-                if(len(words) and words[0] == "module"):
+                if len(words) and words[0] == "module":
                     module = words[1].split('(')[0]
-                    if module[-4:] == "_dxf":
+                    if module[-4:] == "_dxf" and (not parts or (module[:-4] + ".dxf") in parts):
                         #
                         # make a file to use the module
                         #
@@ -67,7 +67,7 @@ def sheets(machine):
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        sheets(sys.argv[1])
+        sheets(sys.argv[1], sys.argv[2:])
     else:
-        print("usage: sheets dibond|mendel|sturdy|huxley|your_machine")
+        print("usage: sheets dibond|mendel|sturdy|huxley|your_machine [part.dxf ...]")
         sys.exit(1)
