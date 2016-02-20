@@ -905,7 +905,7 @@ module machine_assembly(show_bed = true, show_heatshield = true, show_spool = tr
         if(raspberry_pi_camera)
             raspberry_pi_camera_assembly();
 
-        if(show_spool) {
+        if(show_spool && spool) {
             spool_assembly(left_stay_x, right_stay_x);
             if(light_strip && !raspberry_pi_camera)
                 light_strip_assembly();
