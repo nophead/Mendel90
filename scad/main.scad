@@ -718,7 +718,8 @@ module frame_stay(left) {
 
         fixing_block_holes();
 
-        spool_holder_holes();
+        if(spool)
+            spool_holder_holes();
 
         if(left)
             translate([x + (sheet_thickness(frame) + fan_depth(case_fan)) / 2, fan_y, fan_z])
