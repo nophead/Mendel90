@@ -11,7 +11,7 @@ from time import *
 
 source_dir = "scad"
 
-def sheets(machine, parts):
+def sheets(machine, parts = None):
     #
     # Make the target directory
     #
