@@ -9,16 +9,14 @@
 // Small holes can get away without it but they print better with truncated teardrops
 //
 module teardrop_2D(r, truncate = true) {
-    difference() {
-        union() {
-            circle(r = r, center = true);
-            translate([0,r / sqrt(2),0])
-                rotate([0,0,45])
-                    square([r, r], center = true);
-        }
+   hull() {
+        circle(r);
+
         if(truncate)
-            translate([0, r * 2, 0])
-                square([2 * r, 2 * r], center = true);
+            translate([0, r / 2, 0])
+                square([2 * r * (sqrt(2) - 1), r], center = true);
+        else
+            polygon([[0, 0], [eta, 0], [0, r * sqrt(2)]]);
     }
 }
 
