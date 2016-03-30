@@ -34,6 +34,6 @@ module extruder_mounting_holes(reversed = false)
         for(side = [-1, 1])
             translate([side * extruder_mount_pitch / 2, 0, 0])
                 if((reversed ? side < 0 : side > 0) && hot_end_invert_screw(hot_end))
-                    poly_cylinder(r = M4_clearance_radius, h = 100, center = true);
+                    teardrop_plus(r = M4_clearance_radius, h = 100, center = true);
                 else
                     nut_trap(M4_clearance_radius, M4_nut_radius, 3, true);
