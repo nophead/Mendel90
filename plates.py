@@ -1,39 +1,42 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import sys
 import os
 import shutil
+from time import *
+
 from stls import stls, bom_to_stls
 
-plate_list = [
-    "cal.stl",
-    "atx_brackets.stl",
-    "bar_clamps.stl",
-    "cable_clips.stl",
-    "d_motor_brackets.stl",
-    "fixing_blocks.stl",
-    "ribbon_clamps.stl",
-    "small_bits.stl",
-    "spool_holder_brackets.stl",
-    "wades_extruder.stl",
-    "x_carriage_parts.stl",
-    "y_bearing_mounts.stl",
-    "y_belt_anchors.stl",
-    "z_motor_brackets.stl"
-]
-
 def plates(machine):
+    plate_list = [
+        "cal.stl",
+        "atx_brackets.stl",
+        "bar_clamps.stl",
+        "cable_clips.stl",
+        "d_motor_brackets.stl",
+        "fixing_blocks.stl",
+        "ribbon_clamps.stl",
+        "small_bits.stl",
+        "spool_holder_brackets.stl",
+        "wades_extruder.stl",
+        "x_carriage_parts.stl",
+        "y_bearing_mounts.stl",
+        "y_belt_anchors.stl",
+        "z_motor_brackets.stl"
+    ]
     #
     # Make the target directory
     #
     target_dir = machine + "/stls/printed"
     if os.path.isdir(target_dir):
         shutil.rmtree(target_dir)
+        sleep(0.1)
     os.makedirs(target_dir)
     #
     # Make the stls in the list
     #
-    if not machine in ["sturdy", "mendel"]:
+    if not machine in ["sturdy", "sturdy_E3D", "mendel"]:
         plate_list.remove("cable_clips.stl")
     if machine == "huxley":
         plate_list.remove("atx_brackets.stl")

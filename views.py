@@ -1,20 +1,22 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 import sys
 import shutil
 import openscad
 import re
 from set_machine import *
+from time import *
 
-
-
-def views(machine):
+def views(machine, clean = False):
     scad_dir = "views"
     render_dir = machine + os.sep + "views"
 
-    if not os.path.isdir(render_dir):
-        os.makedirs(render_dir)
+    if os.path.isdir(render_dir):
+        shutil.rmtree(render_dir)
+        sleep(0.1)
+    os.makedirs(render_dir)
     #
     # Set the target machine
     #
@@ -65,7 +67,7 @@ def views(machine):
                         d = float(words[10])
 
                     if dx == None or rx == None or d == None:
-                        print "Missing camera data in " + scad_name
+                        print("Missing camera data in " + scad_name)
                         sys.exit(1)
 
                     camera = "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f" % (dx, dy, dz, rx, ry, rz, d)
@@ -83,11 +85,11 @@ def views(machine):
                                      "--camera=" + camera,
                                       "-D$exploded=" + exploded,
                                       "-o", png_name, scad_name)
-                        print
+                        print()
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         views(sys.argv[1])
     else:
-        print "usage: views dibond|mendel|sturdy|huxley|your_machine"
+        print("usage: views dibond|mendel|sturdy|huxley|your_machine")
         sys.exit(1)

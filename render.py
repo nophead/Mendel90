@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 import sys
 import shutil
 import subprocess
 from time import *
 
-def render(machine, parts):
+def render(machine, parts = None):
     stl_dir = machine + os.sep + "stls"
     render_dir = machine + os.sep + "render"
 
@@ -42,5 +43,5 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         render(sys.argv[1], sys.argv[2:])
     else:
-        print "usage: render dibond|mendel|sturdy|huxley|your_machine, [part.stl ...]"
+        print("usage: render dibond|mendel|sturdy|huxley|your_machine, [part.stl ...]")
         sys.exit(1)
