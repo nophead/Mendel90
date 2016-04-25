@@ -119,7 +119,7 @@ module nut_trap(screw_r, nut_r, depth, horizontal = false, supported = false) {
                 }
                 if(supported)
                     translate([0, 0, depth - eta])
-                        cylinder(r = nut_r, h = layer_height, center = false);
+                        cylinder(r = nut_r + eta, h = layer_height, center = false);
             }
         }
     }
