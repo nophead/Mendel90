@@ -74,7 +74,6 @@ ribbon_clamp_color               = plastic_part_color("red");
 fan_guard_color                  = plastic_part_color("lime");
 pcb_spacer_color                 = plastic_part_color("lime");
 pulley_color                     = plastic_part_color("red");
-ribbon_clamp_color               = plastic_part_color("red");
 wades_block_color                = plastic_part_color("yellow");
 wades_big_gear_color             = plastic_part_color("lime");
 wades_small_gear_color           = plastic_part_color("red");

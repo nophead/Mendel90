@@ -17,7 +17,6 @@ screw_depth = 5;
 
 motor = extruder_motor(extruder);
 motor_y = 28;
-driven_y = 31.5;
 motor_min = 26 + 5;
 motor_max = 36;
 motor_x = (motor_min + motor_max) / 2;
