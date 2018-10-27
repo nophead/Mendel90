@@ -7,7 +7,6 @@
 //
 // Linear bearings
 //
-
 LM12UU = [30, 21, 12];
 LM10UU = [29, 19, 10];
 LM8UU  = [24, 15,  8];
