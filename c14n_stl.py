@@ -11,6 +11,11 @@ from __future__ import print_function
 import sys
 
 
+def _cmz(x):
+    ''' Convert "-0" to "0". '''
+    return '0' if x == '-0' else x
+
+
 class Vertex:
     def __init__(self, x, y, z):
         self.x, self.y, self.z = x, y, z
@@ -44,7 +49,7 @@ class STL:
         self.facets = []
 
         f = open(fname)
-        words = [s.strip() for s in f.read().split()]
+        words = [_cmz(s.strip()) for s in f.read().split()]
         f.close()
 
         if words[0] == 'solid' and words[1] == 'OpenSCAD_Model':
