@@ -1,4 +1,3 @@
-## {{{ http://code.activestate.com/recipes/325823/ (r1)
 #!/usr/bin/env python
 """\
 SVG.py - Construct/display SVG scenes.
@@ -23,8 +22,12 @@ class Scene:
     def strarray(self):
         var = ["<?xml version=\"1.0\"?>\n",
                '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="%dmm" width="%dmm" >\n' % (self.height,self.width),
-               ' <g style="fill-opacity:1.0; stroke:black; stroke-width:1;">\n'
+               ' <g style="fill-opacity:1.0; stroke:darkgrey; stroke-width:0.5;">\n'
               ]
+        grid = Grid(self.width,self.height)
+        var += grid.strarray()
+        var += [" </g>\n",
+               ' <g style="fill-opacity:1.0; stroke:black; stroke-width:1;">\n']
         for item in self.items: var += item.strarray()
         var += [" </g>\n</svg>\n"]
         return var
@@ -43,6 +46,34 @@ class Scene:
         os.system("%s" % (self.svgname))
         return
 
+class Grid:
+    def __init__(self,width,height,spacing=20):
+        self.width = width
+        self.height = height
+        return
+    def strarray(self):
+        w = self.width
+        h = self.height
+        return ['  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (0,0,w,h),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (0,h,w,0),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (0,h*0.3333,w*0.3333,0),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (0,h*0.6667,w*0.6667,0),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (0,h*0.3333,w*0.6667,h),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (0,h*0.6667,w*0.3333,h),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (w*0.3333,h,w,h*0.3333),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (w*0.3333,0,w,h*0.6667),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (w*0.6667,0,w,h*0.3333),
+                '  <line x1="%fmm" y1="%fmm" x2="%fmm" y2="%fmm" />\n' %
+                (w*0.6667,h,w,h*0.6667)]
 
 class Line:
     def __init__(self,start,end):
@@ -108,5 +139,5 @@ def test():
     scene.display()
     return
 
-if __name__ == '__main__': test()
-## end of http://code.activestate.com/recipes/325823/ }}}
+if __name__ == '__main__':
+    test()
