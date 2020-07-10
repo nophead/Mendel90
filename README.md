@@ -1,5 +1,6 @@
-Standard variants
------------------
+# A RepRap Mendel variant using sheets for the frame instead of rods
+
+## Standard variants
 [dibond](https://github.com/nophead/Mendel90/tree/master/dibond) is the version that was sold as a kit with 3mm sheets, 8mm rods and uses nuts and machine screws through the frame.
 
 [sturdy](https://github.com/nophead/Mendel90/tree/master/sturdy) is 12mm MDF sheets, 10mm rods and uses wood screws into pilot holes in the frame. It can be built without CNC.
@@ -11,13 +12,11 @@ Standard variants
 The dibond, sturdy and mendel versions can be modified to accept the E3D v6 hot end. The files that change are [dibond_E3D](https://github.com/nophead/Mendel90/tree/master/dibond_E3D)
 and [sturdy_E3D](https://github.com/nophead/Mendel90/tree/master/sturdy_E3D).
 
-Limitations
------------
+## Limitations
 The dibond and sturdy versions are well tested and popular. The acrylic version, called mendel, hasn't been built for a long time and is not recommened.
 The Huxley version hasn't been tested in its final form although one prototype has been made of an earlier version and a few snags fixed since.
 
-Use
----
+## Use
 Add the directory of the OpenScad executable to your search path. OpenSCAD-2015.05 or later is required.
 To get PDF versions of the sheet drawings add InkScape to your search path.
 
@@ -36,8 +35,7 @@ To view a sub-assembly, open the individual scad files. Set the exploded flag in
 
 To get blender renders of all the parts put blender in your search path and run `render.py machine_name`.
 
-Credits
--------
+## Credits
 Fan model based on [this model](http://www.thingiverse.com/thing:8063) by MiseryBot, CC license.
 
 [Sanguinololu model](http://www.thingiverse.com/thing:18606) by ax\_the\_b, CC license.
