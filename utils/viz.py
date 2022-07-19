@@ -23,7 +23,7 @@ def load_stl(file_path):
     ob = bpy.context.selected_objects[0]
     print(ob)
     bpy.ops.object.select_all(action='DESELECT')
-    ob.select = True
+    ob.select_set(True)
     # remove doubles and clean
     #py.ops.object.editmode_toggle()
     #bpy.ops.mesh.select_all(action='TOGGLE')
@@ -36,7 +36,9 @@ def load_stl(file_path):
     print(z_dim)
     filename = file_path.split(os.sep)[-1]
     if filename in rotations:
-        bpy.ops.transform.rotate(value = rotations[filename] * math.pi / 180.0, axis = (False, False, True))
+        ov=bpy.context.copy()
+        ov['area']=[a for a in bpy.context.screen.areas if a.type=="VIEW_3D"][0]
+        bpy.ops.transform.rotate(ov, value = rotations[filename] * math.pi / 180.0, orient_axis = ('Z'))
     bpy.ops.transform.translate(value=(0,0,z_dim/2.0))
     cam_target = (0,0,z_dim/3.0)
     # assign material
